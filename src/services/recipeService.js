@@ -1,72 +1,92 @@
 // src/services/recipeService.js
-// Core logic: match user ingredients to recipes
+import { MOCK_RECIPES } from '../data/mockData';
+import { COLORS } from '../constants/theme';
 
-import { mockRecipes } from '../data/mockRecipes';
-import { analyzeIngredients } from '../utils/helpers';
-import { MAX_RECIPES_SHOWN } from '../utils/constants';
-import { recipePalettes } from '../styles/theme';
+function normalizeIngredient(ingredient) {
+  return ingredient
+    .toLowerCase()
+    .trim()
+    .replace(/\b(a|an|the|some|few|piece of|cup of|tbsp|tsp|g|kg|lb|oz)\b/gi, '')
+    .replace(/s$/, '')
+    .trim();
+}
 
-/**
- * Given an array of user ingredient strings,
- * returns the top N best-matching recipes, enriched with:
- *   - missing / available arrays
- *   - matchScore (0–1)
- *   - palette (color, bg)
- *   - paletteIndex
- */
-export function findMatchingRecipes(userIngredients, limit = MAX_RECIPES_SHOWN) {
+function ingredientsMatch(userIngredient, recipeIngredient) {
+  const a = normalizeIngredient(userIngredient);
+  const b = normalizeIngredient(recipeIngredient);
+  if (!a || !b) return false;
+  return (
+    a === b ||
+    a.includes(b) ||
+    b.includes(a) ||
+    (a.length > 3 && b.length > 3 && (a.startsWith(b.slice(0, 4)) || b.startsWith(a.slice(0, 4))))
+  );
+}
+
+function analyzeIngredients(userIngredients, recipeIngredients) {
+  const available = [];
+  const missing   = [];
+  for (const recipeIng of recipeIngredients) {
+    const found = userIngredients.some(ui => ingredientsMatch(ui, recipeIng));
+    if (found) available.push(recipeIng);
+    else        missing.push(recipeIng);
+  }
+  const matchScore = recipeIngredients.length > 0 ? available.length / recipeIngredients.length : 0;
+  return { available, missing, matchScore };
+}
+
+export function findMatchingRecipes(userIngredients, limit = 8) {
   if (!userIngredients || userIngredients.length === 0) return [];
 
-  const enriched = mockRecipes.map((recipe, idx) => {
-    const { available, missing, matchScore } = analyzeIngredients(
-      userIngredients,
-      recipe.ingredients
-    );
+  const results = MOCK_RECIPES.map((recipe, index) => {
+    const { available, missing, matchScore } = analyzeIngredients(userIngredients, recipe.ingredients);
+    const palette = COLORS.recipePalettes[index % COLORS.recipePalettes.length];
     return {
-      ...recipe,
-      available,
-      missing,
+      recipe: { ...recipe, palette },
       matchScore,
-      missingCount: missing.length,
-      palette: recipePalettes[idx % recipePalettes.length],
-      paletteIndex: idx % recipePalettes.length,
+      availableIngredients: available,
+      missingIngredients:   missing,
     };
   });
 
-  // Sort: highest matchScore first, then lowest prepTime, then fewest missing
-  const sorted = enriched.sort((a, b) => {
-    if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
-    if (a.missingCount !== b.missingCount) return a.missingCount - b.missingCount;
-    return a.prepTime - b.prepTime;
-  });
+  const filtered = results.filter(r => r.matchScore > 0);
+  const pool = filtered.length > 0 ? filtered : results;
 
-  // Only return recipes with at least 1 matching ingredient
-  const filtered = sorted.filter((r) => r.available.length > 0);
-
-  // If nothing matches at all, fall back to all recipes sorted by prep time
-  const pool = filtered.length > 0 ? filtered : sorted;
-
-  return pool.slice(0, limit);
+  return pool
+    .sort((a, b) => {
+      if (b.matchScore !== a.matchScore) return b.matchScore - a.matchScore;
+      if (a.missingIngredients.length !== b.missingIngredients.length)
+        return a.missingIngredients.length - b.missingIngredients.length;
+      return a.recipe.prepTime - b.recipe.prepTime;
+    })
+    .slice(0, limit);
 }
 
-/**
- * Returns a single recipe by ID (with palette applied)
- */
 export function getRecipeById(id) {
-  const idx = mockRecipes.findIndex((r) => r.id === id);
-  if (idx === -1) return null;
-  return {
-    ...mockRecipes[idx],
-    palette: recipePalettes[idx % recipePalettes.length],
-  };
+  const index = MOCK_RECIPES.findIndex(r => r.id === id);
+  if (index === -1) return null;
+  return { ...MOCK_RECIPES[index], palette: COLORS.recipePalettes[index % COLORS.recipePalettes.length] };
 }
 
-/**
- * Returns all recipes (e.g. for browse/explore)
- */
 export function getAllRecipes() {
-  return mockRecipes.map((recipe, idx) => ({
+  return MOCK_RECIPES.map((recipe, index) => ({
     ...recipe,
-    palette: recipePalettes[idx % recipePalettes.length],
+    palette: COLORS.recipePalettes[index % COLORS.recipePalettes.length],
   }));
+}
+
+export function filterRecipesByDiet(recipes, diet) {
+  if (!diet || diet === 'none') return recipes;
+  return recipes.filter(r => {
+    if (diet === 'vegetarian' || diet === 'vegan') return r.tags?.includes('vegetarian');
+    if (diet === 'high_protein') return r.macros?.protein >= 20;
+    if (diet === 'low_carb') return r.macros?.carbs <= 20;
+    return true;
+  });
+}
+
+export function filterRecipesByTime(recipes, maxTime) {
+  if (!maxTime || maxTime === 'unlimited') return recipes;
+  const limit = parseInt(maxTime, 10);
+  return recipes.filter(r => r.prepTime <= limit);
 }

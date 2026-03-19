@@ -1,30 +1,30 @@
-// App.jsx
-// Root entry point — splash → onboarding → app
+// App.jsx — FRIDGR Premium
+// Root entry point: providers + navigation
 
-import React, { useState } from 'react';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import AppNavigator from './src/navigation/AppNavigator';
-import { RecipesProvider } from './src/context/RecipesContext';
-import SplashScreen from './src/screens/SplashScreen';
-import OnboardingScreen from './src/screens/OnboardingScreen';
+import { AuthProvider }       from './src/context/AuthContext';
+import { OnboardingProvider } from './src/context/OnboardingContext';
+import { RecipesProvider }    from './src/context/RecipesContext';
+
+import RootNavigator from './src/navigation/RootNavigator';
 
 export default function App() {
-  const [phase, setPhase] = useState('splash'); // 'splash' | 'onboarding' | 'app'
-
   return (
-    <SafeAreaProvider>
-      <RecipesProvider>
-        <StatusBar style="light" />
-        <AppNavigator />
-        {phase === 'splash' && (
-          <SplashScreen onDone={() => setPhase('onboarding')} />
-        )}
-        {phase === 'onboarding' && (
-          <OnboardingScreen onDone={() => setPhase('app')} />
-        )}
-      </RecipesProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <OnboardingProvider>
+            <RecipesProvider>
+              <StatusBar style="auto" />
+              <RootNavigator />
+            </RecipesProvider>
+          </OnboardingProvider>
+        </AuthProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

@@ -1,33 +1,54 @@
 // src/screens/auth/LoginScreen.jsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, TextInput,
+  View, Text, Pressable, TextInput,
   KeyboardAvoidingView, ScrollView, Platform, Animated,
   ActivityIndicator,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  ArrowLeft,
+  AlertCircle,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  Smartphone,
+} from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
-import { COLORS, FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
+import { SPACING } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
+import { useThemeColors } from '../../context/ThemeContext';
+import { ICON_STROKE } from '../../constants/icons';
+import PremiumScreenShell from '../../components/PremiumScreenShell';
+import { createPremiumAuthStyles } from '../../constants/premiumAuthStyles';
+import {
+  PREMIUM,
+  PREMIUM_CTA_VERTICAL,
+  PREMIUM_CTA_VERTICAL_END,
+  PREMIUM_CTA_VERTICAL_START,
+} from '../../constants/premiumScreenTheme';
 
 export default function LoginScreen({ navigation }) {
   const { login, loading, error, clearError } = useAuth();
   const insets = useSafeAreaInsets();
+  const C = useThemeColors();
+  const styles = useMemo(() => createPremiumAuthStyles(C), [C]);
 
-  const [email,    setEmail]    = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPw,   setShowPw]   = useState(false);
+  const [showPw, setShowPw] = useState(false);
   const [localErr, setLocalErr] = useState('');
+  const [fieldErr, setFieldErr] = useState({ email: '', password: '' });
+  const passwordRef = useRef(null);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(24)).current;
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim,  { toValue: 1, duration: 500, useNativeDriver: true }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
     ]).start();
     return () => clearError();
@@ -35,28 +56,35 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     setLocalErr('');
-    const result = await login(email.trim(), password);
+    setFieldErr({ email: '', password: '' });
+    const emailTrim = email.trim();
+    const next = {};
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)) next.email = 'Enter a valid email address';
+    if (password.length < 6) next.password = 'Use at least 6 characters';
+    if (Object.keys(next).length) {
+      setFieldErr(next);
+      return;
+    }
+    const result = await login(emailTrim, password);
     if (!result.success) setLocalErr(result.error || 'Login failed.');
   };
 
   const displayError = localErr || error;
 
   return (
+    <PremiumScreenShell>
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <StatusBar style="dark" />
-
-      {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + SPACING.sm }]}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={22} color={COLORS.text} />
-        </TouchableOpacity>
+        <Pressable style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.75 }]} onPress={() => navigation.goBack()}>
+          <ArrowLeft size={22} color={PREMIUM.text} strokeWidth={ICON_STROKE} />
+        </Pressable>
         <View style={styles.logoBadge}>
           <Text style={styles.logoBadgeText}>FRIDGR</Text>
         </View>
-        <View style={{ width: 38 }} />
+        <View style={{ width: 40 }} />
       </View>
 
       <ScrollView
@@ -68,189 +96,117 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.title}>Welcome back</Text>
           <Text style={styles.subtitle}>Sign in to your account</Text>
 
-          {/* Error Banner */}
           {displayError ? (
             <View style={styles.errorBanner}>
-              <Ionicons name="alert-circle" size={16} color={COLORS.error} />
+              <AlertCircle size={16} color={C.error} strokeWidth={ICON_STROKE} />
               <Text style={styles.errorText}>{displayError}</Text>
             </View>
           ) : null}
 
-          {/* Form */}
           <View style={styles.form}>
             <View style={styles.field}>
               <Text style={styles.label}>Email</Text>
-              <View style={styles.inputWrap}>
-                <Ionicons name="mail-outline" size={18} color={COLORS.textTertiary} style={styles.inputIcon} />
+              <View style={[styles.inputWrap, fieldErr.email ? styles.inputWrapError : null]}>
+                <Mail size={18} color={PREMIUM.iconMuted} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={t => {
+                    setEmail(t);
+                    if (fieldErr.email) setFieldErr(f => ({ ...f, email: '' }));
+                  }}
                   placeholder="you@example.com"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={PREMIUM.iconMuted}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  autoComplete="email"
+                  textContentType="emailAddress"
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                  onSubmitEditing={() => passwordRef.current?.focus()}
                 />
               </View>
+              {fieldErr.email ? <Text style={styles.fieldError}>{fieldErr.email}</Text> : null}
             </View>
 
             <View style={styles.field}>
               <View style={styles.labelRow}>
                 <Text style={styles.label}>Password</Text>
-                <TouchableOpacity onPress={() => navigation.navigate(ROUTES.FORGOT_PW)}>
+                <Pressable onPress={() => navigation.navigate(ROUTES.FORGOT_PW)}>
                   <Text style={styles.forgotText}>Forgot password?</Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
-              <View style={styles.inputWrap}>
-                <Ionicons name="lock-closed-outline" size={18} color={COLORS.textTertiary} style={styles.inputIcon} />
+              <View style={[styles.inputWrap, fieldErr.password ? styles.inputWrapError : null]}>
+                <Lock size={18} color={PREMIUM.iconMuted} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
                 <TextInput
+                  ref={passwordRef}
                   style={[styles.input, { flex: 1 }]}
                   value={password}
-                  onChangeText={setPassword}
+                  onChangeText={t => {
+                    setPassword(t);
+                    if (fieldErr.password) setFieldErr(f => ({ ...f, password: '' }));
+                  }}
                   placeholder="Enter your password"
-                  placeholderTextColor={COLORS.textTertiary}
+                  placeholderTextColor={PREMIUM.iconMuted}
                   secureTextEntry={!showPw}
                   autoCapitalize="none"
+                  textContentType="password"
+                  autoComplete="password"
+                  returnKeyType="done"
+                  onSubmitEditing={handleLogin}
                 />
-                <TouchableOpacity onPress={() => setShowPw(v => !v)} style={styles.eyeBtn}>
-                  <Ionicons
-                    name={showPw ? 'eye-off-outline' : 'eye-outline'}
-                    size={18}
-                    color={COLORS.textTertiary}
-                  />
-                </TouchableOpacity>
+                <Pressable onPress={() => setShowPw(v => !v)} style={styles.eyeBtn}>
+                  {showPw
+                    ? <EyeOff size={18} color={PREMIUM.iconMuted} strokeWidth={ICON_STROKE} />
+                    : <Eye size={18} color={PREMIUM.iconMuted} strokeWidth={ICON_STROKE} />}
+                </Pressable>
               </View>
+              {fieldErr.password ? <Text style={styles.fieldError}>{fieldErr.password}</Text> : null}
             </View>
           </View>
 
-          {/* CTA */}
-          <TouchableOpacity
-            style={[styles.loginBtn, loading && styles.loginBtnDisabled]}
+          <Pressable
+            style={({ pressed }) => [styles.primaryBtn, loading && styles.primaryBtnDisabled, pressed && !loading && { opacity: 0.9 }]}
             onPress={handleLogin}
             disabled={loading}
-            activeOpacity={0.85}
           >
             <LinearGradient
-              colors={['#16A34A', '#15803D']}
-              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-              style={styles.loginBtnGradient}
+              colors={PREMIUM_CTA_VERTICAL}
+              start={PREMIUM_CTA_VERTICAL_START}
+              end={PREMIUM_CTA_VERTICAL_END}
+              style={styles.primaryBtnGradient}
             >
               {loading
-                ? <ActivityIndicator color={COLORS.white} />
-                : <Text style={styles.loginBtnText}>Sign In</Text>
-              }
+                ? <ActivityIndicator color="#FFFFFF" />
+                : <Text style={styles.primaryBtnText}>Sign In</Text>}
             </LinearGradient>
-          </TouchableOpacity>
+          </Pressable>
 
-          {/* Divider */}
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
             <Text style={styles.dividerText}>or continue with</Text>
             <View style={styles.dividerLine} />
           </View>
 
-          {/* Social */}
           <View style={styles.social}>
-            {['logo-google', 'logo-apple'].map(icon => (
-              <TouchableOpacity key={icon} style={styles.socialBtn} activeOpacity={0.7}>
-                <Ionicons name={icon} size={20} color={COLORS.text} />
-              </TouchableOpacity>
-            ))}
+            <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.85 }]}>
+              <Text style={styles.socialBtnLabel}>G</Text>
+            </Pressable>
+            <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.85 }]}>
+              <Smartphone size={20} color={PREMIUM.text} strokeWidth={ICON_STROKE} />
+            </Pressable>
           </View>
 
-          {/* Footer */}
-          <TouchableOpacity
-            style={styles.footer}
-            onPress={() => navigation.navigate(ROUTES.SIGN_UP)}
-          >
+          <Pressable style={styles.footer} onPress={() => navigation.navigate(ROUTES.SIGN_UP)}>
             <Text style={styles.footerText}>
               Don't have an account?{' '}
               <Text style={styles.footerLink}>Sign up</Text>
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </PremiumScreenShell>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.md,
-  },
-  backBtn: {
-    width: 38, height: 38,
-    borderRadius: RADIUS.md,
-    backgroundColor: COLORS.surface2,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  logoBadge: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    backgroundColor: COLORS.primaryFaint,
-    borderRadius: RADIUS.full,
-  },
-  logoBadgeText: { ...FONT.label, color: COLORS.primary },
-  scroll: {
-    paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.xxl,
-    paddingBottom: 40,
-  },
-  title: { ...FONT.h1, color: COLORS.text, marginBottom: SPACING.xs },
-  subtitle: { ...FONT.body, color: COLORS.textSecondary, marginBottom: SPACING.xxl },
-
-  errorBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: SPACING.sm,
-    backgroundColor: COLORS.errorLight,
-    borderRadius: RADIUS.md,
-    padding: SPACING.md,
-    marginBottom: SPACING.lg,
-  },
-  errorText: { ...FONT.bodySmall, color: COLORS.error, flex: 1 },
-
-  form: { gap: SPACING.lg, marginBottom: SPACING.xxl },
-  field: { gap: SPACING.sm },
-  label: { ...FONT.label, color: COLORS.text },
-  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  forgotText: { ...FONT.bodySmallMedium, color: COLORS.primary },
-
-  inputWrap: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.md,
-    borderWidth: 1.5,
-    borderColor: COLORS.border,
-    paddingHorizontal: SPACING.md,
-    height: 52,
-  },
-  inputIcon: { marginRight: SPACING.sm },
-  input: { flex: 1, ...FONT.body, color: COLORS.text },
-  eyeBtn: { padding: SPACING.xs },
-
-  loginBtn: { borderRadius: RADIUS.lg, overflow: 'hidden', marginBottom: SPACING.xxl, ...SHADOWS.green },
-  loginBtnDisabled: { opacity: 0.7 },
-  loginBtnGradient: { height: 54, alignItems: 'center', justifyContent: 'center' },
-  loginBtnText: { ...FONT.h5, color: COLORS.white },
-
-  divider: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginBottom: SPACING.lg },
-  dividerLine: { flex: 1, height: 1, backgroundColor: COLORS.border },
-  dividerText: { ...FONT.bodySmall, color: COLORS.textTertiary },
-
-  social: { flexDirection: 'row', justifyContent: 'center', gap: SPACING.md, marginBottom: SPACING.xxl },
-  socialBtn: {
-    width: 52, height: 52, borderRadius: RADIUS.md,
-    backgroundColor: COLORS.surface,
-    borderWidth: 1.5, borderColor: COLORS.border,
-    alignItems: 'center', justifyContent: 'center',
-  },
-
-  footer: { alignItems: 'center' },
-  footerText: { ...FONT.body, color: COLORS.textSecondary },
-  footerLink: { color: COLORS.primary, fontWeight: '600' },
-});

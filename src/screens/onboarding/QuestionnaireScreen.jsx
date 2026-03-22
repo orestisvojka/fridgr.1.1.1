@@ -1,296 +1,549 @@
 // src/screens/onboarding/QuestionnaireScreen.jsx
-import React, { useState, useRef } from 'react';
+// Multi-select and steps with advance: 'confirm' use Continue; other singles advance on tap.
+
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  Dimensions, Animated, ActivityIndicator,
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
+import { ArrowLeft, Check, ChevronRight } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useOnboarding } from '../../context/OnboardingContext';
-import { COLORS, FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
-import { QUESTIONNAIRE_STEPS } from '../../data/mockData';
+import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
+import { QUESTIONNAIRE_STEPS } from '../../data/questionnaireSteps';
+import { ICON_STROKE } from '../../constants/icons';
+import { getQuestionnaireIcon } from '../../constants/questionnaireIcons';
+import { ROUTES } from '../../constants/routes';
+import PremiumScreenShell from '../../components/PremiumScreenShell';
+import {
+  PREMIUM,
+  PREMIUM_CTA_VERTICAL,
+  PREMIUM_CTA_VERTICAL_END,
+  PREMIUM_CTA_VERTICAL_START,
+} from '../../constants/premiumScreenTheme';
 
-const { width } = Dimensions.get('window');
+const { width: SCREEN_W } = Dimensions.get('window');
+const TOTAL = QUESTIONNAIRE_STEPS.length;
 
-function OptionCard({ option, isSelected, onPress, isMulti }) {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+function ProgressDots({ index, total }) {
+  return (
+    <View style={styles.dotsRow}>
+      {Array.from({ length: total }).map((_, i) => (
+        <View
+          key={i}
+          style={[
+            styles.dot,
+            i === index && styles.dotActive,
+            i < index && styles.dotDone,
+          ]}
+        />
+      ))}
+    </View>
+  );
+}
 
-  const handlePress = () => {
-    Animated.sequence([
-      Animated.timing(scaleAnim, { toValue: 0.96, duration: 80, useNativeDriver: true }),
-      Animated.timing(scaleAnim, { toValue: 1,    duration: 80, useNativeDriver: true }),
-    ]).start();
-    onPress();
+function OptionRow({
+  option,
+  selected,
+  onPress,
+  showCheck,
+}) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const OptionIcon = getQuestionnaireIcon(option.iconKey);
+
+  const pressIn = () => {
+    Animated.spring(scale, { toValue: 0.97, friction: 6, useNativeDriver: true }).start();
+  };
+  const pressOut = () => {
+    Animated.spring(scale, { toValue: 1, friction: 5, useNativeDriver: true }).start();
   };
 
   return (
-    <TouchableOpacity onPress={handlePress} activeOpacity={0.85}>
+    <Pressable
+      onPress={onPress}
+      onPressIn={pressIn}
+      onPressOut={pressOut}
+      style={({ pressed }) => [pressed && { opacity: 0.92 }]}
+    >
       <Animated.View
         style={[
-          styles.optionCard,
-          isSelected && styles.optionCardSelected,
-          { transform: [{ scale: scaleAnim }] },
+          styles.optionShell,
+          selected && styles.optionShellSelected,
+          { transform: [{ scale }] },
         ]}
       >
-        <View style={[styles.optionEmoji, isSelected && styles.optionEmojiSelected]}>
-          <Text style={styles.optionEmojiText}>{option.emoji}</Text>
-        </View>
-        <View style={styles.optionText}>
-          <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
-            {option.label}
-          </Text>
-          <Text style={styles.optionDesc}>{option.desc}</Text>
-        </View>
-        <View style={[
-          styles.optionCheck,
-          isSelected && styles.optionCheckSelected,
-          isMulti && styles.optionCheckMulti,
-          isMulti && isSelected && styles.optionCheckMultiSelected,
-        ]}>
-          {isSelected && <Ionicons name="checkmark" size={14} color="#FFFFFF" />}
-        </View>
+        <LinearGradient
+          colors={
+            selected
+              ? [PREMIUM.accentSoft, 'rgba(21,128,61,0.35)']
+              : ['rgba(30,41,59,0.55)', 'rgba(15,23,42,0.4)']
+          }
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.optionGradient}
+        >
+          <View style={[styles.optionIcon, selected && styles.optionIconOn]}>
+            <OptionIcon
+              size={22}
+              color={selected ? PREMIUM.accent : PREMIUM.textMuted}
+              strokeWidth={ICON_STROKE}
+            />
+          </View>
+          <View style={styles.optionCopy}>
+            <Text style={[styles.optionLabel, selected && styles.optionLabelSelected]}>{option.label}</Text>
+            <Text style={styles.optionDesc}>{option.desc}</Text>
+          </View>
+          {showCheck ? (
+            <View style={[styles.tick, selected && styles.tickOn]}>
+              {selected ? (
+                <Check size={16} color="#052E16" strokeWidth={ICON_STROKE + 0.5} />
+              ) : null}
+            </View>
+          ) : null}
+        </LinearGradient>
       </Animated.View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
 export default function QuestionnaireScreen({ navigation }) {
   const insets = useSafeAreaInsets();
-  const { answers, setAnswer, toggleMultiAnswer, completeOnboarding } = useOnboarding();
+  const { answers, setAnswer, toggleMultiAnswer } = useOnboarding();
 
-  const [currentStep, setCurrentStep] = useState(0);
-  const [finishing,   setFinishing]   = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
+  const advancing = useRef(false);
+  const contentOp = useRef(new Animated.Value(1)).current;
 
-  const slideAnim = useRef(new Animated.Value(0)).current;
+  const step = QUESTIONNAIRE_STEPS[stepIndex];
+  const isMulti = step.type === 'multi';
+  const needsContinue = isMulti || step.advance === 'confirm';
+  const showOptionCheck = isMulti || step.advance === 'confirm';
 
-  const step = QUESTIONNAIRE_STEPS[currentStep];
-  const totalSteps = QUESTIONNAIRE_STEPS.length;
-
-  const isAnswered = () => {
+  const isAnswered = useCallback(() => {
     const answer = answers[step.id];
-    if (step.type === 'multi') return Array.isArray(answer) && answer.length > 0;
+    if (isMulti) return Array.isArray(answer) && answer.length > 0;
     return !!answer;
-  };
+  }, [answers, step.id, isMulti]);
 
-  const animateTransition = (callback) => {
+  const pulseContent = useCallback(() => {
     Animated.sequence([
-      Animated.timing(slideAnim, { toValue: -20, duration: 150, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0,   duration: 0,   useNativeDriver: true }),
-    ]).start(callback);
-  };
+      Animated.timing(contentOp, { toValue: 0.25, duration: 90, useNativeDriver: true }),
+      Animated.timing(contentOp, { toValue: 1, duration: 220, useNativeDriver: true }),
+    ]).start();
+  }, [contentOp]);
 
-  const handleNext = () => {
-    if (!isAnswered()) return;
-    if (currentStep < totalSteps - 1) {
-      animateTransition(() => setCurrentStep(prev => prev + 1));
-    } else {
-      handleFinish();
-    }
-  };
+  const goNextOrFinish = useCallback(
+    (fromIndex) => {
+      if (fromIndex >= TOTAL - 1) {
+        navigation.navigate(ROUTES.ONBOARDING_HANDOFF);
+        return;
+      }
+      setStepIndex(fromIndex + 1);
+    },
+    [navigation],
+  );
 
-  const handleBack = () => {
-    if (currentStep > 0) {
-      animateTransition(() => setCurrentStep(prev => prev - 1));
-    }
-  };
-
-  const handleFinish = () => {
-    setFinishing(true);
-    setTimeout(() => {
-      completeOnboarding();
-    }, 800);
-  };
-
-  const handleSelect = (optionId) => {
-    if (step.type === 'multi') {
-      toggleMultiAnswer(step.id, optionId);
-    } else {
+  const handleSingleTap = useCallback(
+    (optionId) => {
+      if (advancing.current) return;
       setAnswer(step.id, optionId);
-    }
-  };
+      pulseContent();
+      if (step.advance === 'confirm') return;
+      advancing.current = true;
+      const idx = stepIndex;
+      setTimeout(() => {
+        goNextOrFinish(idx);
+        advancing.current = false;
+      }, 340);
+    },
+    [step.id, step.advance, stepIndex, goNextOrFinish, pulseContent, setAnswer],
+  );
 
-  const isOptionSelected = (optionId) => {
+  const handleMultiTap = useCallback(
+    (optionId) => {
+      toggleMultiAnswer(step.id, optionId);
+    },
+    [step.id, toggleMultiAnswer],
+  );
+
+  const handleContinue = useCallback(() => {
+    if (!isAnswered() || advancing.current) return;
+    advancing.current = true;
+    pulseContent();
+    const idx = stepIndex;
+    setTimeout(() => {
+      goNextOrFinish(idx);
+      advancing.current = false;
+    }, 280);
+  }, [isAnswered, stepIndex, goNextOrFinish, pulseContent]);
+
+  const handleBack = useCallback(() => {
+    if (stepIndex <= 0 || advancing.current) return;
+    setStepIndex((s) => s - 1);
+  }, [stepIndex]);
+
+  useEffect(() => {
+    contentOp.setValue(1);
+  }, [stepIndex, contentOp]);
+
+  const isSelected = (optionId) => {
     const answer = answers[step.id];
-    if (step.type === 'multi') return Array.isArray(answer) && answer.includes(optionId);
+    if (isMulti) return Array.isArray(answer) && answer.includes(optionId);
     return answer === optionId;
   };
 
-  const progress = (currentStep + 1) / totalSteps;
-
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
-
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + SPACING.md }]}>
-        <TouchableOpacity
-          style={styles.backBtn}
+    <PremiumScreenShell>
+      <View style={[styles.header, { paddingTop: insets.top + SPACING.sm }]}>
+        <Pressable
           onPress={handleBack}
-          disabled={currentStep === 0}
+          disabled={stepIndex === 0}
+          style={({ pressed }) => [
+            styles.backBtn,
+            pressed && stepIndex > 0 && { opacity: 0.85 },
+          ]}
         >
-          <Ionicons
-            name="arrow-back"
-            size={20}
-            color={currentStep === 0 ? COLORS.textTertiary : COLORS.text}
+          <ArrowLeft
+            size={22}
+            color={stepIndex === 0 ? 'rgba(248,250,252,0.22)' : PREMIUM.text}
+            strokeWidth={ICON_STROKE}
           />
-        </TouchableOpacity>
-
-        {/* Progress bar */}
-        <View style={styles.progressWrap}>
-          <View style={styles.progressBg}>
-            <Animated.View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+        </Pressable>
+        <View style={styles.headerCenter}>
+          <View style={styles.stepPill}>
+            <Text style={styles.stepPillText}>
+              Step {stepIndex + 1} of {TOTAL}
+            </Text>
           </View>
-          <Text style={styles.progressLabel}>{currentStep + 1}/{totalSteps}</Text>
+          <View style={styles.progressTrack}>
+            <View style={styles.progressRow}>
+              <View style={{ flex: stepIndex + 1 }}>
+                <View style={styles.progressFill} />
+              </View>
+              <View style={{ flex: Math.max(0, TOTAL - stepIndex - 1) }} />
+            </View>
+          </View>
+          <ProgressDots index={stepIndex} total={TOTAL} />
         </View>
-
-        <View style={{ width: 38 }} />
+        <View style={{ width: 44 }} />
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Animated.View style={{ transform: [{ translateY: slideAnim }] }}>
-          {/* Question */}
-          <View style={styles.questionBlock}>
-            <Text style={styles.questionLabel}>
-              Question {currentStep + 1}
-            </Text>
+      <Animated.View style={[styles.body, { opacity: contentOp }]}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollInner,
+            { paddingBottom: insets.bottom + (needsContinue ? 140 : 64) },
+          ]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.questionCard}>
+            <View style={styles.kickerRow}>
+              <View style={styles.kickerDot} />
+              <Text style={styles.kicker}>Personalize FRIDGR</Text>
+            </View>
             <Text style={styles.question}>{step.question}</Text>
-            <Text style={styles.questionSub}>{step.subtitle}</Text>
+            <Text style={styles.subtitle}>{step.subtitle}</Text>
           </View>
 
-          {/* Options */}
           <View style={styles.options}>
-            {step.options.map(option => (
-              <OptionCard
+            {step.options.map((option) => (
+              <OptionRow
                 key={option.id}
                 option={option}
-                isSelected={isOptionSelected(option.id)}
-                onPress={() => handleSelect(option.id)}
-                isMulti={step.type === 'multi'}
+                selected={isSelected(option.id)}
+                onPress={() => (isMulti ? handleMultiTap(option.id) : handleSingleTap(option.id))}
+                showCheck={showOptionCheck}
               />
             ))}
           </View>
-        </Animated.View>
-      </ScrollView>
 
-      {/* Bottom CTA */}
-      <View style={[styles.bottomWrap, { paddingBottom: insets.bottom + SPACING.lg }]}>
-        <TouchableOpacity
-          style={[styles.nextBtn, !isAnswered() && styles.nextBtnDisabled]}
-          onPress={handleNext}
-          disabled={!isAnswered() || finishing}
-          activeOpacity={0.85}
-        >
-          {finishing ? (
-            <ActivityIndicator color={COLORS.white} />
-          ) : (
-            <LinearGradient
-              colors={isAnswered() ? ['#16A34A', '#15803D'] : [COLORS.border, COLORS.border]}
-              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-              style={styles.nextBtnGradient}
-            >
-              <Text style={[styles.nextBtnText, !isAnswered() && styles.nextBtnTextDisabled]}>
-                {currentStep < totalSteps - 1 ? 'Continue' : 'Get Cooking 🎉'}
-              </Text>
-            </LinearGradient>
-          )}
-        </TouchableOpacity>
+          <View style={styles.hintWrap}>
+            <Text style={styles.hint}>
+              {isMulti
+                ? 'Select all that apply, then tap the button below'
+                : step.advance === 'confirm'
+                  ? 'Choose an option, then tap Continue'
+                  : 'Tap an answer to go to the next question'}
+            </Text>
+          </View>
+        </ScrollView>
+      </Animated.View>
 
-        {step.type === 'multi' && (
-          <Text style={styles.multiHint}>Select all that apply</Text>
-        )}
-      </View>
-    </View>
+      {needsContinue ? (
+        <View style={[styles.footer, { paddingBottom: insets.bottom + SPACING.md }]}>
+          <Pressable
+            onPress={handleContinue}
+            disabled={!isAnswered()}
+            style={({ pressed }) => [
+              styles.continueBtnOuter,
+              isAnswered() && styles.continueBtnOuterEnabled,
+              pressed && isAnswered() && { transform: [{ scale: 0.985 }] },
+            ]}
+          >
+            {isAnswered() ? (
+              <LinearGradient
+                colors={PREMIUM_CTA_VERTICAL}
+                start={PREMIUM_CTA_VERTICAL_START}
+                end={PREMIUM_CTA_VERTICAL_END}
+                style={styles.continueGrad}
+              >
+                <Text style={styles.continueText}>
+                  {stepIndex >= TOTAL - 1 ? 'Finish' : 'Continue'}
+                </Text>
+                <ChevronRight size={20} color="#FFFFFF" strokeWidth={ICON_STROKE} />
+              </LinearGradient>
+            ) : (
+              <View style={styles.continueSolidDisabled}>
+                <Text style={styles.continueTextDisabled}>
+                  {stepIndex >= TOTAL - 1 ? 'Finish' : 'Continue'}
+                </Text>
+                <ChevronRight size={20} color="#64748B" strokeWidth={ICON_STROKE} />
+              </View>
+            )}
+          </Pressable>
+        </View>
+      ) : null}
+    </PremiumScreenShell>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
+    alignItems: 'flex-start',
+    paddingHorizontal: SPACING.md,
     paddingBottom: SPACING.md,
-    gap: SPACING.md,
   },
   backBtn: {
-    width: 38, height: 38, borderRadius: RADIUS.md,
-    backgroundColor: COLORS.surface2,
-    alignItems: 'center', justifyContent: 'center',
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: 'rgba(15,23,42,0.85)',
+    borderWidth: 1,
+    borderColor: PREMIUM.glassBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  progressWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
-  progressBg: {
-    flex: 1, height: 6, backgroundColor: COLORS.surface2, borderRadius: 3, overflow: 'hidden',
+  headerCenter: { flex: 1, alignItems: 'center', gap: 10, paddingHorizontal: SPACING.xs },
+  stepPill: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 6,
+    borderRadius: RADIUS.full,
+    backgroundColor: 'rgba(15,23,42,0.9)',
+    borderWidth: 1,
+    borderColor: PREMIUM.glassBorder,
   },
-  progressFill: { height: '100%', backgroundColor: COLORS.primary, borderRadius: 3 },
-  progressLabel: { ...FONT.captionMedium, color: COLORS.textSecondary, minWidth: 28, textAlign: 'right' },
-
-  scroll: { paddingHorizontal: SPACING.xl, paddingBottom: 20 },
-  questionBlock: { marginTop: SPACING.xl, marginBottom: SPACING.xxl },
-  questionLabel: {
-    ...FONT.labelSmall,
-    color: COLORS.primary,
-    marginBottom: SPACING.sm,
+  stepPillText: {
+    ...FONT.captionMedium,
+    color: PREMIUM.textMuted,
+    letterSpacing: 0.8,
+    fontWeight: '600',
   },
-  question: { ...FONT.h2, color: COLORS.text, marginBottom: SPACING.sm },
-  questionSub: { ...FONT.body, color: COLORS.textSecondary },
-
-  options: { gap: SPACING.sm },
-  optionCard: {
+  progressTrack: {
+    width: '100%',
+    maxWidth: SCREEN_W - 140,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    overflow: 'hidden',
+  },
+  progressRow: {
+    flexDirection: 'row',
+    height: 4,
+    width: '100%',
+  },
+  progressFill: {
+    flex: 1,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: PREMIUM.accent,
+  },
+  dotsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 4,
+    maxWidth: SCREEN_W - 120,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+  },
+  dotDone: { backgroundColor: 'rgba(74,222,128,0.5)' },
+  dotActive: {
+    width: 16,
+    borderRadius: 2,
+    backgroundColor: PREMIUM.accent,
+  },
+  body: { flex: 1 },
+  scrollInner: {
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.sm,
+  },
+  questionCard: {
+    borderRadius: RADIUS.xxl,
+    padding: SPACING.lg,
+    marginBottom: SPACING.lg,
+    backgroundColor: PREMIUM.cardBg,
+    borderWidth: 1,
+    borderColor: PREMIUM.cardBorder,
+  },
+  kickerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    gap: SPACING.md,
-    ...SHADOWS.xs,
-  },
-  optionCardSelected: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primaryFaint,
-  },
-  optionEmoji: {
-    width: 46, height: 46, borderRadius: RADIUS.md,
-    backgroundColor: COLORS.surface2,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  optionEmojiSelected: { backgroundColor: COLORS.primaryPale },
-  optionEmojiText: { fontSize: 22 },
-  optionText: { flex: 1, gap: 2 },
-  optionLabel: { ...FONT.bodySemiBold, color: COLORS.text },
-  optionLabelSelected: { color: COLORS.primary },
-  optionDesc: { ...FONT.bodySmall, color: COLORS.textSecondary },
-  optionCheck: {
-    width: 24, height: 24, borderRadius: 12,
-    borderWidth: 2, borderColor: COLORS.border,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  optionCheckSelected: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
-  optionCheckMulti: { borderRadius: RADIUS.xs },
-  optionCheckMultiSelected: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-
-  bottomWrap: {
-    paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.md,
     gap: SPACING.sm,
-    backgroundColor: COLORS.background,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.borderLight,
+    marginBottom: SPACING.md,
   },
-  nextBtn: { borderRadius: RADIUS.lg, overflow: 'hidden', ...SHADOWS.green },
-  nextBtnDisabled: { ...SHADOWS.none },
-  nextBtnGradient: { height: 54, alignItems: 'center', justifyContent: 'center' },
-  nextBtnText: { ...FONT.h5, color: COLORS.white },
-  nextBtnTextDisabled: { color: COLORS.textTertiary },
-  multiHint: { ...FONT.caption, color: COLORS.textTertiary, textAlign: 'center' },
+  kickerDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: PREMIUM.accent,
+  },
+  kicker: {
+    ...FONT.labelSmall,
+    color: PREMIUM.accent,
+    letterSpacing: 1.8,
+    textTransform: 'uppercase',
+    fontWeight: '700',
+  },
+  question: {
+    fontSize: 27,
+    fontWeight: '800',
+    color: PREMIUM.text,
+    letterSpacing: -0.7,
+    lineHeight: 33,
+    marginBottom: SPACING.sm,
+  },
+  subtitle: {
+    ...FONT.body,
+    fontSize: 15,
+    color: PREMIUM.textMuted,
+    lineHeight: 22,
+    maxWidth: 340,
+  },
+  options: { gap: SPACING.md },
+  optionShell: {
+    borderRadius: RADIUS.xl,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: PREMIUM.glassBorder,
+    ...SHADOWS.sm,
+  },
+  optionShellSelected: {
+    borderColor: 'rgba(74,222,128,0.65)',
+    borderWidth: 1.5,
+    ...SHADOWS.green,
+  },
+  optionGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    gap: SPACING.md,
+  },
+  optionIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 16,
+    backgroundColor: 'rgba(30,41,59,0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  optionIconOn: {
+    backgroundColor: 'rgba(22,101,52,0.55)',
+  },
+  optionCopy: { flex: 1, gap: 3 },
+  optionLabel: {
+    ...FONT.bodySemiBold,
+    fontSize: 16,
+    color: PREMIUM.text,
+  },
+  optionLabelSelected: { color: '#ECFDF5' },
+  optionDesc: {
+    ...FONT.bodySmall,
+    color: PREMIUM.textMuted,
+    lineHeight: 18,
+  },
+  tick: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tickOn: {
+    backgroundColor: PREMIUM.accent,
+    borderColor: PREMIUM.accent,
+  },
+  hintWrap: {
+    marginTop: SPACING.xxl,
+    alignSelf: 'center',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.lg,
+    backgroundColor: 'rgba(15,23,42,0.65)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    maxWidth: SCREEN_W - SPACING.xl * 2,
+  },
+  hint: {
+    ...FONT.caption,
+    color: 'rgba(248,250,252,0.45)',
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  footer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.lg,
+    backgroundColor: PREMIUM.footerBg,
+    borderTopWidth: 1,
+    borderTopColor: '#13221a',
+  },
+  continueBtnOuter: {
+    borderRadius: RADIUS.xl,
+    overflow: 'hidden',
+  },
+  continueBtnOuterEnabled: {
+    ...SHADOWS.green,
+  },
+  continueGrad: {
+    height: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.xs,
+  },
+  continueSolidDisabled: {
+    height: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.xs,
+    backgroundColor: PREMIUM.btnDisabledBg,
+    borderWidth: 1,
+    borderColor: PREMIUM.btnDisabledBorder,
+    borderRadius: RADIUS.xl,
+  },
+  continueText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '700' },
+  continueTextDisabled: {
+    ...FONT.h5,
+    color: '#94A3B8',
+    fontWeight: '600',
+  },
 });

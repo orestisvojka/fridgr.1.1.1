@@ -1,8 +1,10 @@
 // src/data/mockData.js
 // Complete mock dataset: recipes, users, tips
 
+import { getRecipeImageUrl } from './recipeImages';
+
 // ─── RECIPES ─────────────────────────────────────────────────────────────────
-export const MOCK_RECIPES = [
+const RECIPE_DATA = [
   {
     id: 'r1',
     title: 'Shakshuka',
@@ -313,6 +315,11 @@ export const MOCK_RECIPES = [
   },
 ];
 
+export const MOCK_RECIPES = RECIPE_DATA.map((r) => ({
+  ...r,
+  imageUrl: getRecipeImageUrl(r.id),
+}));
+
 // ─── ONBOARDING CAROUSEL SLIDES ──────────────────────────────────────────────
 export const ONBOARDING_SLIDES = [
   {
@@ -357,79 +364,14 @@ export const ONBOARDING_SLIDES = [
   },
 ];
 
-// ─── QUESTIONNAIRE STEPS ─────────────────────────────────────────────────────
-export const QUESTIONNAIRE_STEPS = [
-  {
-    id: 'goal',
-    question: "What's your main goal?",
-    subtitle: "We'll tailor your experience accordingly",
-    type: 'single',
-    options: [
-      { id: 'save_money', label: 'Save Money', emoji: '💰', desc: 'Use what you have' },
-      { id: 'eat_healthy', label: 'Eat Healthier', emoji: '🥦', desc: 'Nutritious meals' },
-      { id: 'reduce_waste', label: 'Reduce Waste', emoji: '♻️', desc: 'Use up leftovers' },
-      { id: 'build_muscle', label: 'Build Muscle', emoji: '💪', desc: 'High protein focus' },
-      { id: 'quick_meals', label: 'Quick Meals', emoji: '⚡', desc: 'Fast & easy' },
-    ],
-  },
-  {
-    id: 'diet',
-    question: 'Any dietary preferences?',
-    subtitle: 'We filter recipes that work for you',
-    type: 'single',
-    options: [
-      { id: 'none', label: 'No Preference', emoji: '🍽️', desc: 'Everything goes' },
-      { id: 'vegetarian', label: 'Vegetarian', emoji: '🥕', desc: 'No meat' },
-      { id: 'vegan', label: 'Vegan', emoji: '🌱', desc: 'Plant-based' },
-      { id: 'high_protein', label: 'High Protein', emoji: '🥩', desc: 'Muscle & fitness' },
-      { id: 'low_carb', label: 'Low Carb', emoji: '🥑', desc: 'Keto-friendly' },
-      { id: 'gluten_free', label: 'Gluten Free', emoji: '🌾', desc: 'No gluten' },
-    ],
-  },
-  {
-    id: 'allergies',
-    question: 'Any food allergies?',
-    subtitle: 'Select all that apply — your safety matters',
-    type: 'multi',
-    options: [
-      { id: 'none', label: 'None', emoji: '✅', desc: 'All good' },
-      { id: 'nuts', label: 'Nuts', emoji: '🥜', desc: 'Tree nuts & peanuts' },
-      { id: 'dairy', label: 'Dairy', emoji: '🥛', desc: 'Milk & cheese' },
-      { id: 'eggs', label: 'Eggs', emoji: '🥚', desc: 'All egg products' },
-      { id: 'seafood', label: 'Seafood', emoji: '🦐', desc: 'Fish & shellfish' },
-      { id: 'soy', label: 'Soy', emoji: '🫘', desc: 'Soy products' },
-    ],
-  },
-  {
-    id: 'skill',
-    question: 'How do you cook?',
-    subtitle: 'We adjust recipe complexity to your level',
-    type: 'single',
-    options: [
-      { id: 'beginner', label: 'Beginner', emoji: '🌱', desc: 'Learning the basics' },
-      { id: 'intermediate', label: 'Intermediate', emoji: '🍳', desc: 'Comfortable cooking' },
-      { id: 'advanced', label: 'Advanced', emoji: '👨‍🍳', desc: 'I own the kitchen' },
-    ],
-  },
-  {
-    id: 'time',
-    question: 'How much time do you have?',
-    subtitle: "We'll prioritize recipes that fit your schedule",
-    type: 'single',
-    options: [
-      { id: '10', label: 'Under 10 min', emoji: '⚡', desc: 'Super fast' },
-      { id: '20', label: 'Under 20 min', emoji: '🕐', desc: 'Quick meal' },
-      { id: '30', label: 'Under 30 min', emoji: '🕑', desc: 'Comfortable' },
-      { id: 'unlimited', label: 'No Limit', emoji: '😌', desc: 'I enjoy cooking' },
-    ],
-  },
-];
+// ─── QUESTIONNAIRE (15 steps) ────────────────────────────────────────────────
+export { QUESTIONNAIRE_STEPS } from './questionnaireSteps';
 
 // ─── MOCK USER ────────────────────────────────────────────────────────────────
 export const MOCK_USER = {
-  id: 'u1',
-  name: 'Alex',
-  email: 'alex@fridgr.app',
+  id: 'u_template',
+  name: 'Chef',
+  email: '',
   avatar: null,
   joinDate: '2024-01-15',
   stats: {

@@ -21,6 +21,7 @@ import {
 } from '../styles/theme';
 import MacroBadge from './MacroBadge';
 import PrimaryButton from './PrimaryButton';
+import RecipeImage from './RecipeImage';
 import { formatPrepTime } from '../utils/helpers';
 
 export default function RecipeCard({
@@ -50,9 +51,8 @@ export default function RecipeCard({
         activeOpacity={1}
         style={[styles.card, shadows.md, { backgroundColor: palette.bg }]}
       >
-        {/* Emoji hero */}
         <View style={[styles.emojiWrap, { backgroundColor: palette.color + '18' }]}>
-          <Text style={styles.emoji}>{recipe.emoji}</Text>
+          <RecipeImage recipe={recipe} height={176} borderRadius={0} style={{ width: '100%' }} />
 
           {/* Save button */}
           <TouchableOpacity
@@ -156,13 +156,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   emojiWrap: {
-    paddingVertical: spacing.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
     position: 'relative',
-  },
-  emoji: {
-    fontSize: 52,
+    overflow: 'hidden',
   },
   saveBtn: {
     position: 'absolute',

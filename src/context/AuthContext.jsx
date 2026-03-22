@@ -1,6 +1,7 @@
 // src/context/AuthContext.jsx
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { MOCK_USER } from '../data/mockData';
+import { displayNameFromEmail, userIdFromEmail } from '../utils/userIdentity';
 
 const AuthContext = createContext(null);
 
@@ -18,7 +19,13 @@ export function AuthProvider({ children }) {
       if (!email || !password) throw new Error('Please fill in all fields.');
       if (!email.includes('@')) throw new Error('Please enter a valid email address.');
       if (password.length < 6) throw new Error('Password must be at least 6 characters.');
-      setUser({ ...MOCK_USER, email });
+      const emailTrim = email.trim();
+      setUser({
+        ...MOCK_USER,
+        id: userIdFromEmail(emailTrim),
+        name: displayNameFromEmail(emailTrim),
+        email: emailTrim,
+      });
       return { success: true };
     } catch (err) {
       setError(err.message);
@@ -36,11 +43,12 @@ export function AuthProvider({ children }) {
       if (!name || !email || !password) throw new Error('Please fill in all fields.');
       if (!email.includes('@')) throw new Error('Please enter a valid email address.');
       if (password.length < 6) throw new Error('Password must be at least 6 characters.');
+      const emailTrim = email.trim();
       const newUser = {
         ...MOCK_USER,
-        id: `u_${Date.now()}`,
+        id: userIdFromEmail(emailTrim),
         name: name.trim(),
-        email,
+        email: emailTrim,
         joinDate: new Date().toISOString().split('T')[0],
         stats: { recipesGenerated: 0, savedMeals: 0, cookingStreak: 0, ingredientsScanned: 0 },
       };

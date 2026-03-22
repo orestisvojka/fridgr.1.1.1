@@ -1,19 +1,34 @@
 // src/screens/main/ScanScreen.jsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, TextInput,
-  ScrollView, Animated, Alert, ActivityIndicator, Dimensions,
+  View, Text, StyleSheet, Pressable, TextInput,
+  ScrollView, Animated, Alert, ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  Camera,
+  Image as ImageIcon,
+  Search,
+  Plus,
+  X,
+  Sparkles,
+} from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRecipes } from '../../context/RecipesContext';
 import { findMatchingRecipes } from '../../services/recipeService';
-import { COLORS, FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
+import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
-
-const { width } = Dimensions.get('window');
+import {
+  PREMIUM_HERO_COMPACT,
+  PREMIUM_HERO_COMPACT_END,
+  PREMIUM_HERO_COMPACT_START,
+  PREMIUM_CTA_VERTICAL,
+  PREMIUM_CTA_VERTICAL_END,
+  PREMIUM_CTA_VERTICAL_START,
+} from '../../constants/premiumScreenTheme';
+import { useThemeColors } from '../../context/ThemeContext';
+import { ICON_STROKE } from '../../constants/icons';
 
 const SUGGESTIONS = [
   'eggs', 'tomatoes', 'garlic', 'onion', 'pasta', 'chicken',
@@ -28,14 +43,108 @@ const SIMULATED_SCAN_WORDS = [
   ['avocado', 'lemon', 'sourdough bread'],
 ];
 
+function createStyles(C) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: C.background },
+    header: {
+      paddingHorizontal: SPACING.xl,
+      paddingBottom: SPACING.xxl,
+    },
+    headerTitle: { ...FONT.h2, color: '#FFFFFF', marginBottom: SPACING.xs },
+    headerSub: { ...FONT.body, color: 'rgba(255,255,255,0.6)', marginBottom: SPACING.xl },
+    scanBtns: { flexDirection: 'row', gap: SPACING.md },
+    scanBtn: { flex: 1 },
+    scanBtnInner: {
+      backgroundColor: 'rgba(255,255,255,0.12)',
+      borderRadius: RADIUS.xl,
+      padding: SPACING.lg,
+      alignItems: 'center',
+      gap: SPACING.sm,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.18)',
+    },
+    scanIcon: {
+      width: 56, height: 56, borderRadius: RADIUS.lg,
+      backgroundColor: '#F0FDF4',
+      alignItems: 'center', justifyContent: 'center',
+    },
+    scanBtnLabel: { ...FONT.bodySemiBold, color: '#FFFFFF' },
+    scanBtnSub: { ...FONT.caption, color: 'rgba(255,255,255,0.5)' },
+    scroll: { padding: SPACING.xl, paddingBottom: 100 },
+    scanningBanner: {
+      flexDirection: 'row', alignItems: 'center', gap: SPACING.md,
+      backgroundColor: C.primaryFaint,
+      borderRadius: RADIUS.lg, padding: SPACING.md,
+      marginBottom: SPACING.lg,
+      borderWidth: 1, borderColor: C.primaryPale,
+    },
+    scanningText: { ...FONT.bodyMedium, color: C.primary },
+    inputSection: { gap: SPACING.sm, marginBottom: SPACING.lg },
+    inputLabel: { ...FONT.label, color: C.text },
+    inputRow: { flexDirection: 'row', gap: SPACING.sm },
+    inputWrap: {
+      flex: 1, flexDirection: 'row', alignItems: 'center',
+      backgroundColor: C.surface, borderRadius: RADIUS.md,
+      borderWidth: 1.5, borderColor: C.border,
+      paddingHorizontal: SPACING.md, height: 50,
+    },
+    input: { flex: 1, ...FONT.body, color: C.text },
+    addBtn: {
+      width: 50, height: 50, borderRadius: RADIUS.md,
+      backgroundColor: C.primary,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    addBtnDisabled: { backgroundColor: C.surface2 },
+    suggestions: { marginBottom: SPACING.lg },
+    suggestionsLabel: { ...FONT.label, color: C.textSecondary, marginBottom: SPACING.sm },
+    suggestionChips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
+    suggestionChip: {
+      backgroundColor: C.surface2,
+      borderRadius: RADIUS.full, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs + 2,
+      borderWidth: 1, borderColor: C.border,
+    },
+    suggestionChipText: { ...FONT.bodySmallMedium, color: C.textSecondary },
+    ingredientsSection: { gap: SPACING.md },
+    ingredientsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    ingredientsTitle: { ...FONT.bodySemiBold, color: C.text },
+    clearAll: { ...FONT.bodySmallMedium, color: C.error },
+    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
+    chip: {
+      flexDirection: 'row', alignItems: 'center', gap: SPACING.xs,
+      backgroundColor: C.primaryFaint, borderRadius: RADIUS.full,
+      paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
+      borderWidth: 1, borderColor: C.primaryPale,
+    },
+    chipText: { ...FONT.bodySmallMedium, color: C.primary },
+    emptyState: { alignItems: 'center', paddingTop: SPACING.section, gap: SPACING.md },
+    emptyEmoji: { fontSize: 56 },
+    emptyTitle: { ...FONT.h4, color: C.text },
+    emptySub: { ...FONT.body, color: C.textSecondary, textAlign: 'center', lineHeight: 24 },
+    ctaWrap: {
+      position: 'absolute', bottom: 0, left: 0, right: 0,
+      paddingHorizontal: SPACING.xl,
+      paddingTop: SPACING.md,
+      backgroundColor: C.background,
+      borderTopWidth: 1, borderTopColor: C.borderLight,
+      ...SHADOWS.md,
+    },
+    ctaBtn: { borderRadius: RADIUS.lg, overflow: 'hidden', ...SHADOWS.green },
+    ctaBtnGradient: { height: 54, alignItems: 'center', justifyContent: 'center' },
+    ctaBtnContent: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+    ctaBtnText: { ...FONT.h5, color: C.white },
+  });
+}
+
 export default function ScanScreen({ navigation }) {
   const insets = useSafeAreaInsets();
+  const C = useThemeColors();
+  const styles = useMemo(() => createStyles(C), [C]);
   const { addRecentScan } = useRecipes();
 
   const [ingredients, setIngredients] = useState([]);
-  const [inputText,   setInputText]   = useState('');
-  const [scanning,    setScanning]    = useState(false);
-  const [searching,   setSearching]   = useState(false);
+  const [inputText, setInputText] = useState('');
+  const [scanning, setScanning] = useState(false);
+  const [searching, setSearching] = useState(false);
 
   const inputRef = useRef(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -76,8 +185,9 @@ export default function ScanScreen({ navigation }) {
     Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, { toValue: 1.08, duration: 600, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1,    duration: 600, useNativeDriver: true }),
-      ]), { iterations: 3 }
+        Animated.timing(pulseAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+      ]),
+      { iterations: 3 },
     ).start();
 
     setTimeout(() => {
@@ -99,36 +209,44 @@ export default function ScanScreen({ navigation }) {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: COLORS.background }]}>
-      {/* Header */}
+    <View style={styles.container}>
       <LinearGradient
-        colors={['#0A1F0E', '#15803D']}
+        colors={PREMIUM_HERO_COMPACT}
+        start={PREMIUM_HERO_COMPACT_START}
+        end={PREMIUM_HERO_COMPACT_END}
         style={[styles.header, { paddingTop: insets.top + SPACING.md }]}
       >
         <Text style={styles.headerTitle}>Scan Ingredients</Text>
         <Text style={styles.headerSub}>Take a photo or type what you have</Text>
 
-        {/* Scan buttons */}
         <View style={styles.scanBtns}>
-          <TouchableOpacity style={styles.scanBtn} onPress={handleScan} activeOpacity={0.85} disabled={scanning}>
+          <Pressable
+            style={({ pressed }) => [styles.scanBtn, pressed && { opacity: 0.88 }]}
+            onPress={handleScan}
+            disabled={scanning}
+          >
             <Animated.View style={[styles.scanBtnInner, { transform: [{ scale: pulseAnim }] }]}>
               <View style={styles.scanIcon}>
-                <Ionicons name="camera" size={26} color={COLORS.primary} />
+                <Camera size={26} color={C.primary} strokeWidth={ICON_STROKE + 0.25} />
               </View>
               <Text style={styles.scanBtnLabel}>Camera</Text>
               <Text style={styles.scanBtnSub}>Take a photo</Text>
             </Animated.View>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity style={styles.scanBtn} onPress={handleGallery} activeOpacity={0.85} disabled={scanning}>
+          <Pressable
+            style={({ pressed }) => [styles.scanBtn, pressed && { opacity: 0.88 }]}
+            onPress={handleGallery}
+            disabled={scanning}
+          >
             <View style={styles.scanBtnInner}>
               <View style={[styles.scanIcon, { backgroundColor: '#EDE9FE' }]}>
-                <Ionicons name="image" size={26} color="#7C3AED" />
+                <ImageIcon size={26} color="#7C3AED" strokeWidth={ICON_STROKE + 0.25} />
               </View>
               <Text style={styles.scanBtnLabel}>Gallery</Text>
               <Text style={styles.scanBtnSub}>Upload photo</Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </LinearGradient>
 
@@ -137,81 +255,88 @@ export default function ScanScreen({ navigation }) {
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Scanning indicator */}
         {scanning && (
           <View style={styles.scanningBanner}>
-            <ActivityIndicator size="small" color={COLORS.primary} />
+            <ActivityIndicator size="small" color={C.primary} />
             <Text style={styles.scanningText}>AI is detecting your ingredients…</Text>
           </View>
         )}
 
-        {/* Input field */}
         <View style={styles.inputSection}>
           <Text style={styles.inputLabel}>Or type ingredients manually</Text>
           <View style={styles.inputRow}>
             <View style={styles.inputWrap}>
-              <Ionicons name="search-outline" size={18} color={COLORS.textTertiary} style={styles.inputIcon} />
+              <Search size={18} color={C.textTertiary} strokeWidth={ICON_STROKE} style={{ marginRight: SPACING.sm }} />
               <TextInput
                 ref={inputRef}
                 style={styles.input}
                 value={inputText}
                 onChangeText={setInputText}
                 placeholder="Add ingredient…"
-                placeholderTextColor={COLORS.textTertiary}
+                placeholderTextColor={C.textTertiary}
                 onSubmitEditing={() => addIngredient(inputText)}
                 returnKeyType="done"
                 autoCapitalize="none"
               />
             </View>
-            <TouchableOpacity
-              style={[styles.addBtn, !inputText.trim() && styles.addBtnDisabled]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.addBtn,
+                !inputText.trim() && styles.addBtnDisabled,
+                pressed && inputText.trim() && { opacity: 0.88 },
+              ]}
               onPress={() => addIngredient(inputText)}
               disabled={!inputText.trim()}
             >
-              <Ionicons name="add" size={22} color={inputText.trim() ? COLORS.white : COLORS.textTertiary} />
-            </TouchableOpacity>
+              <Plus
+                size={22}
+                color={inputText.trim() ? C.white : C.textTertiary}
+                strokeWidth={ICON_STROKE + 0.25}
+              />
+            </Pressable>
           </View>
         </View>
 
-        {/* Quick suggestions */}
         {ingredients.length < 5 && (
           <View style={styles.suggestions}>
             <Text style={styles.suggestionsLabel}>Quick add</Text>
             <View style={styles.suggestionChips}>
               {SUGGESTIONS.filter(s => !ingredients.includes(s)).slice(0, 8).map(s => (
-                <TouchableOpacity key={s} style={styles.suggestionChip} onPress={() => addIngredient(s)}>
+                <Pressable
+                  key={s}
+                  style={({ pressed }) => [styles.suggestionChip, pressed && { opacity: 0.85 }]}
+                  onPress={() => addIngredient(s)}
+                >
                   <Text style={styles.suggestionChipText}>+ {s}</Text>
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </View>
           </View>
         )}
 
-        {/* Ingredient chips */}
         {ingredients.length > 0 && (
           <View style={styles.ingredientsSection}>
             <View style={styles.ingredientsHeader}>
               <Text style={styles.ingredientsTitle}>
                 {ingredients.length} ingredient{ingredients.length !== 1 ? 's' : ''} added
               </Text>
-              <TouchableOpacity onPress={() => setIngredients([])}>
+              <Pressable onPress={() => setIngredients([])}>
                 <Text style={styles.clearAll}>Clear all</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
             <View style={styles.chips}>
               {ingredients.map(item => (
                 <View key={item} style={styles.chip}>
                   <Text style={styles.chipText}>{item}</Text>
-                  <TouchableOpacity onPress={() => removeIngredient(item)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                    <Ionicons name="close" size={14} color={COLORS.primary} />
-                  </TouchableOpacity>
+                  <Pressable onPress={() => removeIngredient(item)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                    <X size={14} color={C.primary} strokeWidth={ICON_STROKE + 0.5} />
+                  </Pressable>
                 </View>
               ))}
             </View>
           </View>
         )}
 
-        {/* Empty state */}
         {ingredients.length === 0 && !scanning && (
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>🛒</Text>
@@ -223,131 +348,31 @@ export default function ScanScreen({ navigation }) {
         )}
       </ScrollView>
 
-      {/* Find Recipes CTA */}
       {ingredients.length > 0 && (
         <View style={[styles.ctaWrap, { paddingBottom: insets.bottom + SPACING.md }]}>
-          <TouchableOpacity
-            style={[styles.ctaBtn, searching && { opacity: 0.8 }]}
+          <Pressable
+            style={({ pressed }) => [styles.ctaBtn, searching && { opacity: 0.8 }, pressed && !searching && { opacity: 0.92 }]}
             onPress={handleFindRecipes}
             disabled={searching}
-            activeOpacity={0.85}
           >
             <LinearGradient
-              colors={['#16A34A', '#15803D']}
-              start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+              colors={PREMIUM_CTA_VERTICAL}
+              start={PREMIUM_CTA_VERTICAL_START}
+              end={PREMIUM_CTA_VERTICAL_END}
               style={styles.ctaBtnGradient}
             >
-              {searching
-                ? <ActivityIndicator color={COLORS.white} />
-                : (
-                  <View style={styles.ctaBtnContent}>
-                    <Ionicons name="sparkles" size={20} color={COLORS.white} />
-                    <Text style={styles.ctaBtnText}>Find Recipes ({ingredients.length})</Text>
-                  </View>
-                )
-              }
+              {searching ? (
+                <ActivityIndicator color={C.white} />
+              ) : (
+                <View style={styles.ctaBtnContent}>
+                  <Sparkles size={20} color={C.white} strokeWidth={ICON_STROKE} />
+                  <Text style={styles.ctaBtnText}>Find Recipes ({ingredients.length})</Text>
+                </View>
+              )}
             </LinearGradient>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    paddingHorizontal: SPACING.xl,
-    paddingBottom: SPACING.xxl,
-  },
-  headerTitle: { ...FONT.h2, color: '#FFFFFF', marginBottom: SPACING.xs },
-  headerSub: { ...FONT.body, color: 'rgba(255,255,255,0.6)', marginBottom: SPACING.xl },
-  scanBtns: { flexDirection: 'row', gap: SPACING.md },
-  scanBtn: { flex: 1 },
-  scanBtnInner: {
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: RADIUS.xl,
-    padding: SPACING.lg,
-    alignItems: 'center',
-    gap: SPACING.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
-  },
-  scanIcon: {
-    width: 56, height: 56, borderRadius: RADIUS.lg,
-    backgroundColor: '#F0FDF4',
-    alignItems: 'center', justifyContent: 'center',
-  },
-  scanBtnLabel: { ...FONT.bodySemiBold, color: '#FFFFFF' },
-  scanBtnSub: { ...FONT.caption, color: 'rgba(255,255,255,0.5)' },
-
-  scroll: { padding: SPACING.xl, paddingBottom: 100 },
-
-  scanningBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: SPACING.md,
-    backgroundColor: COLORS.primaryFaint,
-    borderRadius: RADIUS.lg, padding: SPACING.md,
-    marginBottom: SPACING.lg,
-    borderWidth: 1, borderColor: COLORS.primaryPale,
-  },
-  scanningText: { ...FONT.bodyMedium, color: COLORS.primary },
-
-  inputSection: { gap: SPACING.sm, marginBottom: SPACING.lg },
-  inputLabel: { ...FONT.label, color: COLORS.text },
-  inputRow: { flexDirection: 'row', gap: SPACING.sm },
-  inputWrap: {
-    flex: 1, flexDirection: 'row', alignItems: 'center',
-    backgroundColor: COLORS.surface, borderRadius: RADIUS.md,
-    borderWidth: 1.5, borderColor: COLORS.border,
-    paddingHorizontal: SPACING.md, height: 50,
-  },
-  inputIcon: { marginRight: SPACING.sm },
-  input: { flex: 1, ...FONT.body, color: COLORS.text },
-  addBtn: {
-    width: 50, height: 50, borderRadius: RADIUS.md,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  addBtnDisabled: { backgroundColor: COLORS.surface2 },
-
-  suggestions: { marginBottom: SPACING.lg },
-  suggestionsLabel: { ...FONT.label, color: COLORS.textSecondary, marginBottom: SPACING.sm },
-  suggestionChips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-  suggestionChip: {
-    backgroundColor: COLORS.surface2,
-    borderRadius: RADIUS.full, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs + 2,
-    borderWidth: 1, borderColor: COLORS.border,
-  },
-  suggestionChipText: { ...FONT.bodySmallMedium, color: COLORS.textSecondary },
-
-  ingredientsSection: { gap: SPACING.md },
-  ingredientsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  ingredientsTitle: { ...FONT.bodySemiBold, color: COLORS.text },
-  clearAll: { ...FONT.bodySmallMedium, color: COLORS.error },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-  chip: {
-    flexDirection: 'row', alignItems: 'center', gap: SPACING.xs,
-    backgroundColor: COLORS.primaryFaint, borderRadius: RADIUS.full,
-    paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
-    borderWidth: 1, borderColor: COLORS.primaryPale,
-  },
-  chipText: { ...FONT.bodySmallMedium, color: COLORS.primary },
-
-  emptyState: { alignItems: 'center', paddingTop: SPACING.section, gap: SPACING.md },
-  emptyEmoji: { fontSize: 56 },
-  emptyTitle: { ...FONT.h4, color: COLORS.text },
-  emptySub: { ...FONT.body, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 24 },
-
-  ctaWrap: {
-    position: 'absolute', bottom: 0, left: 0, right: 0,
-    paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.md,
-    backgroundColor: COLORS.background,
-    borderTopWidth: 1, borderTopColor: COLORS.borderLight,
-    ...SHADOWS.md,
-  },
-  ctaBtn: { borderRadius: RADIUS.lg, overflow: 'hidden', ...SHADOWS.green },
-  ctaBtnGradient: { height: 54, alignItems: 'center', justifyContent: 'center' },
-  ctaBtnContent: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
-  ctaBtnText: { ...FONT.h5, color: COLORS.white },
-});

@@ -1,211 +1,231 @@
 // src/screens/auth/WelcomeScreen.jsx
 import React, { useEffect, useRef } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions, Image,
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
+import { Camera, ScanLine, Sparkles } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS, FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
+import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
+import { ICON_STROKE } from '../../constants/icons';
+import PremiumScreenShell from '../../components/PremiumScreenShell';
+import {
+  PREMIUM,
+  PREMIUM_CTA_VERTICAL,
+  PREMIUM_CTA_VERTICAL_END,
+  PREMIUM_CTA_VERTICAL_START,
+} from '../../constants/premiumScreenTheme';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const FEATURES = [
-  { emoji: '📸', text: 'Snap ingredients' },
-  { emoji: '🤖', text: 'AI identifies them' },
-  { emoji: '🍽️', text: 'Get instant recipes' },
+  { Icon: Camera, label: 'Snap ingredients' },
+  { Icon: ScanLine, label: 'AI identifies them' },
+  { Icon: Sparkles, label: 'Get instant recipes' },
 ];
 
 export default function WelcomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
 
-  const fadeAnim  = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(30)).current;
-  const ctaAnim   = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(28)).current;
+  const ctaAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
       Animated.parallel([
-        Animated.timing(fadeAnim,  { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(slideAnim, { toValue: 0, duration: 700, useNativeDriver: true }),
+        Animated.timing(fadeAnim, { toValue: 1, duration: 640, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: 0, duration: 640, useNativeDriver: true }),
       ]),
-      Animated.timing(ctaAnim, { toValue: 1, duration: 400, useNativeDriver: true, delay: 100 }),
+      Animated.timing(ctaAnim, { toValue: 1, duration: 380, useNativeDriver: true, delay: 80 }),
     ]).start();
-  }, []);
+  }, [fadeAnim, slideAnim, ctaAnim]);
 
   return (
-    <View style={styles.container}>
+    <PremiumScreenShell>
       <StatusBar style="light" />
 
-      {/* Hero gradient */}
-      <LinearGradient
-        colors={['#0A1F0E', '#0F3320', '#15803D']}
-        style={styles.hero}
-      >
-        {/* Decorative circles */}
-        <View style={styles.circle1} />
-        <View style={styles.circle2} />
-
+      <View style={styles.hero}>
+        <View style={styles.heroGlow} />
         <Animated.View
           style={[
-            styles.heroContent,
+            styles.heroInner,
             { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
           ]}
         >
-          {/* Badge */}
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>✦ AI-Powered Cooking</Text>
+            <Sparkles size={12} color="#FACC15" strokeWidth={ICON_STROKE} />
+            <Text style={styles.badgeText}>AI-powered cooking</Text>
           </View>
 
-          {/* Logo */}
           <View style={styles.logoRow}>
             <View style={styles.logoDot} />
             <Text style={styles.logoText}>FRIDGR</Text>
           </View>
 
-          <Text style={styles.heroTitle}>Cook with what{'\n'}you already have</Text>
+          <Text style={styles.heroTitle}>Cook with what you already have</Text>
           <Text style={styles.heroSubtitle}>
-            Turn any ingredients into delicious recipes in seconds
+            Turn ingredients into recipes in seconds — less waste, more flavor.
           </Text>
 
-          {/* Feature pills */}
           <View style={styles.features}>
-            {FEATURES.map((f, i) => (
+            {FEATURES.map(({ Icon, label }, i) => (
               <View key={i} style={styles.featurePill}>
-                <Text style={styles.featureEmoji}>{f.emoji}</Text>
-                <Text style={styles.featureText}>{f.text}</Text>
+                <Icon size={16} color="rgba(249,250,251,0.95)" strokeWidth={ICON_STROKE} />
+                <Text style={styles.featureText}>{label}</Text>
               </View>
             ))}
           </View>
         </Animated.View>
-      </LinearGradient>
+      </View>
 
-      {/* Bottom CTA card */}
-      <Animated.View style={[styles.bottomCard, { opacity: ctaAnim }]}>
-        <View style={styles.ctaSection}>
-          <TouchableOpacity
-            style={styles.primaryBtn}
-            onPress={() => navigation.navigate(ROUTES.SIGN_UP)}
-            activeOpacity={0.85}
+      <Animated.View
+        style={[
+          styles.bottom,
+          {
+            opacity: ctaAnim,
+            backgroundColor: PREMIUM.footerBg,
+            paddingBottom: insets.bottom + SPACING.lg,
+          },
+        ]}
+      >
+        <Pressable
+          style={({ pressed }) => [styles.primaryBtn, pressed && { opacity: 0.92, transform: [{ scale: 0.99 }] }]}
+          onPress={() => navigation.navigate(ROUTES.SIGN_UP)}
+        >
+          <LinearGradient
+            colors={PREMIUM_CTA_VERTICAL}
+            start={PREMIUM_CTA_VERTICAL_START}
+            end={PREMIUM_CTA_VERTICAL_END}
+            style={styles.primaryGradient}
           >
-            <LinearGradient
-              colors={['#16A34A', '#15803D']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.primaryBtnGradient}
-            >
-              <Text style={styles.primaryBtnText}>Get Started — It's Free</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            <Text style={styles.primaryText}>Create account</Text>
+          </LinearGradient>
+        </Pressable>
 
-          <TouchableOpacity
-            style={styles.secondaryBtn}
-            onPress={() => navigation.navigate(ROUTES.LOGIN)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.secondaryBtnText}>
-              Already have an account?{' '}
-              <Text style={styles.secondaryBtnLink}>Sign in</Text>
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <Pressable
+          style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.85 }]}
+          onPress={() => navigation.navigate(ROUTES.LOGIN)}
+        >
+          <Text style={styles.secondaryText}>
+            Already have an account?{' '}
+            <Text style={styles.secondaryLink}>Sign in</Text>
+          </Text>
+        </Pressable>
 
-        <Text style={[styles.legal, { paddingBottom: insets.bottom + SPACING.sm }]}>
-          By continuing, you agree to our Terms & Privacy Policy
+        <Text style={styles.legal}>
+          By continuing, you agree to our Terms and Privacy Policy
         </Text>
       </Animated.View>
-    </View>
+    </PremiumScreenShell>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
-
-  // Hero
-  hero: { flex: 1, overflow: 'hidden' },
-  heroContent: {
+  hero: {
     flex: 1,
     paddingHorizontal: SPACING.xl,
+    paddingTop: 72,
     justifyContent: 'flex-end',
-    paddingBottom: SPACING.xxxl,
-    paddingTop: 80,
+    paddingBottom: SPACING.xxl,
+    overflow: 'hidden',
   },
-  circle1: {
-    position: 'absolute', top: -80, right: -80,
-    width: 280, height: 280, borderRadius: 140,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+  heroGlow: {
+    position: 'absolute',
+    top: width * 0.05,
+    right: -width * 0.15,
+    width: width * 0.65,
+    height: width * 0.65,
+    borderRadius: width * 0.325,
+    backgroundColor: 'rgba(250,204,21,0.08)',
   },
-  circle2: {
-    position: 'absolute', top: -30, right: 40,
-    width: 140, height: 140, borderRadius: 70,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+  heroInner: {
+    gap: SPACING.md,
   },
-
   badge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: RADIUS.full,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.18)',
-    marginBottom: SPACING.lg,
-  },
-  badgeText: { ...FONT.labelSmall, color: 'rgba(255,255,255,0.8)' },
-
-  logoRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: SPACING.lg, gap: 4 },
-  logoDot:  { width: 10, height: 10, borderRadius: 5, backgroundColor: '#86EFAC', marginTop: 6 },
-  logoText: { fontSize: 28, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.8 },
-
-  heroTitle: {
-    ...FONT.hero,
-    color: '#FFFFFF',
-    marginBottom: SPACING.md,
-  },
-  heroSubtitle: {
-    ...FONT.body,
-    color: 'rgba(255,255,255,0.65)',
-    marginBottom: SPACING.xxl,
-    lineHeight: 24,
-  },
-
-  features: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-  featurePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.xs,
+    alignSelf: 'flex-start',
+    gap: 6,
     backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: RADIUS.full,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.xs + 2,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.14)',
   },
-  featureEmoji: { fontSize: 14 },
-  featureText:  { ...FONT.bodySmallMedium, color: 'rgba(255,255,255,0.85)' },
-
-  // Bottom card
-  bottomCard: {
-    backgroundColor: COLORS.surface,
+  badgeText: {
+    ...FONT.labelSmall,
+    color: 'rgba(249,250,251,0.88)',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
+  },
+  logoRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginTop: SPACING.sm },
+  logoDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#FACC15',
+    marginTop: 8,
+  },
+  logoText: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#F9FAFB',
+    letterSpacing: -1.2,
+  },
+  heroTitle: {
+    ...FONT.hero,
+    color: '#F9FAFB',
+    marginTop: SPACING.sm,
+  },
+  heroSubtitle: {
+    ...FONT.body,
+    color: 'rgba(249,250,251,0.62)',
+    lineHeight: 24,
+    maxWidth: 360,
+  },
+  features: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginTop: SPACING.md },
+  featurePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: RADIUS.full,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs + 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  featureText: { ...FONT.bodySmallMedium, color: 'rgba(249,250,251,0.9)' },
+  bottom: {
     borderTopLeftRadius: RADIUS.xxl,
     borderTopRightRadius: RADIUS.xxl,
     paddingHorizontal: SPACING.xl,
     paddingTop: SPACING.xxl,
+    borderTopWidth: 1,
+    borderTopColor: PREMIUM.glassBorder,
     ...SHADOWS.lg,
   },
-  ctaSection: { gap: SPACING.md, marginBottom: SPACING.md },
-
-  primaryBtn: { borderRadius: RADIUS.lg, overflow: 'hidden', ...SHADOWS.green },
-  primaryBtnGradient: {
+  primaryBtn: {
+    borderRadius: RADIUS.xl,
+    overflow: 'hidden',
+    ...SHADOWS.green,
+  },
+  primaryGradient: {
     paddingVertical: SPACING.lg + 2,
     alignItems: 'center',
   },
-  primaryBtnText: { ...FONT.bodySemiBold, color: COLORS.white, fontSize: 16 },
-
-  secondaryBtn: { alignItems: 'center', paddingVertical: SPACING.sm },
-  secondaryBtnText: { ...FONT.body, color: COLORS.textSecondary },
-  secondaryBtnLink: { color: COLORS.primary, fontWeight: '600' },
-
-  legal: { ...FONT.caption, color: COLORS.textTertiary, textAlign: 'center' },
+  primaryText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '700' },
+  secondaryBtn: { alignItems: 'center', paddingVertical: SPACING.md },
+  secondaryText: { ...FONT.body, color: PREMIUM.textMuted },
+  secondaryLink: { fontWeight: '700', color: PREMIUM.accent },
+  legal: { ...FONT.caption, textAlign: 'center', marginTop: SPACING.sm, color: 'rgba(248,250,252,0.4)' },
 });

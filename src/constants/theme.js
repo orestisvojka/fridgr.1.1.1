@@ -2,92 +2,84 @@
 // Premium FRIDGR Design System — Professional UI Standards
 
 export const COLORS = {
-  // ─── Brand Primary (Forest Green) ────────────────────────────────────────
-  primary: '#15803D',
-  primaryMid: '#16A34A',
-  primaryLight: '#22C55E',
+  // Brand (exact palette)
+  primary: '#22C55E',
+  primaryMid: '#22C55E',
+  primaryLight: '#4ADE80',
+  secondary: '#4ADE80',
   primaryPale: '#DCFCE7',
-  primaryFaint: '#F0FDF4',
-  primaryDark: '#14532D',
-  primaryGradient: ['#15803D', '#16A34A'],
-  primaryGradientFull: ['#0F4C25', '#15803D', '#16A34A'],
+  primaryFaint: '#ECFDF5',
+  primaryDark: '#16A34A',
+  primaryGradient: ['#16A34A', '#22C55E'],
+  primaryGradientFull: ['#0F172A', '#16A34A', '#22C55E'],
 
-  // ─── Accent (Warm Amber / Food Tone) ─────────────────────────────────────
-  accent: '#D97706',
-  accentLight: '#F59E0B',
-  accentPale: '#FEF3C7',
-  accentFaint: '#FFFBEB',
+  accent: '#FACC15',
+  accentLight: '#FDE047',
+  accentPale: '#FEF9C3',
+  accentFaint: '#FEFCE8',
 
-  // ─── Warm Neutrals (Stone Palette) ───────────────────────────────────────
-  background:   '#FAFAF9',
-  surface:      '#FFFFFF',
-  surface2:     '#F5F4F0',
-  surface3:     '#ECEAE6',
-  border:       '#E2DFD8',
-  borderLight:  '#F0EDE8',
-  borderStrong: '#C4BFB8',
+  background: '#F8FAFC',
+  surface: '#FFFFFF',
+  surface2: '#F8FAFC',
+  surface3: '#E5E7EB',
+  border: '#E5E7EB',
+  borderLight: '#F1F5F9',
+  borderStrong: '#CBD5E1',
 
-  // ─── Text ─────────────────────────────────────────────────────────────────
-  text:          '#1C1917',
-  textSecondary: '#78716C',
-  textTertiary:  '#A8A29E',
-  textDisabled:  '#D6D3D0',
-  textInverse:   '#FFFFFF',
-  textPrimary:   '#15803D',
-  textAccent:    '#D97706',
+  text: '#1F2937',
+  textSecondary: '#6B7280',
+  textTertiary: '#9CA3AF',
+  textDisabled: '#D1D5DB',
+  textInverse: '#FFFFFF',
+  textPrimary: '#22C55E',
+  textAccent: '#FACC15',
 
-  // ─── Status ───────────────────────────────────────────────────────────────
-  success:      '#15803D',
+  success: '#22C55E',
   successLight: '#DCFCE7',
-  warning:      '#D97706',
-  warningLight: '#FEF3C7',
-  error:        '#DC2626',
-  errorLight:   '#FEE2E2',
-  info:         '#0284C7',
-  infoLight:    '#E0F2FE',
+  warning: '#F97316',
+  warningLight: '#FFEDD5',
+  error: '#EF4444',
+  errorLight: '#FEE2E2',
+  info: '#3B82F6',
+  infoLight: '#DBEAFE',
 
-  // ─── Overlays ─────────────────────────────────────────────────────────────
-  overlay:      'rgba(28, 25, 23, 0.65)',
-  overlayLight: 'rgba(28, 25, 23, 0.12)',
-  overlayCard:  'rgba(28, 25, 23, 0.04)',
+  overlay: 'rgba(15, 23, 42, 0.55)',
+  overlayLight: 'rgba(15, 23, 42, 0.08)',
+  overlayCard: 'rgba(15, 23, 42, 0.04)',
 
-  // ─── Utility ──────────────────────────────────────────────────────────────
-  white:       '#FFFFFF',
-  black:       '#000000',
+  white: '#FFFFFF',
+  black: '#000000',
   transparent: 'transparent',
-  star:        '#F59E0B',
+  star: '#FACC15',
 
-  // ─── Dark Mode Surface ────────────────────────────────────────────────────
   dark: {
-    background:    '#100F0C',
-    surface:       '#1A1814',
-    surface2:      '#242018',
-    surface3:      '#302C26',
-    border:        '#3D3830',
-    text:          '#F5F2ED',
-    textSecondary: '#A8A29E',
-    textTertiary:  '#6B6560',
+    background: '#0F172A',
+    surface: '#111827',
+    surface2: '#1F2937',
+    surface3: '#374151',
+    border: '#374151',
+    text: '#F9FAFB',
+    textSecondary: '#9CA3AF',
+    textTertiary: '#6B7280',
   },
 
-  // ─── Onboarding Gradient Stops ────────────────────────────────────────────
   onboarding: [
-    ['#0F4C25', '#0A2E16'],
-    ['#14532D', '#0F3D22'],
-    ['#15803D', '#14532D'],
-    ['#0D3321', '#16A34A'],
-    ['#0A1F13', '#15803D'],
+    ['#0F172A', '#14532D'],
+    ['#111827', '#166534'],
+    ['#0F172A', '#22C55E'],
+    ['#14532D', '#FACC15'],
+    ['#0F172A', '#16A34A'],
   ],
 
-  // ─── Recipe Accent Palettes ───────────────────────────────────────────────
   recipePalettes: [
-    { color: '#EA580C', bg: '#FFF7ED', light: '#FFEDD5' },
-    { color: '#15803D', bg: '#F0FDF4', light: '#DCFCE7' },
-    { color: '#D97706', bg: '#FFFBEB', light: '#FEF3C7' },
-    { color: '#DB2777', bg: '#FDF2F8', light: '#FCE7F3' },
-    { color: '#7C3AED', bg: '#F5F3FF', light: '#EDE9FE' },
-    { color: '#0284C7', bg: '#F0F9FF', light: '#E0F2FE' },
-    { color: '#0F766E', bg: '#F0FDFA', light: '#CCFBF1' },
-    { color: '#BE123C', bg: '#FFF1F2', light: '#FFE4E6' },
+    { color: '#F97316', bg: '#FFF7ED', light: '#FFEDD5' },
+    { color: '#22C55E', bg: '#ECFDF5', light: '#DCFCE7' },
+    { color: '#FACC15', bg: '#FEFCE8', light: '#FEF9C3' },
+    { color: '#EC4899', bg: '#FDF2F8', light: '#FCE7F3' },
+    { color: '#3B82F6', bg: '#EFF6FF', light: '#DBEAFE' },
+    { color: '#8B5CF6', bg: '#F5F3FF', light: '#EDE9FE' },
+    { color: '#14B8A6', bg: '#F0FDFA', light: '#CCFBF1' },
+    { color: '#EF4444', bg: '#FEF2F2', light: '#FEE2E2' },
   ],
 };
 
@@ -186,14 +178,14 @@ export const SHADOWS = {
     elevation: 12,
   },
   green: {
-    shadowColor: '#15803D',
+    shadowColor: '#22C55E',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
     elevation: 8,
   },
   accent: {
-    shadowColor: '#D97706',
+    shadowColor: '#FACC15',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 12,
@@ -203,9 +195,9 @@ export const SHADOWS = {
 
 // ─── Difficulty Color Map ─────────────────────────────────────────────────────
 export const DIFFICULTY_COLORS = {
-  Easy:   { bg: '#F0FDF4', text: '#15803D', dot: '#22C55E' },
-  Medium: { bg: '#FFFBEB', text: '#D97706', dot: '#F59E0B' },
-  Hard:   { bg: '#FFF1F2', text: '#BE123C', dot: '#F43F5E' },
+  Easy:   { bg: '#ECFDF5', text: '#22C55E', dot: '#4ADE80' },
+  Medium: { bg: '#FEFCE8', text: '#CA8A04', dot: '#FACC15' },
+  Hard:   { bg: '#FEF2F2', text: '#EF4444', dot: '#F97316' },
 };
 
 // ─── Tab Bar ─────────────────────────────────────────────────────────────────
@@ -213,9 +205,33 @@ export const TAB_BAR = {
   height: 80,
   paddingBottom: 20,
   backgroundColor: '#FFFFFF',
-  borderTopColor: '#F0EDE8',
+  borderTopColor: '#E5E7EB',
   borderTopWidth: 1,
 };
+
+/** Resolved palette for light/dark (spread over COLORS). Use with useThemeColors(). */
+export function resolveTheme(isDark) {
+  if (!isDark) {
+    return { ...COLORS, isDark: false };
+  }
+  const d = COLORS.dark;
+  return {
+    ...COLORS,
+    isDark: true,
+    background: d.background,
+    surface: d.surface,
+    surface2: d.surface2,
+    surface3: d.surface3,
+    border: d.border,
+    borderLight: '#1F2937',
+    borderStrong: '#4B5563',
+    text: d.text,
+    textSecondary: d.textSecondary,
+    textTertiary: d.textTertiary,
+    textDisabled: '#6B7280',
+    overlayCard: 'rgba(255,255,255,0.06)',
+  };
+}
 
 export default {
   COLORS,
@@ -225,4 +241,5 @@ export default {
   SHADOWS,
   DIFFICULTY_COLORS,
   TAB_BAR,
+  resolveTheme,
 };

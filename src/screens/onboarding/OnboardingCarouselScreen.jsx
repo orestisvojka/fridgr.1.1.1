@@ -7,19 +7,14 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS, FONT, SPACING, RADIUS } from '../../constants/theme';
+import { FONT, SPACING, RADIUS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
 import { ONBOARDING_SLIDES } from '../../data/mockData';
+import { PREMIUM_CAROUSEL_GRADIENTS, PREMIUM_VEIL, PREMIUM, PREMIUM_CTA_VERTICAL, PREMIUM_CTA_VERTICAL_END, PREMIUM_CTA_VERTICAL_START } from '../../constants/premiumScreenTheme';
 
 const { width, height } = Dimensions.get('window');
 
-const GRADIENTS = [
-  ['#071A0B', '#0F3D22', '#15803D'],
-  ['#0A2410', '#133A1E', '#1A6B3C'],
-  ['#0C2E18', '#166534', '#15803D'],
-  ['#081C0F', '#0F4C25', '#196935'],
-  ['#060F0A', '#0D3321', '#16A34A'],
-];
+const GRADIENTS = PREMIUM_CAROUSEL_GRADIENTS;
 
 function Slide({ item, index }) {
   return (
@@ -74,7 +69,17 @@ export default function OnboardingCarouselScreen({ navigation }) {
       <StatusBar style="light" />
       <LinearGradient
         colors={GRADIENTS[activeIndex] || GRADIENTS[0]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.85, y: 1 }}
         style={StyleSheet.absoluteFill}
+      />
+      <LinearGradient
+        colors={PREMIUM_VEIL.colors}
+        locations={PREMIUM_VEIL.locations}
+        start={PREMIUM_VEIL.start}
+        end={PREMIUM_VEIL.end}
+        style={styles.topVeil}
+        pointerEvents="none"
       />
 
       {/* Decorative orb */}
@@ -130,13 +135,18 @@ export default function OnboardingCarouselScreen({ navigation }) {
         </View>
 
         {/* CTA */}
-        <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.85}>
-          <View style={styles.nextBtnInner}>
+        <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.92}>
+          <LinearGradient
+            colors={PREMIUM_CTA_VERTICAL}
+            start={PREMIUM_CTA_VERTICAL_START}
+            end={PREMIUM_CTA_VERTICAL_END}
+            style={styles.nextBtnInner}
+          >
             <Text style={styles.nextBtnText}>
               {isLast ? 'Get Started' : 'Continue'}
             </Text>
             {!isLast && <Text style={styles.nextArrow}>→</Text>}
-          </View>
+          </LinearGradient>
         </TouchableOpacity>
 
         {/* Step indicator */}
@@ -149,7 +159,14 @@ export default function OnboardingCarouselScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.primaryDark },
+  container: { flex: 1, backgroundColor: PREMIUM.rootBg },
+  topVeil: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: 280,
+  },
   orb: {
     position: 'absolute',
     top: -100,
@@ -220,10 +237,7 @@ const styles = StyleSheet.create({
   },
   nextBtn: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: RADIUS.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.25)',
+    borderRadius: RADIUS.xl,
     overflow: 'hidden',
   },
   nextBtnInner: {

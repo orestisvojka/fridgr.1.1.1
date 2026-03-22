@@ -1,21 +1,128 @@
 // src/screens/recipe/ResultsScreen.jsx
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, FlatList, TouchableOpacity,
-  Animated, Dimensions,
+  View, Text, StyleSheet, FlatList, Pressable, Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  ArrowLeft,
+  Heart,
+  Star,
+  Clock,
+  AlertCircle,
+  ArrowRight,
+} from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRecipes } from '../../context/RecipesContext';
-import { COLORS, FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
+import { useThemeColors } from '../../context/ThemeContext';
+import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
+import {
+  PREMIUM_HERO_COMPACT,
+  PREMIUM_HERO_COMPACT_END,
+  PREMIUM_HERO_COMPACT_START,
+} from '../../constants/premiumScreenTheme';
+import { ICON_STROKE } from '../../constants/icons';
+import RecipeImage from '../../components/RecipeImage';
 
-const { width } = Dimensions.get('window');
+function createStyles(C) {
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: C.background },
+    header: {
+      flexDirection: 'row', alignItems: 'center',
+      paddingHorizontal: SPACING.xl, paddingBottom: SPACING.xl,
+      gap: SPACING.md,
+    },
+    backBtn: {
+      width: 38, height: 38, borderRadius: RADIUS.md,
+      backgroundColor: 'rgba(255,255,255,0.12)',
+      alignItems: 'center', justifyContent: 'center',
+    },
+    headerTextWrap: { flex: 1 },
+    headerTitle: { ...FONT.h3, color: '#FFFFFF' },
+    headerSub: { ...FONT.bodySmall, color: 'rgba(255,255,255,0.55)', marginTop: 2 },
+    ingredientStrip: {
+      backgroundColor: C.surface,
+      borderBottomWidth: 1, borderBottomColor: C.borderLight,
+      paddingVertical: SPACING.sm,
+    },
+    ingredientChips: { paddingHorizontal: SPACING.xl, gap: SPACING.sm },
+    ingredientChip: {
+      backgroundColor: C.primaryFaint,
+      borderRadius: RADIUS.full, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs,
+      borderWidth: 1, borderColor: C.primaryPale,
+    },
+    ingredientChipText: { ...FONT.bodySmallMedium, color: C.primary },
+    list: { padding: SPACING.xl, gap: SPACING.lg, paddingBottom: 30 },
+    recipeCard: {
+      backgroundColor: C.surface,
+      borderRadius: RADIUS.xxl,
+      overflow: 'hidden',
+      borderWidth: 1, borderColor: C.borderLight,
+      ...SHADOWS.md,
+    },
+    cardHero: { height: 160, position: 'relative' },
+    heartBtn: {
+      position: 'absolute', top: SPACING.md, right: SPACING.md,
+      width: 36, height: 36, borderRadius: 18,
+      backgroundColor: C.surface,
+      alignItems: 'center', justifyContent: 'center',
+      ...SHADOWS.sm,
+    },
+    heartBtnActive: { backgroundColor: C.primary },
+    cardBody: { padding: SPACING.lg, gap: SPACING.md },
+    cardTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    cardTitle: { ...FONT.h4, color: C.text, flex: 1 },
+    ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+    ratingText: { ...FONT.bodySmallMedium, color: C.text },
+    cardDesc: { ...FONT.bodySmall, color: C.textSecondary, lineHeight: 20 },
+    matchBar: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
+    matchBg: { flex: 1, height: 6, backgroundColor: C.surface2, borderRadius: 3, overflow: 'hidden' },
+    matchFill: { height: '100%', borderRadius: 3 },
+    matchLabel: { ...FONT.captionMedium, minWidth: 60, textAlign: 'right' },
+    macrosRow: {
+      flexDirection: 'row', backgroundColor: C.surface2,
+      borderRadius: RADIUS.md, padding: SPACING.sm,
+    },
+    macroItem: { flex: 1, alignItems: 'center', gap: 2 },
+    macroValue: { ...FONT.bodySemiBold, color: C.text, fontSize: 14 },
+    macroLabel: { ...FONT.caption, color: C.textTertiary },
+    metaRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, flexWrap: 'wrap' },
+    metaPill: {
+      flexDirection: 'row', alignItems: 'center', gap: 4,
+      backgroundColor: C.surface2, borderRadius: RADIUS.full,
+      paddingHorizontal: SPACING.sm, paddingVertical: 4,
+    },
+    metaText: { ...FONT.caption, color: C.textTertiary },
+    diffText: { fontSize: 11, fontWeight: '600' },
+    missingPill: {
+      flexDirection: 'row', alignItems: 'center', gap: 4,
+      backgroundColor: C.accentFaint, borderRadius: RADIUS.full,
+      paddingHorizontal: SPACING.sm, paddingVertical: 4,
+    },
+    missingText: { ...FONT.caption, color: C.accent },
+    viewBtn: {
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+      gap: SPACING.xs, backgroundColor: C.primaryFaint,
+      borderRadius: RADIUS.lg, paddingVertical: SPACING.md,
+      borderWidth: 1.5, borderColor: C.primaryPale,
+    },
+    viewBtnText: { ...FONT.bodySemiBold, color: C.primary },
+    emptyState: {
+      flex: 1, alignItems: 'center', justifyContent: 'center', gap: SPACING.md,
+      paddingHorizontal: SPACING.xxl,
+    },
+    emptyEmoji: { fontSize: 56 },
+    emptyTitle: { ...FONT.h4, color: C.text },
+    emptySub: { ...FONT.body, color: C.textSecondary, textAlign: 'center', lineHeight: 24 },
+    tryAgainBtn: { marginTop: SPACING.md },
+    tryAgainText: { ...FONT.bodyMedium, color: C.primary },
+  });
+}
 
-function MatchBar({ score }) {
+function MatchBar({ score, styles, C }) {
   const pct = Math.round(score * 100);
-  const color = pct >= 80 ? COLORS.primary : pct >= 50 ? COLORS.accent : COLORS.error;
+  const color = pct >= 80 ? C.primary : pct >= 50 ? C.accent : C.error;
   return (
     <View style={styles.matchBar}>
       <View style={styles.matchBg}>
@@ -26,61 +133,68 @@ function MatchBar({ score }) {
   );
 }
 
-function RecipeResultCard({ item, index, navigation }) {
+function RecipeResultCard({ item, index, navigation, styles, C }) {
   const { toggleSave, isSaved } = useRecipes();
-  const fadeAnim  = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
   const saved = isSaved(item.recipe.id);
 
-  const palette = COLORS.recipePalettes[parseInt(item.recipe.id.replace('r', ''), 10) % COLORS.recipePalettes.length];
-
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim,  { toValue: 1, duration: 350, delay: index * 80, useNativeDriver: true }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 350, delay: index * 80, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: 0, duration: 350, delay: index * 80, useNativeDriver: true }),
     ]).start();
   }, []);
 
+  const diffBg =
+    item.recipe.difficulty === 'Easy' ? C.primaryFaint
+      : item.recipe.difficulty === 'Medium' ? C.accentFaint
+        : C.errorLight;
+  const diffColor =
+    item.recipe.difficulty === 'Easy' ? C.primary
+      : item.recipe.difficulty === 'Medium' ? C.accent
+        : C.error;
+
   return (
     <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-      <TouchableOpacity
-        style={styles.recipeCard}
+      <Pressable
+        style={({ pressed }) => [styles.recipeCard, pressed && { opacity: 0.95 }]}
         onPress={() => navigation.navigate(ROUTES.DETAIL, { recipe: item.recipe })}
-        activeOpacity={0.88}
       >
-        {/* Hero */}
-        <View style={[styles.cardHero, { backgroundColor: palette.light }]}>
-          <Text style={styles.cardEmoji}>{item.recipe.emoji}</Text>
-          <TouchableOpacity
-            style={[styles.heartBtn, saved && styles.heartBtnActive]}
+        <View style={styles.cardHero}>
+          <RecipeImage recipe={item.recipe} height={160} borderRadius={0} style={{ width: '100%' }} />
+          <Pressable
+            style={({ pressed }) => [styles.heartBtn, saved && styles.heartBtnActive, pressed && { opacity: 0.85 }]}
             onPress={() => toggleSave(item.recipe)}
           >
-            <Ionicons name={saved ? 'heart' : 'heart-outline'} size={18} color={saved ? '#FFFFFF' : COLORS.primary} />
-          </TouchableOpacity>
+            <Heart
+              size={18}
+              color={saved ? '#FFFFFF' : C.primary}
+              fill={saved ? '#FFFFFF' : 'transparent'}
+              strokeWidth={ICON_STROKE}
+            />
+          </Pressable>
         </View>
 
-        {/* Body */}
         <View style={styles.cardBody}>
           <View style={styles.cardTopRow}>
             <Text style={styles.cardTitle} numberOfLines={1}>{item.recipe.title}</Text>
             <View style={styles.ratingRow}>
-              <Ionicons name="star" size={12} color={COLORS.star} />
+              <Star size={12} color={C.star} fill={C.star} strokeWidth={0} />
               <Text style={styles.ratingText}>{item.recipe.rating}</Text>
             </View>
           </View>
 
           <Text style={styles.cardDesc} numberOfLines={2}>{item.recipe.description}</Text>
 
-          {/* Match bar */}
-          <MatchBar score={item.matchScore} />
+          <MatchBar score={item.matchScore} styles={styles} C={C} />
 
-          {/* Macros row */}
           <View style={styles.macrosRow}>
             {[
-              { label: 'Cal',  value: item.recipe.calories },
-              { label: 'Pro',  value: `${item.recipe.macros.protein}g` },
+              { label: 'Cal', value: item.recipe.calories },
+              { label: 'Pro', value: `${item.recipe.macros.protein}g` },
               { label: 'Carbs', value: `${item.recipe.macros.carbs}g` },
-              { label: 'Fat',  value: `${item.recipe.macros.fat}g` },
+              { label: 'Fat', value: `${item.recipe.macros.fat}g` },
             ].map(m => (
               <View key={m.label} style={styles.macroItem}>
                 <Text style={styles.macroValue}>{m.value}</Text>
@@ -89,26 +203,17 @@ function RecipeResultCard({ item, index, navigation }) {
             ))}
           </View>
 
-          {/* Meta pills */}
           <View style={styles.metaRow}>
             <View style={styles.metaPill}>
-              <Ionicons name="time-outline" size={12} color={COLORS.textTertiary} />
+              <Clock size={12} color={C.textTertiary} strokeWidth={ICON_STROKE} />
               <Text style={styles.metaText}>{item.recipe.prepTime} min</Text>
             </View>
-            <View style={[styles.metaPill, {
-              backgroundColor: item.recipe.difficulty === 'Easy' ? COLORS.primaryFaint
-                : item.recipe.difficulty === 'Medium' ? COLORS.accentFaint
-                : COLORS.errorLight,
-            }]}>
-              <Text style={[styles.diffText, {
-                color: item.recipe.difficulty === 'Easy' ? COLORS.primary
-                  : item.recipe.difficulty === 'Medium' ? COLORS.accent
-                  : COLORS.error,
-              }]}>{item.recipe.difficulty}</Text>
+            <View style={[styles.metaPill, { backgroundColor: diffBg }]}>
+              <Text style={[styles.diffText, { color: diffColor }]}>{item.recipe.difficulty}</Text>
             </View>
             {item.missingIngredients.length > 0 && (
               <View style={styles.missingPill}>
-                <Ionicons name="alert-circle-outline" size={12} color={COLORS.accent} />
+                <AlertCircle size={12} color={C.accent} strokeWidth={ICON_STROKE} />
                 <Text style={styles.missingText}>
                   {item.missingIngredients.length} missing
                 </Text>
@@ -116,34 +221,39 @@ function RecipeResultCard({ item, index, navigation }) {
             )}
           </View>
 
-          {/* CTA */}
-          <TouchableOpacity
-            style={styles.viewBtn}
+          <Pressable
+            style={({ pressed }) => [styles.viewBtn, pressed && { opacity: 0.88 }]}
             onPress={() => navigation.navigate(ROUTES.DETAIL, { recipe: item.recipe })}
           >
             <Text style={styles.viewBtnText}>View Recipe</Text>
-            <Ionicons name="arrow-forward" size={16} color={COLORS.primary} />
-          </TouchableOpacity>
+            <ArrowRight size={16} color={C.primary} strokeWidth={ICON_STROKE} />
+          </Pressable>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </Animated.View>
   );
 }
 
 export default function ResultsScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
+  const C = useThemeColors();
+  const styles = useMemo(() => createStyles(C), [C]);
   const { ingredients = [], results = [] } = route.params ?? {};
 
   return (
-    <View style={[styles.container, { backgroundColor: COLORS.background }]}>
-      {/* Header */}
+    <View style={styles.container}>
       <LinearGradient
-        colors={['#0A1F0E', '#15803D']}
+        colors={PREMIUM_HERO_COMPACT}
+        start={PREMIUM_HERO_COMPACT_START}
+        end={PREMIUM_HERO_COMPACT_END}
         style={[styles.header, { paddingTop: insets.top + SPACING.md }]}
       >
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
-        </TouchableOpacity>
+        <Pressable
+          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.8 }]}
+          onPress={() => navigation.goBack()}
+        >
+          <ArrowLeft size={20} color="#FFFFFF" strokeWidth={ICON_STROKE} />
+        </Pressable>
         <View style={styles.headerTextWrap}>
           <Text style={styles.headerTitle}>
             {results.length} Recipe{results.length !== 1 ? 's' : ''} Found
@@ -152,7 +262,6 @@ export default function ResultsScreen({ navigation, route }) {
         </View>
       </LinearGradient>
 
-      {/* Ingredient chips */}
       <View style={styles.ingredientStrip}>
         <FlatList
           data={ingredients}
@@ -168,15 +277,14 @@ export default function ResultsScreen({ navigation, route }) {
         />
       </View>
 
-      {/* Results */}
       {results.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyEmoji}>🥺</Text>
           <Text style={styles.emptyTitle}>No recipes found</Text>
           <Text style={styles.emptySub}>Try adding more ingredients or changing your filters</Text>
-          <TouchableOpacity style={styles.tryAgainBtn} onPress={() => navigation.goBack()}>
+          <Pressable style={styles.tryAgainBtn} onPress={() => navigation.goBack()}>
             <Text style={styles.tryAgainText}>← Try Again</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       ) : (
         <FlatList
@@ -185,111 +293,10 @@ export default function ResultsScreen({ navigation, route }) {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) => (
-            <RecipeResultCard item={item} index={index} navigation={navigation} />
+            <RecipeResultCard item={item} index={index} navigation={navigation} styles={styles} C={C} />
           )}
         />
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: SPACING.xl, paddingBottom: SPACING.xl,
-    gap: SPACING.md,
-  },
-  backBtn: {
-    width: 38, height: 38, borderRadius: RADIUS.md,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    alignItems: 'center', justifyContent: 'center',
-  },
-  headerTextWrap: { flex: 1 },
-  headerTitle: { ...FONT.h3, color: '#FFFFFF' },
-  headerSub: { ...FONT.bodySmall, color: 'rgba(255,255,255,0.55)', marginTop: 2 },
-
-  ingredientStrip: {
-    backgroundColor: COLORS.surface,
-    borderBottomWidth: 1, borderBottomColor: COLORS.borderLight,
-    paddingVertical: SPACING.sm,
-  },
-  ingredientChips: { paddingHorizontal: SPACING.xl, gap: SPACING.sm },
-  ingredientChip: {
-    backgroundColor: COLORS.primaryFaint,
-    borderRadius: RADIUS.full, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs,
-    borderWidth: 1, borderColor: COLORS.primaryPale,
-  },
-  ingredientChipText: { ...FONT.bodySmallMedium, color: COLORS.primary },
-
-  list: { padding: SPACING.xl, gap: SPACING.lg, paddingBottom: 30 },
-  recipeCard: {
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.xxl,
-    overflow: 'hidden',
-    borderWidth: 1, borderColor: COLORS.borderLight,
-    ...SHADOWS.md,
-  },
-  cardHero: { height: 150, alignItems: 'center', justifyContent: 'center' },
-  cardEmoji: { fontSize: 64 },
-  heartBtn: {
-    position: 'absolute', top: SPACING.md, right: SPACING.md,
-    width: 36, height: 36, borderRadius: 18,
-    backgroundColor: COLORS.surface,
-    alignItems: 'center', justifyContent: 'center',
-    ...SHADOWS.sm,
-  },
-  heartBtnActive: { backgroundColor: '#DB2777' },
-  cardBody: { padding: SPACING.lg, gap: SPACING.md },
-  cardTopRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  cardTitle: { ...FONT.h4, color: COLORS.text, flex: 1 },
-  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  ratingText: { ...FONT.bodySmallMedium, color: COLORS.text },
-  cardDesc: { ...FONT.bodySmall, color: COLORS.textSecondary, lineHeight: 20 },
-
-  matchBar: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
-  matchBg: { flex: 1, height: 6, backgroundColor: COLORS.surface2, borderRadius: 3, overflow: 'hidden' },
-  matchFill: { height: '100%', borderRadius: 3 },
-  matchLabel: { ...FONT.captionMedium, minWidth: 60, textAlign: 'right' },
-
-  macrosRow: {
-    flexDirection: 'row', backgroundColor: COLORS.surface2,
-    borderRadius: RADIUS.md, padding: SPACING.sm,
-  },
-  macroItem: { flex: 1, alignItems: 'center', gap: 2 },
-  macroValue: { ...FONT.bodySemiBold, color: COLORS.text, fontSize: 14 },
-  macroLabel: { ...FONT.caption, color: COLORS.textTertiary },
-
-  metaRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, flexWrap: 'wrap' },
-  metaPill: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: COLORS.surface2, borderRadius: RADIUS.full,
-    paddingHorizontal: SPACING.sm, paddingVertical: 4,
-  },
-  metaText: { ...FONT.caption, color: COLORS.textTertiary },
-  diffText: { fontSize: 11, fontWeight: '600' },
-  missingPill: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: COLORS.accentFaint, borderRadius: RADIUS.full,
-    paddingHorizontal: SPACING.sm, paddingVertical: 4,
-  },
-  missingText: { ...FONT.caption, color: COLORS.accent },
-
-  viewBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: SPACING.xs, backgroundColor: COLORS.primaryFaint,
-    borderRadius: RADIUS.lg, paddingVertical: SPACING.md,
-    borderWidth: 1.5, borderColor: COLORS.primaryPale,
-  },
-  viewBtnText: { ...FONT.bodySemiBold, color: COLORS.primary },
-
-  emptyState: {
-    flex: 1, alignItems: 'center', justifyContent: 'center', gap: SPACING.md,
-    paddingHorizontal: SPACING.xxl,
-  },
-  emptyEmoji: { fontSize: 56 },
-  emptyTitle: { ...FONT.h4, color: COLORS.text },
-  emptySub: { ...FONT.body, color: COLORS.textSecondary, textAlign: 'center', lineHeight: 24 },
-  tryAgainBtn: { marginTop: SPACING.md },
-  tryAgainText: { ...FONT.bodyMedium, color: COLORS.primary },
-});

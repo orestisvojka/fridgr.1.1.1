@@ -3,31 +3,35 @@
 
 export const colors = {
   // Backgrounds
-  bgPrimary: '#0A2E1A',
-  bgSecondary: '#0F3D22',
+  bgPrimary: '#F9FAFB', // Lighter, cleaner background
+  bgSecondary: '#FFFFFF',
   bgCard: '#FFFFFF',
-  bgCardAlt: '#F8FAF8',
-  bgInput: '#1A4A2A',
-  bgMuted: '#F3F4F6',
+  bgCardAlt: '#F3F4F6',
+  bgInput: '#FFFFFF',
+  bgMuted: '#F1F5F9',
 
   // Brand
-  green: '#22C55E',
+  green: '#22C55E',      // Emerald Green (Primary)
   greenDark: '#16A34A',
   greenLight: '#DCFCE7',
   greenMid: '#4ADE80',
   greenAccent: '#86EFAC',
 
+  // Dark Mode Foundations (for future use)
+  darkBg: '#0F172A',
+  darkCard: '#1E293B',
+
   // Text
-  textPrimary: '#0F1714',
+  textPrimary: '#111827',
   textSecondary: '#4B5563',
-  textMuted: '#9CA3AF',
+  textMuted: '#94A3B8',
   textInverse: '#FFFFFF',
-  textOnDark: 'rgba(255,255,255,0.85)',
-  textOnDarkMuted: 'rgba(255,255,255,0.5)',
+  textOnDark: 'rgba(255,255,255,0.9)',
+  textOnDarkMuted: 'rgba(255,255,255,0.6)',
 
   // UI
   border: '#E5E7EB',
-  borderDark: 'rgba(255,255,255,0.12)',
+  borderDark: 'rgba(0,0,0,0.05)',
 
   // States
   error: '#EF4444',
@@ -35,11 +39,26 @@ export const colors = {
   warning: '#F59E0B',
   warningBg: '#FFFBEB',
   warningText: '#92400E',
-  success: '#22C55E',
+  success: '#10B981',
 
   // Misc
-  overlay: 'rgba(0,0,0,0.55)',
+  overlay: 'rgba(0,0,0,0.6)',
   star: '#F59E0B',
+};
+
+export const icons = {
+  size: {
+    xs: 14,
+    sm: 18,
+    md: 22,
+    lg: 26,
+    xl: 32,
+  },
+  stroke: {
+    thin: 1.5,
+    regular: 2,
+    bold: 2.5,
+  }
 };
 
 export const spacing = {

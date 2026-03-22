@@ -4,11 +4,21 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 const OnboardingContext = createContext(null);
 
 const DEFAULT_ANSWERS = {
+  referralSource: null,
   goal: null,
   diet: null,
   allergies: [],
   skill: null,
   time: null,
+  mealsFocus: [],
+  mealPriority: null,
+  cookFrequency: null,
+  activityLevel: null,
+  household: null,
+  cuisineVibe: null,
+  spiceLevel: null,
+  leftovers: null,
+  shoppingStyle: null,
 };
 
 export function OnboardingProvider({ children }) {

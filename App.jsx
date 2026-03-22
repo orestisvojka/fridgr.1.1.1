@@ -9,21 +9,25 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider }       from './src/context/AuthContext';
 import { OnboardingProvider } from './src/context/OnboardingContext';
 import { RecipesProvider }    from './src/context/RecipesContext';
+import { ThemeProvider }      from './src/context/ThemeContext';
 
 import RootNavigator from './src/navigation/RootNavigator';
+import { AppStatusBar } from './src/components/AppStatusBar';
 
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <AuthProvider>
-          <OnboardingProvider>
-            <RecipesProvider>
-              <StatusBar style="auto" />
-              <RootNavigator />
-            </RecipesProvider>
-          </OnboardingProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <OnboardingProvider>
+              <RecipesProvider>
+                <AppStatusBar />
+                <RootNavigator />
+              </RecipesProvider>
+            </OnboardingProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

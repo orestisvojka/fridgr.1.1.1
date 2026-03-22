@@ -12,57 +12,81 @@ import {
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRecipes } from '../context/RecipesContext';
-import { colors, fontSize, fontWeight, radius, spacing, shadows } from '../styles/theme';
+import { useOnboarding } from '../context/OnboardingContext';
+import { colors, fontSize, fontWeight, radius, spacing, shadows, icons } from '../styles/theme';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
 const STEPS = [
   {
+    id: 'goal',
+    icon: 'target',
+    title: 'Primary Goal',
+    subtitle: 'What brings you to FRIDGR today?',
+    options: [
+      { value: 'health', label: 'Eat Healthier', icon: 'heart', desc: 'Focus on balanced, nutritious meals' },
+      { value: 'weight', label: 'Weight Loss', icon: 'trending-down', desc: 'Low-calorie, filling recipes' },
+      { value: 'save_time', label: 'Save Time', icon: 'clock', desc: 'Quick 15-minute meals' },
+      { value: 'save_money', label: 'Save Money', icon: 'dollar-sign', desc: 'Budget-friendly ingredients' },
+    ],
+  },
+  {
+    id: 'cuisine',
+    icon: 'map',
+    title: 'Favorite Cuisine',
+    subtitle: 'Which flavors do you love most?',
+    options: [
+      { value: 'italian', label: 'Italian', icon: 'compass', desc: 'Pasta, pizza, and herbs' },
+      { value: 'mexican', label: 'Mexican', icon: 'sun', desc: 'Spices, tacos, and fresh lime' },
+      { value: 'asian', label: 'Asian', icon: 'anchor', desc: 'Stir-fries, rice, and soy' },
+      { value: 'mediterranean', label: 'Mediterranean', icon: 'wind', desc: 'Olive oil, fish, and greens' },
+    ],
+  },
+  {
     id: 'skill',
-    icon: 'school-outline',
-    title: 'Cooking Skill',
-    subtitle: "We'll suggest recipes that match your level.",
+    icon: 'award',
+    title: 'Cooking Confidence',
+    subtitle: "How comfortable are you in the kitchen?",
     options: [
-      { value: 'beginner', label: 'Beginner', icon: 'happy-outline', desc: 'Simple, quick recipes' },
-      { value: 'home_cook', label: 'Home Cook', icon: 'home-outline', desc: 'Balanced everyday meals' },
-      { value: 'pro', label: 'Chef Mode', icon: 'flame-outline', desc: 'Complex & adventurous' },
+      { value: 'beginner', label: 'Beginner', icon: 'smile', desc: 'I am just starting out' },
+      { value: 'home_cook', label: 'Home Cook', icon: 'home', desc: 'I cook semi-regularly' },
+      { value: 'pro', label: 'Home Chef', icon: 'zap', desc: 'I love complex techniques' },
     ],
   },
   {
-    id: 'diet',
-    icon: 'leaf-outline',
-    title: 'Dietary Preference',
-    subtitle: "We'll filter recipes to fit your lifestyle.",
+    id: 'allergies',
+    icon: 'shield',
+    title: 'Restrictions',
+    subtitle: "Any allergies or dietary needs?",
+    isMulti: true,
     options: [
-      { value: 'none', label: 'No Restrictions', icon: 'restaurant-outline', desc: 'Eat everything' },
-      { value: 'vegetarian', label: 'Vegetarian', icon: 'leaf-outline', desc: 'No meat or fish' },
-      { value: 'vegan', label: 'Vegan', icon: 'flower-outline', desc: 'Plant-based only' },
-      { value: 'gluten_free', label: 'Gluten-Free', icon: 'shield-checkmark-outline', desc: 'No gluten products' },
+      { value: 'none', label: 'No Restrictions', icon: 'check-circle', desc: 'I can eat anything' },
+      { value: 'nuts', label: 'Nut-Free', icon: 'alert-circle', desc: 'No peanuts or tree nuts' },
+      { value: 'dairy', label: 'Dairy-Free', icon: 'droplet', desc: 'No milk or cheese' },
+      { value: 'gluten', label: 'Gluten-Free', icon: 'slash', desc: 'No wheat or barley' },
     ],
   },
   {
-    id: 'time',
-    icon: 'time-outline',
-    title: 'Available Time',
-    subtitle: 'How long can you spend cooking?',
+    id: 'household',
+    icon: 'users',
+    title: 'Household Size',
+    subtitle: 'Who are you cooking for?',
     options: [
-      { value: 15, label: 'Quick', icon: 'flash-outline', desc: 'Under 15 minutes' },
-      { value: 30, label: 'Standard', icon: 'timer-outline', desc: '15 – 30 minutes' },
-      { value: 99, label: 'No Rush', icon: 'hourglass-outline', desc: '30 minutes or more' },
+      { value: '1', label: 'Just Me', icon: 'user', desc: 'Single-serving portions' },
+      { value: '2', label: 'Two People', icon: 'users', desc: 'Perfect for couples' },
+      { value: 'family', label: 'Family', icon: 'command', desc: 'Feeding a whole crew' },
     ],
   },
 ];
 
 export default function OnboardingScreen({ onDone }) {
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState({ skill: 'home_cook', diet: 'none', time: 30 });
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const insets = useSafeAreaInsets();
-  const { setPreferences } = useRecipes();
+  const { answers, setAnswer, toggleMultiAnswer, completeOnboarding } = useOnboarding();
 
   const current = STEPS[step];
 
@@ -81,29 +105,39 @@ export default function OnboardingScreen({ onDone }) {
   };
 
   const handleSelect = (value) => {
-    setAnswers((prev) => ({ ...prev, [current.id]: value }));
+    if (current.isMulti) {
+      toggleMultiAnswer(current.id, value);
+    } else {
+      setAnswer(current.id, value);
+    }
   };
 
   const handleNext = () => {
     if (step < STEPS.length - 1) {
       animateToNext(step + 1);
     } else {
-      setPreferences(answers);
+      completeOnboarding();
       onDone?.();
     }
   };
 
   const handleSkip = () => {
-    setPreferences(answers);
+    completeOnboarding();
     onDone?.();
   };
 
   const isLast = step === STEPS.length - 1;
 
+  const isSelected = (value) => {
+    const answer = answers[current.id];
+    if (current.isMulti) return answer?.includes(value);
+    return answer === value;
+  };
+
   return (
     <View style={[StyleSheet.absoluteFill, styles.root]}>
       <LinearGradient
-        colors={['#031A0C', '#0A2E1A', '#0F3D22']}
+        colors={[colors.bgPrimary, colors.bgMuted]}
         style={[styles.gradient, { paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + spacing.xl }]}
       >
         {/* Top row */}
@@ -130,7 +164,7 @@ export default function OnboardingScreen({ onDone }) {
         >
           {/* Icon */}
           <View style={styles.iconWrap}>
-            <Ionicons name={current.icon} size={32} color={colors.green} />
+            <Feather name={current.icon} size={icons.size.xl} color={colors.green} />
           </View>
 
           {/* Step indicator */}
@@ -143,7 +177,7 @@ export default function OnboardingScreen({ onDone }) {
           {/* Options */}
           <View style={styles.options}>
             {current.options.map((opt) => {
-              const selected = answers[current.id] === opt.value;
+              const selected = isSelected(opt.value);
               return (
                 <TouchableOpacity
                   key={String(opt.value)}
@@ -152,10 +186,10 @@ export default function OnboardingScreen({ onDone }) {
                   style={[styles.option, selected && styles.optionSelected]}
                 >
                   <View style={[styles.optionIcon, selected && styles.optionIconSelected]}>
-                    <Ionicons
+                    <Feather
                       name={opt.icon}
-                      size={22}
-                      color={selected ? '#fff' : 'rgba(255,255,255,0.5)'}
+                      size={icons.size.md}
+                      color={selected ? '#fff' : colors.textMuted}
                     />
                   </View>
                   <View style={styles.optionText}>
@@ -166,7 +200,7 @@ export default function OnboardingScreen({ onDone }) {
                   </View>
                   {selected && (
                     <View style={styles.checkWrap}>
-                      <Ionicons name="checkmark-circle" size={22} color={colors.green} />
+                      <Feather name="check-circle" size={icons.size.md} color={colors.green} />
                     </View>
                   )}
                 </TouchableOpacity>
@@ -178,13 +212,13 @@ export default function OnboardingScreen({ onDone }) {
         {/* CTA */}
         <TouchableOpacity onPress={handleNext} activeOpacity={0.88} style={styles.cta}>
           <LinearGradient
-            colors={['#16A34A', '#22C55E']}
+            colors={[colors.green, colors.greenDark]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.ctaGradient}
           >
             <Text style={styles.ctaText}>{isLast ? "Let's Cook!" : 'Continue'}</Text>
-            <Ionicons name={isLast ? 'restaurant' : 'arrow-forward'} size={18} color="#fff" />
+            <Feather name={isLast ? 'check' : 'arrow-right'} size={icons.size.md} color="#fff" />
           </LinearGradient>
         </TouchableOpacity>
       </LinearGradient>
@@ -214,18 +248,18 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: colors.border,
   },
   dotActive: {
     width: 24,
     backgroundColor: colors.green,
   },
   dotDone: {
-    backgroundColor: colors.green + '80',
+    backgroundColor: colors.greenMid,
   },
   skipText: {
-    fontSize: fontSize.sm + 1,
-    color: 'rgba(255,255,255,0.45)',
+    fontSize: fontSize.md,
+    color: colors.textMuted,
     fontWeight: fontWeight.medium,
   },
   content: {
@@ -233,12 +267,10 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   iconWrap: {
-    width: 56,
-    height: 56,
+    width: 64,
+    height: 64,
     borderRadius: radius.xl,
-    backgroundColor: colors.green + '22',
-    borderWidth: 1.5,
-    borderColor: colors.green + '44',
+    backgroundColor: colors.greenLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -253,12 +285,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontSize.xxxl,
     fontWeight: fontWeight.extrabold,
-    color: '#FFFFFF',
+    color: colors.textPrimary,
     letterSpacing: -0.8,
   },
   subtitle: {
     fontSize: fontSize.md,
-    color: 'rgba(255,255,255,0.5)',
+    color: colors.textSecondary,
     lineHeight: 22,
     marginBottom: spacing.sm,
   },
@@ -269,21 +301,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: colors.bgSecondary,
     borderRadius: radius.xl,
     padding: spacing.lg,
     borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: colors.border,
+    ...shadows.sm,
   },
   optionSelected: {
-    backgroundColor: 'rgba(34,197,94,0.12)',
-    borderColor: colors.green + '60',
+    borderColor: colors.green,
+    backgroundColor: colors.greenLight + '40',
   },
   optionIcon: {
     width: 44,
     height: 44,
     borderRadius: radius.md,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: colors.bgMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -297,9 +330,37 @@ const styles = StyleSheet.create({
   optionLabel: {
     fontSize: fontSize.md + 1,
     fontWeight: fontWeight.bold,
-    color: 'rgba(255,255,255,0.7)',
+    color: colors.textPrimary,
   },
   optionLabelSelected: {
+    color: colors.greenDark,
+  },
+  optionDesc: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+  },
+  checkWrap: {
+    marginLeft: 'auto',
+  },
+  cta: {
+    borderRadius: radius.xl,
+    overflow: 'hidden',
+    ...shadows.md,
+  },
+  ctaGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.lg + 2,
+  },
+  ctaText: {
+     fontSize: fontSize.lg,
+     fontWeight: fontWeight.extrabold,
+     color: '#fff',
+     letterSpacing: -0.2,
+   },
+ });
     color: '#FFFFFF',
   },
   optionDesc: {

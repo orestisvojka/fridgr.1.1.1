@@ -5,6 +5,7 @@ import { ROUTES } from '../constants/routes';
 
 import OnboardingCarouselScreen from '../screens/onboarding/OnboardingCarouselScreen';
 import QuestionnaireScreen from '../screens/onboarding/QuestionnaireScreen';
+import OnboardingHandoffScreen from '../screens/onboarding/OnboardingHandoffScreen';
 
 const Stack = createStackNavigator();
 
@@ -13,6 +14,7 @@ export default function OnboardingNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false, animationEnabled: false }}>
       <Stack.Screen name={ROUTES.ONBOARDING_CAROUSEL} component={OnboardingCarouselScreen} />
       <Stack.Screen name={ROUTES.QUESTIONNAIRE}       component={QuestionnaireScreen} />
+      <Stack.Screen name={ROUTES.ONBOARDING_HANDOFF}  component={OnboardingHandoffScreen} />
     </Stack.Navigator>
   );
 }

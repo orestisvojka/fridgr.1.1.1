@@ -6,7 +6,9 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { useAuth } from '../context/AuthContext';
 import { useOnboarding } from '../context/OnboardingContext';
+import { useTheme } from '../context/ThemeContext';
 import { ROUTES } from '../constants/routes';
+import { buildNavigationTheme } from './navigationTheme';
 
 import AuthNavigator from './AuthNavigator';
 import OnboardingNavigator from './OnboardingNavigator';
@@ -18,7 +20,9 @@ const Root = createStackNavigator();
 export default function RootNavigator() {
   const { isAuthenticated } = useAuth();
   const { hasCompletedOnboarding } = useOnboarding();
+  const { colors, isDark } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
+  const navTheme = buildNavigationTheme(colors, isDark);
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
@@ -39,7 +43,7 @@ export default function RootNavigator() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navTheme}>
       <Root.Navigator screenOptions={{ headerShown: false, animationEnabled: false }}>
         {!isAuthenticated ? (
           <Root.Screen name={ROUTES.AUTH} component={AuthNavigator} />

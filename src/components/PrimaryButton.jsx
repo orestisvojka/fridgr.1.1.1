@@ -1,6 +1,4 @@
 // src/components/PrimaryButton.jsx
-// Reusable styled button with multiple variants
-
 import React from 'react';
 import {
   TouchableOpacity,
@@ -9,20 +7,26 @@ import {
   ActivityIndicator,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { ArrowRight, ShoppingCart } from 'lucide-react-native';
 import { colors, radius, fontSize, fontWeight, spacing, shadows } from '../styles/theme';
+import { ICON_STROKE } from '../constants/icons';
+
+const ICON_MAP = {
+  'arrow-forward': ArrowRight,
+  'cart-outline': ShoppingCart,
+};
 
 export default function PrimaryButton({
   label,
   onPress,
-  variant = 'primary',   // primary | secondary | outline | ghost | danger
-  size = 'md',           // sm | md | lg
+  variant = 'primary',
+  size = 'md',
   icon,
   iconPosition = 'left',
   loading = false,
   disabled = false,
   full = false,
-  color,                 // override accent color
+  color,
   style,
   labelStyle,
 }) {
@@ -70,6 +74,8 @@ export default function PrimaryButton({
   const vs = variantStyles[variant] || variantStyles.primary;
   const ss = sizeStyles[size] || sizeStyles.md;
 
+  const IconComponent = icon ? ICON_MAP[icon] : null;
+
   return (
     <TouchableOpacity
       onPress={!disabled && !loading ? onPress : undefined}
@@ -97,8 +103,10 @@ export default function PrimaryButton({
         />
       ) : (
         <View style={styles.inner}>
-          {icon && iconPosition === 'left' && (
-            <Ionicons name={icon} size={ss.iconSize} color={vs.text} style={styles.iconLeft} />
+          {IconComponent && iconPosition === 'left' && (
+            <View style={styles.iconLeft}>
+              <IconComponent size={ss.iconSize} color={vs.text} strokeWidth={ICON_STROKE} />
+            </View>
           )}
           <Text
             style={[
@@ -109,8 +117,10 @@ export default function PrimaryButton({
           >
             {label}
           </Text>
-          {icon && iconPosition === 'right' && (
-            <Ionicons name={icon} size={ss.iconSize} color={vs.text} style={styles.iconRight} />
+          {IconComponent && iconPosition === 'right' && (
+            <View style={styles.iconRight}>
+              <IconComponent size={ss.iconSize} color={vs.text} strokeWidth={ICON_STROKE} />
+            </View>
           )}
         </View>
       )}

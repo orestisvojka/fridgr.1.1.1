@@ -17,6 +17,7 @@ export const ROUTES = {
   ONBOARDING:        'Onboarding',
   ONBOARDING_CAROUSEL: 'OnboardingCarousel',
   QUESTIONNAIRE:     'Questionnaire',
+  ONBOARDING_HANDOFF: 'OnboardingHandoff',
 
   // ─── Main Tabs ─────────────────────────────────────────────────────────────
   MAIN:      'Main',
@@ -38,6 +39,11 @@ export const ROUTES = {
   NOTIFICATIONS: 'Notifications',
   HELP:          'Help',
   SCAN_HISTORY:  'ScanHistory',
+
+  PRIVACY_POLICY:   'PrivacyPolicy',
+  TERMS_OF_SERVICE: 'TermsOfService',
+  HELP_SUPPORT:     'HelpSupport',
+  RATE_APP:         'RateApp',
 };
 
 export default ROUTES;

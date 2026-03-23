@@ -3,35 +3,35 @@
 
 export const colors = {
   // Backgrounds
-  bgPrimary: '#F9FAFB', // Lighter, cleaner background
-  bgSecondary: '#FFFFFF',
-  bgCard: '#FFFFFF',
-  bgCardAlt: '#F3F4F6',
+  bgPrimary: '#FFFFFF', // Brightest background
+  bgSecondary: '#F9FAFB',
+  bgCard: '#F9FAFB',
+  bgCardAlt: '#F6FFF9',
   bgInput: '#FFFFFF',
-  bgMuted: '#F1F5F9',
+  bgMuted: '#E9FFF3',
 
   // Brand
-  green: '#22C55E',      // Emerald Green (Primary)
-  greenDark: '#16A34A',
-  greenLight: '#DCFCE7',
-  greenMid: '#4ADE80',
-  greenAccent: '#86EFAC',
+  green: '#4FF980',      // Brighter Emerald Green (Primary)
+  greenDark: '#22C55E',
+  greenLight: '#B8FFD6',
+  greenMid: '#7CFFB2',
+  greenAccent: '#A7F3D0',
 
   // Dark Mode Foundations (for future use)
   darkBg: '#0F172A',
   darkCard: '#1E293B',
 
   // Text
-  textPrimary: '#111827',
-  textSecondary: '#4B5563',
-  textMuted: '#94A3B8',
+  textPrimary: '#22292F',
+  textSecondary: '#7B8A99',
+  textMuted: '#B0B8C1',
   textInverse: '#FFFFFF',
-  textOnDark: 'rgba(255,255,255,0.9)',
-  textOnDarkMuted: 'rgba(255,255,255,0.6)',
+  textOnDark: 'rgba(255,255,255,0.95)',
+  textOnDarkMuted: 'rgba(255,255,255,0.7)',
 
   // UI
   border: '#E5E7EB',
-  borderDark: 'rgba(0,0,0,0.05)',
+  borderDark: '#F3F4F6',
 
   // States
   error: '#EF4444',
@@ -42,8 +42,8 @@ export const colors = {
   success: '#10B981',
 
   // Misc
-  overlay: 'rgba(0,0,0,0.6)',
-  star: '#F59E0B',
+  overlay: 'rgba(0,0,0,0.08)',
+  star: '#FFE066',
 };
 
 export const icons = {

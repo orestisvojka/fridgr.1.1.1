@@ -10,7 +10,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONT, SPACING, RADIUS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
 import { ONBOARDING_SLIDES } from '../../data/mockData';
-import { PREMIUM_CAROUSEL_GRADIENTS, PREMIUM_VEIL, PREMIUM, PREMIUM_CTA_VERTICAL, PREMIUM_CTA_VERTICAL_END, PREMIUM_CTA_VERTICAL_START } from '../../constants/premiumScreenTheme';
+import {
+  PREMIUM_CAROUSEL_GRADIENTS,
+  PREMIUM_VEIL,
+  PREMIUM,
+  PREMIUM_CTA_VERTICAL,
+  PREMIUM_CTA_VERTICAL_END,
+  PREMIUM_CTA_VERTICAL_START,
+} from '../../constants/premiumScreenTheme';
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,13 +26,7 @@ const GRADIENTS = PREMIUM_CAROUSEL_GRADIENTS;
 function Slide({ item, index }) {
   return (
     <View style={[styles.slide, { width }]}>
-      {/* Big emoji */}
-      <View style={styles.emojiWrap}>
-        <Text style={styles.emoji}>{item.emoji}</Text>
-        <View style={styles.emojiGlow} />
-      </View>
-
-      {/* Text block */}
+      {/* Text block only, emoji removed */}
       <View style={styles.textBlock}>
         <Text style={styles.slideTitle}>{item.title}</Text>
         <Text style={styles.slideSubtitle}>{item.subtitle}</Text>
@@ -67,44 +68,38 @@ export default function OnboardingCarouselScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
+
       <LinearGradient
-        colors={GRADIENTS[activeIndex] || GRADIENTS[0]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0.85, y: 1 }}
+        colors={GRADIENTS[activeIndex] ?? GRADIENTS[0]}
+        locations={PREMIUM_VEIL.locations}
         style={StyleSheet.absoluteFill}
       />
-      <LinearGradient
-        colors={PREMIUM_VEIL.colors}
-        locations={PREMIUM_VEIL.locations}
-        start={PREMIUM_VEIL.start}
-        end={PREMIUM_VEIL.end}
-        style={styles.topVeil}
-        pointerEvents="none"
-      />
 
-      {/* Decorative orb */}
+      {/* Decorative orbs */}
       <View style={styles.orb} />
       <View style={styles.orb2} />
 
-      {/* Skip */}
-      <TouchableOpacity
-        style={[styles.skipBtn, { top: insets.top + SPACING.md }]}
-        onPress={handleSkip}
-      >
-        <Text style={styles.skipText}>Skip</Text>
-      </TouchableOpacity>
+      {/* Skip button */}
+      {!isLast && (
+        <TouchableOpacity
+          style={[styles.skipBtn, { top: insets.top + SPACING.md }]}
+          onPress={handleSkip}
+        >
+          <Text style={styles.skipText}>Skip</Text>
+        </TouchableOpacity>
+      )}
 
-      {/* Carousel */}
+      {/* Slides */}
       <Animated.FlatList
         ref={flatRef}
         data={ONBOARDING_SLIDES}
-        keyExtractor={item => item.id}
-        renderItem={({ item, index }) => <Slide item={item} index={index} />}
+        keyExtractor={(_, i) => String(i)}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={16}
+        renderItem={({ item, index }) => <Slide item={item} index={index} />}
         style={styles.flatList}
         contentContainerStyle={{ alignItems: 'center' }}
       />
@@ -114,44 +109,35 @@ export default function OnboardingCarouselScreen({ navigation }) {
         {/* Dots */}
         <View style={styles.dots}>
           {ONBOARDING_SLIDES.map((_, i) => {
-            const inputRange = [(i - 1) * width, i * width, (i + 1) * width];
             const dotWidth = scrollX.interpolate({
-              inputRange,
+              inputRange: [(i - 1) * width, i * width, (i + 1) * width],
               outputRange: [8, 24, 8],
-              extrapolate: 'clamp',
-            });
-            const opacity = scrollX.interpolate({
-              inputRange,
-              outputRange: [0.4, 1, 0.4],
               extrapolate: 'clamp',
             });
             return (
               <Animated.View
                 key={i}
-                style={[styles.dot, { width: dotWidth, opacity }]}
+                style={[styles.dot, { width: dotWidth, opacity: i === activeIndex ? 1 : 0.35 }]}
               />
             );
           })}
         </View>
 
-        {/* CTA */}
-        <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.92}>
+        {/* Next / Get Started button */}
+        <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.85}>
           <LinearGradient
-            colors={PREMIUM_CTA_VERTICAL}
-            start={PREMIUM_CTA_VERTICAL_START}
-            end={PREMIUM_CTA_VERTICAL_END}
+            colors={[PREMIUM_CTA_VERTICAL_START, PREMIUM_CTA_VERTICAL_END]}
             style={styles.nextBtnInner}
           >
             <Text style={styles.nextBtnText}>
-              {isLast ? 'Get Started' : 'Continue'}
+              {isLast ? 'Get Started' : 'Next'}
             </Text>
             {!isLast && <Text style={styles.nextArrow}>→</Text>}
           </LinearGradient>
         </TouchableOpacity>
 
-        {/* Step indicator */}
         <Text style={styles.stepText}>
-          {activeIndex + 1} of {ONBOARDING_SLIDES.length}
+          {activeIndex + 1} / {ONBOARDING_SLIDES.length}
         </Text>
       </View>
     </View>
@@ -159,8 +145,11 @@ export default function OnboardingCarouselScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: PREMIUM.rootBg },
-  topVeil: {
+  container: {
+    flex: 1,
+    backgroundColor: '#0A0A0F',
+  },
+  veil: {
     position: 'absolute',
     left: 0,
     right: 0,

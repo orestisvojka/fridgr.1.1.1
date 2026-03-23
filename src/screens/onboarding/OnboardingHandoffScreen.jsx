@@ -4,7 +4,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Check, Sparkles } from 'lucide-react-native';
+import { Check } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useOnboarding } from '../../context/OnboardingContext';
 import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
@@ -44,10 +44,6 @@ export default function OnboardingHandoffScreen() {
           },
         ]}
       >
-        <View style={styles.badge}>
-          <Sparkles size={22} color={PREMIUM.accent} strokeWidth={ICON_STROKE} />
-        </View>
-
         <View style={styles.iconRing}>
           <LinearGradient colors={PREMIUM_ICON_RING_GRADIENT} style={styles.iconGrad}>
             <Check size={40} color={PREMIUM.accent} strokeWidth={ICON_STROKE + 1} />
@@ -84,17 +80,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  badge: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
-    backgroundColor: PREMIUM.glass,
-    borderWidth: 1,
-    borderColor: PREMIUM.glassBorder,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SPACING.lg,
-  },
+
   iconRing: {
     borderRadius: 999,
     padding: 3,

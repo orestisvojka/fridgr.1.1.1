@@ -31,22 +31,7 @@ import {
 const { width: SCREEN_W } = Dimensions.get('window');
 const TOTAL = QUESTIONNAIRE_STEPS.length;
 
-function ProgressDots({ index, total }) {
-  return (
-    <View style={styles.dotsRow}>
-      {Array.from({ length: total }).map((_, i) => (
-        <View
-          key={i}
-          style={[
-            styles.dot,
-            i === index && styles.dotActive,
-            i < index && styles.dotDone,
-          ]}
-        />
-      ))}
-    </View>
-  );
-}
+
 
 function OptionRow({
   option,
@@ -122,7 +107,6 @@ export default function QuestionnaireScreen({ navigation }) {
 
   const step = QUESTIONNAIRE_STEPS[stepIndex];
   const isMulti = step.type === 'multi';
-  const needsContinue = isMulti || step.advance === 'confirm';
   const showOptionCheck = isMulti || step.advance === 'confirm';
 
   const isAnswered = useCallback(() => {
@@ -151,18 +135,9 @@ export default function QuestionnaireScreen({ navigation }) {
 
   const handleSingleTap = useCallback(
     (optionId) => {
-      if (advancing.current) return;
       setAnswer(step.id, optionId);
-      pulseContent();
-      if (step.advance === 'confirm') return;
-      advancing.current = true;
-      const idx = stepIndex;
-      setTimeout(() => {
-        goNextOrFinish(idx);
-        advancing.current = false;
-      }, 340);
     },
-    [step.id, step.advance, stepIndex, goNextOrFinish, pulseContent, setAnswer],
+    [step.id, setAnswer],
   );
 
   const handleMultiTap = useCallback(
@@ -229,7 +204,6 @@ export default function QuestionnaireScreen({ navigation }) {
               <View style={{ flex: Math.max(0, TOTAL - stepIndex - 1) }} />
             </View>
           </View>
-          <ProgressDots index={stepIndex} total={TOTAL} />
         </View>
         <View style={{ width: 44 }} />
       </View>
@@ -238,7 +212,7 @@ export default function QuestionnaireScreen({ navigation }) {
         <ScrollView
           contentContainerStyle={[
             styles.scrollInner,
-            { paddingBottom: insets.bottom + (needsContinue ? 140 : 64) },
+            { paddingBottom: insets.bottom + 140 },
           ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -276,8 +250,7 @@ export default function QuestionnaireScreen({ navigation }) {
         </ScrollView>
       </Animated.View>
 
-      {needsContinue ? (
-        <View style={[styles.footer, { paddingBottom: insets.bottom + SPACING.md }]}>
+      <View style={[styles.footer, { paddingBottom: insets.bottom + SPACING.md }]}>
           <Pressable
             onPress={handleContinue}
             disabled={!isAnswered()}
@@ -309,7 +282,6 @@ export default function QuestionnaireScreen({ navigation }) {
             )}
           </Pressable>
         </View>
-      ) : null}
     </PremiumScreenShell>
   );
 }
@@ -362,25 +334,6 @@ const styles = StyleSheet.create({
   progressFill: {
     flex: 1,
     height: 4,
-    borderRadius: 2,
-    backgroundColor: PREMIUM.accent,
-  },
-  dotsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 4,
-    maxWidth: SCREEN_W - 120,
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: 'rgba(255,255,255,0.14)',
-  },
-  dotDone: { backgroundColor: 'rgba(74,222,128,0.5)' },
-  dotActive: {
-    width: 16,
     borderRadius: 2,
     backgroundColor: PREMIUM.accent,
   },

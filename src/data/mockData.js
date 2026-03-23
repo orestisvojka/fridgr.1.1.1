@@ -324,7 +324,6 @@ export const MOCK_RECIPES = RECIPE_DATA.map((r) => ({
 export const ONBOARDING_SLIDES = [
   {
     id: 'slide1',
-    emoji: '📸',
     title: 'Snap Your Ingredients',
     subtitle: 'Just take a photo of whatever food you have — your fridge, pantry, or countertop.',
     gradientIndex: 0,
@@ -332,7 +331,6 @@ export const ONBOARDING_SLIDES = [
   },
   {
     id: 'slide2',
-    emoji: '🤖',
     title: 'AI Detects Everything',
     subtitle: 'Our AI instantly identifies all your ingredients with impressive accuracy.',
     gradientIndex: 1,
@@ -340,7 +338,6 @@ export const ONBOARDING_SLIDES = [
   },
   {
     id: 'slide3',
-    emoji: '🍽️',
     title: 'Get Instant Recipes',
     subtitle: 'Receive multiple personalized recipe ideas based exactly on what you have.',
     gradientIndex: 2,
@@ -348,7 +345,6 @@ export const ONBOARDING_SLIDES = [
   },
   {
     id: 'slide4',
-    emoji: '❤️',
     title: 'Save Your Favorites',
     subtitle: 'Build your personal recipe collection and plan your weekly meals effortlessly.',
     gradientIndex: 3,
@@ -356,7 +352,6 @@ export const ONBOARDING_SLIDES = [
   },
   {
     id: 'slide5',
-    emoji: '✨',
     title: 'Personalized for You',
     subtitle: 'FRIDGR learns your taste, dietary needs and cooking style over time.',
     gradientIndex: 4,

@@ -1,7 +1,7 @@
 // src/screens/onboarding/QuestionnaireScreen.jsx
 // Multi-select and steps with advance: 'confirm' use Continue; other singles advance on tap.
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -39,60 +39,35 @@ function OptionRow({
   onPress,
   showCheck,
 }) {
-  const scale = useRef(new Animated.Value(1)).current;
   const OptionIcon = getQuestionnaireIcon(option.iconKey);
-
-  const pressIn = () => {
-    Animated.spring(scale, { toValue: 0.97, friction: 6, useNativeDriver: true }).start();
-  };
-  const pressOut = () => {
-    Animated.spring(scale, { toValue: 1, friction: 5, useNativeDriver: true }).start();
-  };
 
   return (
     <Pressable
       onPress={onPress}
-      onPressIn={pressIn}
-      onPressOut={pressOut}
-      style={({ pressed }) => [pressed && { opacity: 0.92 }]}
+      style={({ pressed }) => [
+        styles.optionShell,
+        selected && styles.optionShellSelected,
+        pressed && { opacity: 0.85 }
+      ]}
     >
-      <Animated.View
-        style={[
-          styles.optionShell,
-          selected && styles.optionShellSelected,
-          { transform: [{ scale }] },
-        ]}
-      >
-        <LinearGradient
-          colors={
-            selected
-              ? [PREMIUM.accentSoft, 'rgba(21,128,61,0.35)']
-              : ['rgba(30,41,59,0.55)', 'rgba(15,23,42,0.4)']
-          }
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.optionGradient}
-        >
-          <View style={[styles.optionIcon, selected && styles.optionIconOn]}>
-            <OptionIcon
-              size={22}
-              color={selected ? PREMIUM.accent : PREMIUM.textMuted}
-              strokeWidth={ICON_STROKE}
-            />
-          </View>
-          <View style={styles.optionCopy}>
-            <Text style={[styles.optionLabel, selected && styles.optionLabelSelected]}>{option.label}</Text>
-            <Text style={styles.optionDesc}>{option.desc}</Text>
-          </View>
-          {showCheck ? (
-            <View style={[styles.tick, selected && styles.tickOn]}>
-              {selected ? (
-                <Check size={16} color="#052E16" strokeWidth={ICON_STROKE + 0.5} />
-              ) : null}
-            </View>
+      <View style={styles.optionIcon}>
+        <OptionIcon
+          size={22}
+          color="#06402B"
+          strokeWidth={ICON_STROKE}
+        />
+      </View>
+      <View style={styles.optionCopy}>
+        <Text style={[styles.optionLabel, selected && styles.optionLabelSelected]}>{option.label}</Text>
+        <Text style={[styles.optionDesc, selected && styles.optionDescSelected]}>{option.desc}</Text>
+      </View>
+      {showCheck ? (
+        <View style={[styles.tick, selected && styles.tickOn]}>
+          {selected ? (
+            <Check size={16} color="#FFFFFF" strokeWidth={ICON_STROKE + 0.5} />
           ) : null}
-        </LinearGradient>
-      </Animated.View>
+        </View>
+      ) : null}
     </Pressable>
   );
 }
@@ -186,7 +161,7 @@ export default function QuestionnaireScreen({ navigation }) {
         >
           <ArrowLeft
             size={22}
-            color={stepIndex === 0 ? 'rgba(248,250,252,0.22)' : PREMIUM.text}
+            color={stepIndex === 0 ? 'rgba(248,250,252,0.22)' : '#FFFFFF'}
             strokeWidth={ICON_STROKE}
           />
         </Pressable>
@@ -296,10 +271,9 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 44,
     height: 44,
-    borderRadius: 14,
-    backgroundColor: 'rgba(15,23,42,0.85)',
-    borderWidth: 1,
-    borderColor: PREMIUM.glassBorder,
+    borderRadius: 12,
+    backgroundColor: '#F5F5F5',
+    borderWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -308,13 +282,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: 6,
     borderRadius: RADIUS.full,
-    backgroundColor: 'rgba(15,23,42,0.9)',
-    borderWidth: 1,
-    borderColor: PREMIUM.glassBorder,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
   },
   stepPillText: {
     ...FONT.captionMedium,
-    color: PREMIUM.textMuted,
+    color: '#FFFFFF',
     letterSpacing: 0.8,
     fontWeight: '600',
   },
@@ -323,7 +296,7 @@ const styles = StyleSheet.create({
     maxWidth: SCREEN_W - 140,
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: '#EEEEEE',
     overflow: 'hidden',
   },
   progressRow: {
@@ -343,18 +316,18 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.sm,
   },
   questionCard: {
-    borderRadius: RADIUS.xxl,
+    borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
-    backgroundColor: PREMIUM.cardBg,
-    borderWidth: 1,
-    borderColor: PREMIUM.cardBorder,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
   },
   kickerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.sm,
     marginBottom: SPACING.md,
+    display: 'none',
   },
   kickerDot: {
     width: 8,
@@ -371,16 +344,16 @@ const styles = StyleSheet.create({
   },
   question: {
     fontSize: 27,
-    fontWeight: '800',
-    color: PREMIUM.text,
-    letterSpacing: -0.7,
+    fontWeight: '700',
+    color: '#06402B',
+    letterSpacing: 0,
     lineHeight: 33,
     marginBottom: SPACING.sm,
   },
   subtitle: {
     ...FONT.body,
     fontSize: 15,
-    color: PREMIUM.textMuted,
+    color: '#666666',
     lineHeight: 22,
     maxWidth: 340,
   },
@@ -388,57 +361,56 @@ const styles = StyleSheet.create({
   optionShell: {
     borderRadius: RADIUS.xl,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: PREMIUM.glassBorder,
-    ...SHADOWS.sm,
-  },
-  optionShellSelected: {
-    borderColor: 'rgba(74,222,128,0.65)',
-    borderWidth: 1.5,
-    ...SHADOWS.green,
-  },
-  optionGradient: {
+    borderWidth: 2,
+    borderColor: '#DDDDDD',
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.md,
     gap: SPACING.md,
   },
+  optionShellSelected: {
+    backgroundColor: '#06402B',
+    borderColor: '#06402B',
+  },
   optionIcon: {
     width: 50,
     height: 50,
-    borderRadius: 16,
-    backgroundColor: 'rgba(30,41,59,0.9)',
+    borderRadius: 12,
+    backgroundColor: '#F5F5F5',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  optionIconOn: {
-    backgroundColor: 'rgba(22,101,52,0.55)',
   },
   optionCopy: { flex: 1, gap: 3 },
   optionLabel: {
     ...FONT.bodySemiBold,
     fontSize: 16,
-    color: PREMIUM.text,
+    color: '#06402B',
   },
-  optionLabelSelected: { color: '#ECFDF5' },
+  optionLabelSelected: {
+    color: '#FFFFFF',
+  },
   optionDesc: {
     ...FONT.bodySmall,
-    color: PREMIUM.textMuted,
+    color: '#666666',
     lineHeight: 18,
   },
+  optionDescSelected: {
+    color: '#FFFFFF',
+  },
   tick: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: '#CCCCCC',
     alignItems: 'center',
     justifyContent: 'center',
   },
   tickOn: {
-    backgroundColor: PREMIUM.accent,
-    borderColor: PREMIUM.accent,
+    backgroundColor: '#06402B',
+    borderColor: '#06402B',
   },
   hintWrap: {
     marginTop: SPACING.xxl,
@@ -446,14 +418,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.sm,
     borderRadius: RADIUS.lg,
-    backgroundColor: 'rgba(15,23,42,0.65)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'transparent',
+    borderWidth: 0,
     maxWidth: SCREEN_W - SPACING.xl * 2,
   },
   hint: {
     ...FONT.caption,
-    color: 'rgba(248,250,252,0.45)',
+    color: '#666666',
     textAlign: 'center',
     lineHeight: 18,
   },
@@ -464,16 +435,16 @@ const styles = StyleSheet.create({
     bottom: 0,
     paddingHorizontal: SPACING.xl,
     paddingTop: SPACING.lg,
-    backgroundColor: PREMIUM.footerBg,
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#13221a',
+    borderTopColor: '#EEEEEE',
   },
   continueBtnOuter: {
     borderRadius: RADIUS.xl,
     overflow: 'hidden',
   },
   continueBtnOuterEnabled: {
-    ...SHADOWS.green,
+    ...SHADOWS.sm,
   },
   continueGrad: {
     height: 56,
@@ -481,6 +452,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: SPACING.xs,
+    backgroundColor: '#06402B',
   },
   continueSolidDisabled: {
     height: 56,
@@ -488,9 +460,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: SPACING.xs,
-    backgroundColor: PREMIUM.btnDisabledBg,
-    borderWidth: 1,
-    borderColor: PREMIUM.btnDisabledBorder,
+    backgroundColor: '#EEEEEE',
+    borderWidth: 0,
     borderRadius: RADIUS.xl,
   },
   continueText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '700' },

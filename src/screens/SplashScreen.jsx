@@ -30,12 +30,12 @@ export default function SplashScreen({ onDone }) {
   const accentPulse = useRef(new Animated.Value(1)).current;
   const screenFade = useRef(new Animated.Value(1)).current;
 
-  const logoColor = '#F9FAFB';
-  const taglineColor = 'rgba(249,250,251,0.5)';
-  const badgeBg = 'rgba(250,204,21,0.12)';
-  const badgeBorder = 'rgba(250,204,21,0.35)';
-  const badgeText = 'rgba(250,204,21,0.9)';
-  const ringColor = 'rgba(250,204,21,0.25)';
+  const logoColor = '#06402B';
+  const taglineColor = 'rgba(6,64,43,0.8)';
+  const badgeBg = 'rgba(255,255,255,0.12)';
+  const badgeBorder = 'rgba(255,255,255,0.35)';
+  const badgeText = '#FFFFFF';
+  const ringColor = 'rgba(255,255,255,0.25)';
 
   useEffect(() => {
     const pulse = Animated.loop(

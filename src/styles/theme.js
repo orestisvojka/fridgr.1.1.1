@@ -3,19 +3,19 @@
 
 export const colors = {
   // Backgrounds
-  bgPrimary: '#FFFFFF', // Brightest background
-  bgSecondary: '#F9FAFB',
-  bgCard: '#F9FAFB',
-  bgCardAlt: '#F6FFF9',
-  bgInput: '#FFFFFF',
-  bgMuted: '#E9FFF3',
+  bgPrimary: 'rgba(255,255,255,0.95)', // Brightest background with glass
+  bgSecondary: 'rgba(249,250,251,0.9)',
+  bgCard: 'rgba(249,250,251,0.85)',
+  bgCardAlt: 'rgba(246,255,249,0.88)',
+  bgInput: 'rgba(255,255,255,0.98)',
+  bgMuted: 'rgba(233,255,243,0.9)',
 
   // Brand
-  green: '#4FF980',      // Brighter Emerald Green (Primary)
-  greenDark: '#22C55E',
-  greenLight: '#B8FFD6',
-  greenMid: '#7CFFB2',
-  greenAccent: '#A7F3D0',
+  green: '#06402B',      // Primary Dark Teal Green
+  greenDark: '#052620',
+  greenLight: '#0D6B3F',
+  greenMid: '#116644',
+  greenAccent: '#1A8C54',
 
   // Dark Mode Foundations (for future use)
   darkBg: '#0F172A',

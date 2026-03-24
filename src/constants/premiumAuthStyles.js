@@ -77,7 +77,7 @@ export function createPremiumAuthStyles(C) {
     primaryBtn: { borderRadius: RADIUS.lg, overflow: 'hidden', marginBottom: SPACING.xxl, ...SHADOWS.green },
     primaryBtnDisabled: { opacity: 0.7 },
     primaryBtnGradient: { height: 54, alignItems: 'center', justifyContent: 'center' },
-    primaryBtnText: { ...FONT.h5, color: '#FFFFFF' },
+    primaryBtnText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '700' },
     divider: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginBottom: SPACING.lg },
     dividerLine: { flex: 1, height: 1, backgroundColor: PREMIUM.glassBorder },
     dividerText: { ...FONT.bodySmall, color: PREMIUM.textMuted },

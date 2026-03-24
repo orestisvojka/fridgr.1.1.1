@@ -80,15 +80,15 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.root}>
       {/* Hero gradient */}
       <LinearGradient
-        colors={['#031A0C', '#0A2E1A', '#1A5C2E']}
-        locations={[0, 0.55, 1]}
+        colors={['#06402B', '#0D6B3F', '#116644', '#1A8C54']}
+        locations={[0, 0.33, 0.66, 1]}
         style={[styles.heroGradient, { paddingTop: insets.top + spacing.lg }]}
       >
         {/* Top row */}
         <View style={styles.topRow}>
           <View style={styles.logoRow}>
             <View style={styles.logoIcon}>
-              <Ionicons name="nutrition" size={20} color="#fff" />
+              <Ionicons name="nutrition" size={20} color="#06402B" />
             </View>
             <Text style={styles.logoText}>{APP_NAME}</Text>
           </View>
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: fontSize.xl,
     fontWeight: fontWeight.extrabold,
-    color: '#FFFFFF',
+    color: '#06402B',
     letterSpacing: -0.5,
   },
   topActions: {
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   savedBadgeText: {
     fontSize: fontSize.xs,
     fontWeight: fontWeight.extrabold,
-    color: '#fff',
+    color: '#06402B',
   },
   greetRow: {
     flexDirection: 'row',
@@ -322,13 +322,13 @@ const styles = StyleSheet.create({
   tagline: {
     fontSize: fontSize.xxxl + 4,
     fontWeight: fontWeight.extrabold,
-    color: '#FFFFFF',
+    color: '#06402B',
     letterSpacing: -1.2,
     lineHeight: fontSize.xxxl + 12,
   },
   subtitle: {
     fontSize: fontSize.md,
-    color: 'rgba(255,255,255,0.55)',
+    color: 'rgba(6,64,43,0.55)',
     lineHeight: 22,
   },
   featurePills: {

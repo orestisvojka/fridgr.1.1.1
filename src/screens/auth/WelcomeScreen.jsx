@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     ...FONT.labelSmall,
-    color: 'rgba(249,250,251,0.88)',
+    color: 'rgba(6,64,43,0.88)',
     letterSpacing: 0.3,
     textTransform: 'uppercase',
   },
@@ -178,17 +178,17 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#F9FAFB',
+    color: '#06402B',
     letterSpacing: -1.2,
   },
   heroTitle: {
     ...FONT.hero,
-    color: '#F9FAFB',
+    color: '#06402B',
     marginTop: SPACING.sm,
   },
   heroSubtitle: {
     ...FONT.body,
-    color: 'rgba(249,250,251,0.62)',
+    color: 'rgba(6,64,43,0.62)',
     lineHeight: 24,
     maxWidth: 360,
   },
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)',
   },
-  featureText: { ...FONT.bodySmallMedium, color: 'rgba(249,250,251,0.9)' },
+  featureText: { ...FONT.bodySmallMedium, color: 'rgba(6,64,43,0.9)' },
   bottom: {
     borderTopLeftRadius: RADIUS.xxl,
     borderTopRightRadius: RADIUS.xxl,
@@ -223,9 +223,9 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.lg + 2,
     alignItems: 'center',
   },
-  primaryText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '700' },
+  primaryText: { ...FONT.h5, color: '#06402B', fontWeight: '700' },
   secondaryBtn: { alignItems: 'center', paddingVertical: SPACING.md },
   secondaryText: { ...FONT.body, color: PREMIUM.textMuted },
   secondaryLink: { fontWeight: '700', color: PREMIUM.accent },
-  legal: { ...FONT.caption, textAlign: 'center', marginTop: SPACING.sm, color: 'rgba(248,250,252,0.4)' },
+  legal: { ...FONT.caption, textAlign: 'center', marginTop: SPACING.sm, color: 'rgba(6,64,43,0.4)' },
 });

@@ -46,14 +46,13 @@ export default function SignUpScreen({ navigation }) {
   const [fieldErr, setFieldErr] = useState({ name: '', email: '', password: '' });
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(24)).current;
+  const fadeAnimRef = useRef(new Animated.Value(0));
+  const slideAnimRef = useRef(new Animated.Value(24));
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
+      Animated.timing(fadeAnimRef.current, { toValue: 1, duration: 500, useNativeDriver: true }),
+      Animated.timing(slideAnimRef.current, { toValue: 0, duration: 500, useNativeDriver: true }),
     ]).start();
     return () => clearError();
   }, []);
@@ -107,7 +106,7 @@ export default function SignUpScreen({ navigation }) {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+        <Animated.View style={{ opacity: fadeAnimRef.current, transform: [{ translateY: slideAnimRef.current }] }}>
           <Text style={styles.title}>Create account</Text>
           <Text style={styles.subtitle}>Start cooking smarter today</Text>
 

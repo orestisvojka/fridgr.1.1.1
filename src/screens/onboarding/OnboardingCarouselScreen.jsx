@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.15)',
   },
-  skipText: { ...FONT.bodySmallMedium, color: 'rgba(255,255,255,0.75)' },
+  skipText: { ...FONT.bodySmallMedium, color: 'rgba(6,64,43,0.75)' },
   flatList: { flex: 1, marginTop: 60 },
   slide: {
     alignItems: 'center',
@@ -205,12 +205,12 @@ const styles = StyleSheet.create({
   textBlock: { alignItems: 'center', gap: SPACING.md },
   slideTitle: {
     ...FONT.h1,
-    color: '#FFFFFF',
+    color: '#06402B',
     textAlign: 'center',
   },
   slideSubtitle: {
     ...FONT.body,
-    color: 'rgba(255,255,255,0.65)',
+    color: 'rgba(6,64,43,0.65)',
     textAlign: 'center',
     lineHeight: 26,
     maxWidth: 280,

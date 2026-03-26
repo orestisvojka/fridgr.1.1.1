@@ -315,20 +315,13 @@ export default function DetailScreen({ navigation, route }) {
           onPress={() => toggleSave(recipe)}
         >
           <LinearGradient
-            colors={saved ? ['#FACC15', '#EAB308'] : PREMIUM_CTA_VERTICAL}
-            start={saved ? { x: 0, y: 0 } : PREMIUM_CTA_VERTICAL_START}
-            end={saved ? { x: 1, y: 0 } : PREMIUM_CTA_VERTICAL_END}
+            colors={PREMIUM_CTA_VERTICAL}
+            start={PREMIUM_CTA_VERTICAL_START}
+            end={PREMIUM_CTA_VERTICAL_END}
             style={styles.saveBtnGradient}
           >
-            <Heart
-              size={20}
-              color={saved ? '#1F2937' : '#FFFFFF'}
-              fill={saved ? '#1F2937' : '#FFFFFF'}
-              strokeWidth={ICON_STROKE}
-            />
-            <Text style={[styles.saveBtnText, saved && styles.saveBtnTextOnAccent]}>
-              {saved ? 'Saved to Favorites' : 'Save Recipe'}
-            </Text>
+            <UtensilsCrossed size={20} color="#FFFFFF" strokeWidth={ICON_STROKE} />
+            <Text style={styles.saveBtnText}>Start Cooking</Text>
           </LinearGradient>
         </Pressable>
       </View>

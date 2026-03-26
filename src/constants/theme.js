@@ -1,98 +1,106 @@
 // src/constants/theme.js
-// Premium FRIDGR Design System — Professional UI Standards
+// FRIDGR Design System — Warm Cream + Sage Green (matches mockup)
 
 export const COLORS = {
-  // Brand (exact palette)
-  primary: '#06402B',
-  primaryMid: '#0D6B3F',
-  primaryLight: '#116644',
-  secondary: '#1A8C54',
-  primaryPale: '#E9FFF3',
-  primaryFaint: '#F6FFF9',
-  primaryDark: '#052620',
-  primaryGradient: ['#0D6B3F', '#06402B'],
-  primaryGradientFull: ['#116644', '#0D6B3F', '#06402B'],
+  // ─── Brand Green (sage forest) ────────────────────────────────────────
+  primary:            '#3E6B50',
+  primaryMid:         '#4A7C5E',
+  primaryLight:       '#5D9070',
+  primaryPale:        '#D0E8D8',
+  primaryFaint:       '#EDF5F0',
+  primaryDark:        '#2C4D38',
+  primaryGradient:    ['#3E6B50', '#2C4D38'],
+  primaryGradientFull:['#5D9070', '#3E6B50', '#2C4D38'],
 
-  accent: '#FFE066',
-  accentLight: '#FFF7B2',
-  accentPale: '#FFFBE6',
-  accentFaint: '#FFFEF6',
+  // ─── Warm Amber Accent ────────────────────────────────────────────────
+  accent:             '#C09A42',
+  accentLight:        '#E8D090',
+  accentPale:         '#FAF0D0',
+  accentFaint:        '#FDF8EC',
 
-  background: 'rgba(255,255,255,0.95)',
-  surface: 'rgba(249,250,251,0.85)',
-  surface2: 'rgba(243,244,246,0.88)',
-  surface3: 'rgba(229,231,235,0.9)',
-  border: '#E5E7EB',
-  borderLight: '#F1F5F9',
-  borderStrong: '#CBD5E1',
+  // ─── Backgrounds — Warm Cream ─────────────────────────────────────────
+  background:         '#F9F7F2',
+  surface:            '#FFFFFF',
+  surface2:           '#F4F1EA',
+  surface3:           '#EDE8DF',
+  border:             '#E4DDD2',
+  borderLight:        '#EAE6DD',
+  borderStrong:       '#CEC8BC',
 
-  text: '#06402B',
-  textSecondary: '#0D6B3F',
-  textTertiary: '#999999',
-  textDisabled: '#E5E7EB',
-  textInverse: '#FFFFFF',
-  textPrimary: '#4FF980',
-  textAccent: '#FFE066',
+  // ─── Text ─────────────────────────────────────────────────────────────
+  text:               '#1E1E1C',
+  textSecondary:      '#4A4A46',
+  textTertiary:       '#8A8A84',
+  textDisabled:       '#C4C0B8',
+  textInverse:        '#FFFFFF',
+  textPrimary:        '#3E6B50',
+  textAccent:         '#C09A42',
 
-  success: '#22C55E',
-  successLight: '#DCFCE7',
-  warning: '#F97316',
-  warningLight: '#FFEDD5',
-  error: '#EF4444',
-  errorLight: '#FEE2E2',
-  info: '#3B82F6',
-  infoLight: '#DBEAFE',
+  // ─── Semantic ─────────────────────────────────────────────────────────
+  success:            '#3E6B50',
+  successLight:       '#D0E8D8',
+  warning:            '#C09A42',
+  warningLight:       '#FAF0D0',
+  error:              '#B84040',
+  errorLight:         '#FCECEC',
+  info:               '#2E6DA4',
+  infoLight:          '#E4EEF8',
 
-  overlay: 'rgba(15, 23, 42, 0.55)',
-  overlayLight: 'rgba(15, 23, 42, 0.08)',
-  overlayCard: 'rgba(15, 23, 42, 0.04)',
+  // ─── Overlays ─────────────────────────────────────────────────────────
+  overlay:            'rgba(30, 30, 28, 0.5)',
+  overlayLight:       'rgba(30, 30, 28, 0.06)',
+  overlayCard:        'rgba(30, 30, 28, 0.03)',
 
-  white: '#FFFFFF',
-  black: '#06402B',
-  transparent: 'transparent',
-  star: '#FACC15',
+  // ─── Base ─────────────────────────────────────────────────────────────
+  white:              '#FFFFFF',
+  black:              '#1E1E1C',
+  transparent:        'transparent',
+  star:               '#C09A42',
 
+  // ─── Dark Mode ────────────────────────────────────────────────────────
   dark: {
-    background: 'rgba(15,23,42,0.95)',
-    surface: 'rgba(17,24,39,0.85)',
-    surface2: 'rgba(31,41,55,0.88)',
-    surface3: 'rgba(55,65,81,0.9)',
-    border: '#374151',
-    text: '#F9FAFB',
-    textSecondary: '#9CA3AF',
-    textTertiary: '#6B7280',
+    background:    'rgba(14, 20, 16, 0.97)',
+    surface:       'rgba(20, 28, 22, 0.90)',
+    surface2:      'rgba(30, 40, 32, 0.90)',
+    surface3:      'rgba(44, 56, 46, 0.92)',
+    border:        '#2E4038',
+    text:          '#F2F5F0',
+    textSecondary: '#A0AEA4',
+    textTertiary:  '#6A7A70',
   },
 
+  // ─── Onboarding Slides ────────────────────────────────────────────────
   onboarding: [
-    ['#0F172A', '#14532D'],
-    ['#111827', '#166534'],
-    ['#0F172A', '#22C55E'],
-    ['#14532D', '#FACC15'],
-    ['#0F172A', '#16A34A'],
+    ['#1A2E22', '#2C4D38'],
+    ['#1A2E22', '#3E6B50'],
+    ['#1A2E22', '#4A7C5E'],
+    ['#2C4D38', '#C09A42'],
+    ['#1A2E22', '#3E6B50'],
   ],
 
+  // ─── Recipe Card Palettes ─────────────────────────────────────────────
   recipePalettes: [
-    { color: '#F97316', bg: '#FFF7ED', light: '#FFEDD5' },
-    { color: '#22C55E', bg: '#ECFDF5', light: '#DCFCE7' },
-    { color: '#FACC15', bg: '#FEFCE8', light: '#FEF9C3' },
-    { color: '#EC4899', bg: '#FDF2F8', light: '#FCE7F3' },
-    { color: '#3B82F6', bg: '#EFF6FF', light: '#DBEAFE' },
-    { color: '#8B5CF6', bg: '#F5F3FF', light: '#EDE9FE' },
-    { color: '#14B8A6', bg: '#F0FDFA', light: '#CCFBF1' },
-    { color: '#EF4444', bg: '#FEF2F2', light: '#FEE2E2' },
+    { color: '#B85030', bg: '#FFF3EE', light: '#FFE4DA' },
+    { color: '#3E6B50', bg: '#EDF5F0', light: '#D0E8D8' },
+    { color: '#C09A42', bg: '#FAF0D0', light: '#F0DFA0' },
+    { color: '#B83870', bg: '#FAF0F6', light: '#F5DAEA' },
+    { color: '#2E6DA4', bg: '#E8F0F8', light: '#D0E2F4' },
+    { color: '#7048AC', bg: '#F2EEF8', light: '#E2D8F4' },
+    { color: '#2C8A78', bg: '#E8F5F2', light: '#C8EAE4' },
+    { color: '#9E3828', bg: '#FBF0EE', light: '#F5DCDA' },
   ],
 };
 
 // ─── Spacing ──────────────────────────────────────────────────────────────────
 export const SPACING = {
-  xxs:    2,
-  xs:     4,
-  sm:     8,
-  md:    12,
-  lg:    16,
-  xl:    20,
-  xxl:   24,
-  xxxl:  32,
+  xxs:     2,
+  xs:      4,
+  sm:      8,
+  md:      12,
+  lg:      16,
+  xl:      20,
+  xxl:     24,
+  xxxl:    32,
   section: 40,
   screen:  20,
 };
@@ -110,136 +118,113 @@ export const RADIUS = {
 
 // ─── Typography ───────────────────────────────────────────────────────────────
 export const FONT = {
-  // Display
-  display: {
-    fontSize: 40, fontWeight: '800',
-    letterSpacing: -1.5, lineHeight: 46,
-  },
-  hero: {
-    fontSize: 32, fontWeight: '800',
-    letterSpacing: -1, lineHeight: 38,
-  },
-  // Headings
-  h1: { fontSize: 28, fontWeight: '700', letterSpacing: -0.5, lineHeight: 34 },
-  h2: { fontSize: 24, fontWeight: '700', letterSpacing: -0.3, lineHeight: 30 },
-  h3: { fontSize: 20, fontWeight: '700', letterSpacing: -0.2, lineHeight: 26 },
-  h4: { fontSize: 18, fontWeight: '600', letterSpacing: -0.1, lineHeight: 24 },
-  h5: { fontSize: 16, fontWeight: '600', lineHeight: 22 },
-  // Body
-  body:           { fontSize: 15, fontWeight: '400', lineHeight: 23 },
-  bodyMedium:     { fontSize: 15, fontWeight: '500', lineHeight: 23 },
-  bodySemiBold:   { fontSize: 15, fontWeight: '600', lineHeight: 23 },
-  bodySmall:      { fontSize: 13, fontWeight: '400', lineHeight: 20 },
-  bodySmallMedium:{ fontSize: 13, fontWeight: '500', lineHeight: 20 },
-  // Labels
+  display: { fontSize: 40, fontWeight: '800', letterSpacing: -1.5, lineHeight: 46 },
+  hero:    { fontSize: 32, fontWeight: '800', letterSpacing: -1,   lineHeight: 38 },
+  h1:      { fontSize: 28, fontWeight: '700', letterSpacing: -0.5, lineHeight: 34 },
+  h2:      { fontSize: 24, fontWeight: '700', letterSpacing: -0.3, lineHeight: 30 },
+  h3:      { fontSize: 20, fontWeight: '700', letterSpacing: -0.2, lineHeight: 26 },
+  h4:      { fontSize: 18, fontWeight: '600', letterSpacing: -0.1, lineHeight: 24 },
+  h5:      { fontSize: 16, fontWeight: '600', lineHeight: 22 },
+  body:            { fontSize: 15, fontWeight: '400', lineHeight: 23 },
+  bodyMedium:      { fontSize: 15, fontWeight: '500', lineHeight: 23 },
+  bodySemiBold:    { fontSize: 15, fontWeight: '600', lineHeight: 23 },
+  bodySmall:       { fontSize: 13, fontWeight: '400', lineHeight: 20 },
+  bodySmallMedium: { fontSize: 13, fontWeight: '500', lineHeight: 20 },
   label:      { fontSize: 12, fontWeight: '600', letterSpacing: 0.3 },
   labelSmall: { fontSize: 10, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase' },
-  // Caption
   caption:       { fontSize: 11, fontWeight: '400', lineHeight: 16 },
   captionMedium: { fontSize: 11, fontWeight: '500', lineHeight: 16 },
 };
 
-// ─── Shadows ─────────────────────────────────────────────────────────────────
+// ─── Shadows ──────────────────────────────────────────────────────────────────
 export const SHADOWS = {
   none: {},
   xs: {
-    shadowColor: '#1C1917',
+    shadowColor: '#1A1410',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
+    shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
   },
   sm: {
-    shadowColor: '#1C1917',
+    shadowColor: '#1A1410',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.07,
     shadowRadius: 6,
     elevation: 2,
   },
   md: {
-    shadowColor: '#1C1917',
+    shadowColor: '#1A1410',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.09,
     shadowRadius: 12,
     elevation: 4,
   },
   lg: {
-    shadowColor: '#1C1917',
+    shadowColor: '#1A1410',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.11,
+    shadowOpacity: 0.10,
     shadowRadius: 20,
     elevation: 8,
   },
   xl: {
-    shadowColor: '#1C1917',
+    shadowColor: '#1A1410',
     shadowOffset: { width: 0, height: 16 },
-    shadowOpacity: 0.14,
+    shadowOpacity: 0.12,
     shadowRadius: 32,
     elevation: 12,
   },
   green: {
-    shadowColor: '#22C55E',
+    shadowColor: '#3E6B50',
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
     elevation: 8,
   },
   accent: {
-    shadowColor: '#FACC15',
+    shadowColor: '#C09A42',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
     elevation: 6,
   },
 };
 
-// ─── Difficulty Color Map ─────────────────────────────────────────────────────
+// ─── Difficulty Colors ────────────────────────────────────────────────────────
 export const DIFFICULTY_COLORS = {
-  Easy:   { bg: '#ECFDF5', text: '#22C55E', dot: '#4ADE80' },
-  Medium: { bg: '#FEFCE8', text: '#CA8A04', dot: '#FACC15' },
-  Hard:   { bg: '#FEF2F2', text: '#EF4444', dot: '#F97316' },
+  Easy:   { bg: '#EDF5F0', text: '#3E6B50', dot: '#5D9070' },
+  Medium: { bg: '#FAF0D0', text: '#8A6820', dot: '#C09A42' },
+  Hard:   { bg: '#FCECEC', text: '#8A2828', dot: '#B84040' },
 };
 
-// ─── Tab Bar ─────────────────────────────────────────────────────────────────
+// ─── Tab Bar ──────────────────────────────────────────────────────────────────
 export const TAB_BAR = {
-  height: 80,
-  paddingBottom: 20,
+  height:          78,
+  paddingBottom:   18,
   backgroundColor: '#FFFFFF',
-  borderTopColor: '#E5E7EB',
-  borderTopWidth: 1,
+  borderTopColor:  '#E4DDD2',
+  borderTopWidth:  1,
 };
 
-/** Resolved palette for light/dark (spread over COLORS). Use with useThemeColors(). */
 export function resolveTheme(isDark) {
-  if (!isDark) {
-    return { ...COLORS, isDark: false };
-  }
+  if (!isDark) return { ...COLORS, isDark: false };
   const d = COLORS.dark;
   return {
     ...COLORS,
     isDark: true,
-    background: d.background,
-    surface: d.surface,
-    surface2: d.surface2,
-    surface3: d.surface3,
-    border: d.border,
-    borderLight: '#1F2937',
-    borderStrong: '#4B5563',
-    text: d.text,
+    background:   d.background,
+    surface:      d.surface,
+    surface2:     d.surface2,
+    surface3:     d.surface3,
+    border:       d.border,
+    borderLight:  '#233030',
+    borderStrong: '#3A5048',
+    text:         d.text,
     textSecondary: d.textSecondary,
-    textTertiary: d.textTertiary,
-    textDisabled: '#6B7280',
-    overlayCard: 'rgba(255,255,255,0.06)',
+    textTertiary:  d.textTertiary,
+    textDisabled:  '#4A5A50',
+    overlayCard:   'rgba(255,255,255,0.05)',
   };
 }
 
-export default {
-  COLORS,
-  SPACING,
-  RADIUS,
-  FONT,
-  SHADOWS,
-  DIFFICULTY_COLORS,
-  TAB_BAR,
-  resolveTheme,
-};
+export default { COLORS, SPACING, RADIUS, FONT, SHADOWS, DIFFICULTY_COLORS, TAB_BAR, resolveTheme };

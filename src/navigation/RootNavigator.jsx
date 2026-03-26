@@ -45,10 +45,10 @@ export default function RootNavigator() {
   return (
     <NavigationContainer theme={navTheme}>
       <Root.Navigator screenOptions={{ headerShown: false, animationEnabled: false }}>
-        {!isAuthenticated ? (
-          <Root.Screen name={ROUTES.AUTH} component={AuthNavigator} />
-        ) : !hasCompletedOnboarding ? (
+        {!hasCompletedOnboarding ? (
           <Root.Screen name={ROUTES.ONBOARDING} component={OnboardingNavigator} />
+        ) : !isAuthenticated ? (
+          <Root.Screen name={ROUTES.AUTH} component={AuthNavigator} />
         ) : (
           <Root.Screen name={ROUTES.MAIN} component={MainNavigator} />
         )}

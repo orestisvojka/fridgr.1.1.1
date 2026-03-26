@@ -126,7 +126,9 @@ export default function OnboardingCarouselScreen({ navigation }) {
         {/* Next / Get Started button */}
         <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.85}>
           <LinearGradient
-            colors={[PREMIUM_CTA_VERTICAL_START, PREMIUM_CTA_VERTICAL_END]}
+            colors={PREMIUM_CTA_VERTICAL}
+            start={PREMIUM_CTA_VERTICAL_START}
+            end={PREMIUM_CTA_VERTICAL_END}
             style={styles.nextBtnInner}
           >
             <Text style={styles.nextBtnText}>

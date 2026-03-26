@@ -14,10 +14,11 @@ export const ROUTES = {
   FORGOT_PW:   'ForgotPassword',
 
   // ─── Onboarding ────────────────────────────────────────────────────────────
-  ONBOARDING:        'Onboarding',
+  ONBOARDING:          'Onboarding',
   ONBOARDING_CAROUSEL: 'OnboardingCarousel',
-  QUESTIONNAIRE:     'Questionnaire',
-  ONBOARDING_HANDOFF: 'OnboardingHandoff',
+  QUESTIONNAIRE:       'Questionnaire',
+  TRIAL:               'Trial',
+  ONBOARDING_HANDOFF:  'OnboardingHandoff',
 
   // ─── Main Tabs ─────────────────────────────────────────────────────────────
   MAIN:      'Main',

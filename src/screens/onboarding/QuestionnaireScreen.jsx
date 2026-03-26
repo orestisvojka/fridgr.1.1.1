@@ -100,7 +100,7 @@ export default function QuestionnaireScreen({ navigation }) {
   const goNextOrFinish = useCallback(
     (fromIndex) => {
       if (fromIndex >= TOTAL - 1) {
-        navigation.navigate(ROUTES.ONBOARDING_HANDOFF);
+        navigation.navigate(ROUTES.TRIAL);
         return;
       }
       setStepIndex(fromIndex + 1);

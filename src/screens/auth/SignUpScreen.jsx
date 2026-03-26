@@ -1,19 +1,11 @@
 // src/screens/auth/SignUpScreen.jsx
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View, Text, Pressable, TextInput,
   KeyboardAvoidingView, ScrollView, Platform, Animated, ActivityIndicator,
 } from 'react-native';
 import {
-  ArrowLeft,
-  AlertCircle,
-  User,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  Check,
-  Smartphone,
+  ArrowLeft, AlertCircle, User, Mail, Lock, Eye, EyeOff, Check, Smartphone,
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -22,14 +14,14 @@ import { SPACING } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
 import { useThemeColors } from '../../context/ThemeContext';
 import { ICON_STROKE } from '../../constants/icons';
-import PremiumScreenShell from '../../components/PremiumScreenShell';
 import { createPremiumAuthStyles } from '../../constants/premiumAuthStyles';
 import {
-  PREMIUM,
   PREMIUM_CTA_VERTICAL,
   PREMIUM_CTA_VERTICAL_END,
   PREMIUM_CTA_VERTICAL_START,
 } from '../../constants/premiumScreenTheme';
+
+const ICON_COLOR = '#9A9A94';
 
 export default function SignUpScreen({ navigation }) {
   const { signUp, loading, error, clearError } = useAuth();
@@ -42,18 +34,18 @@ export default function SignUpScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [agree, setAgree] = useState(false);
+  const [nameFocused, setNameFocused] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const [localErr, setLocalErr] = useState('');
   const [fieldErr, setFieldErr] = useState({ name: '', email: '', password: '' });
+
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
-  const fadeAnimRef = useRef(new Animated.Value(0));
-  const slideAnimRef = useRef(new Animated.Value(24));
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnimRef.current, { toValue: 1, duration: 500, useNativeDriver: true }),
-      Animated.timing(slideAnimRef.current, { toValue: 0, duration: 500, useNativeDriver: true }),
-    ]).start();
+    Animated.timing(fadeAnim, { toValue: 1, duration: 380, useNativeDriver: true }).start();
     return () => clearError();
   }, []);
 
@@ -86,188 +78,220 @@ export default function SignUpScreen({ navigation }) {
   const strengthLabel = ['', 'Too short', 'Good', 'Strong'][strengthLevel];
 
   return (
-    <PremiumScreenShell>
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <View style={[styles.header, { paddingTop: insets.top + SPACING.sm }]}>
-        <Pressable style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.75 }]} onPress={() => navigation.goBack()}>
-          <ArrowLeft size={22} color={PREMIUM.text} strokeWidth={ICON_STROKE} />
-        </Pressable>
-        <View style={styles.logoBadge}>
-          <Text style={styles.logoBadgeText}>FRIDGR</Text>
-        </View>
-        <View style={{ width: 40 }} />
-      </View>
-
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        <Animated.View style={{ opacity: fadeAnimRef.current, transform: [{ translateY: slideAnimRef.current }] }}>
-          <Text style={styles.title}>Create account</Text>
-          <Text style={styles.subtitle}>Start cooking smarter today</Text>
+        <View style={[styles.header, { paddingTop: insets.top + SPACING.sm }]}>
+          <Pressable
+            style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.goBack()}
+          >
+            <ArrowLeft size={22} color="#1E1E1C" strokeWidth={ICON_STROKE} />
+          </Pressable>
+          <View style={styles.logoBadge}>
+            <Text style={styles.logoBadgeText}>FRIDGR</Text>
+          </View>
+          <View style={{ width: 40 }} />
+        </View>
 
-          {displayError ? (
-            <View style={styles.errorBanner}>
-              <AlertCircle size={16} color={C.error} strokeWidth={ICON_STROKE} />
-              <Text style={styles.errorText}>{displayError}</Text>
-            </View>
-          ) : null}
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Animated.View style={{ opacity: fadeAnim }}>
+            <Text style={styles.title}>Create account</Text>
+            <Text style={styles.subtitle}>Start cooking smarter today</Text>
 
-          <View style={styles.form}>
-            <View style={styles.field}>
-              <Text style={styles.label}>Full Name</Text>
-              <View style={[styles.inputWrap, fieldErr.name ? styles.inputWrapError : null]}>
-                <User size={18} color={PREMIUM.iconMuted} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  value={name}
-                  onChangeText={t => {
-                    setName(t);
-                    if (fieldErr.name) setFieldErr(f => ({ ...f, name: '' }));
-                  }}
-                  placeholder="Your name"
-                  placeholderTextColor={PREMIUM.iconMuted}
-                  autoCapitalize="words"
-                  textContentType="name"
-                  returnKeyType="next"
-                  blurOnSubmit={false}
-                  onSubmitEditing={() => emailRef.current?.focus()}
-                />
+            {displayError ? (
+              <View style={styles.errorBanner}>
+                <AlertCircle size={16} color={C.error} strokeWidth={ICON_STROKE} />
+                <Text style={styles.errorText}>{displayError}</Text>
               </View>
-              {fieldErr.name ? <Text style={styles.fieldError}>{fieldErr.name}</Text> : null}
-            </View>
+            ) : null}
 
-            <View style={styles.field}>
-              <Text style={styles.label}>Email</Text>
-              <View style={[styles.inputWrap, fieldErr.email ? styles.inputWrapError : null]}>
-                <Mail size={18} color={PREMIUM.iconMuted} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
-                <TextInput
-                  ref={emailRef}
-                  style={styles.input}
-                  value={email}
-                  onChangeText={t => {
-                    setEmail(t);
-                    if (fieldErr.email) setFieldErr(f => ({ ...f, email: '' }));
-                  }}
-                  placeholder="you@example.com"
-                  placeholderTextColor={PREMIUM.iconMuted}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  autoComplete="email"
-                  textContentType="emailAddress"
-                  returnKeyType="next"
-                  blurOnSubmit={false}
-                  onSubmitEditing={() => passwordRef.current?.focus()}
-                />
-              </View>
-              {fieldErr.email ? <Text style={styles.fieldError}>{fieldErr.email}</Text> : null}
-            </View>
-
-            <View style={styles.field}>
-              <Text style={styles.label}>Password</Text>
-              <View style={[styles.inputWrap, fieldErr.password ? styles.inputWrapError : null]}>
-                <Lock size={18} color={PREMIUM.iconMuted} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
-                <TextInput
-                  ref={passwordRef}
-                  style={[styles.input, { flex: 1 }]}
-                  value={password}
-                  onChangeText={t => {
-                    setPassword(t);
-                    if (fieldErr.password) setFieldErr(f => ({ ...f, password: '' }));
-                  }}
-                  placeholder="Min. 6 characters"
-                  placeholderTextColor={PREMIUM.iconMuted}
-                  secureTextEntry={!showPw}
-                  autoCapitalize="none"
-                  textContentType="newPassword"
-                  autoComplete="password-new"
-                  returnKeyType="done"
-                  onSubmitEditing={handleSignUp}
-                />
-                <Pressable onPress={() => setShowPw(v => !v)} style={styles.eyeBtn}>
-                  {showPw
-                    ? <EyeOff size={18} color={PREMIUM.iconMuted} strokeWidth={ICON_STROKE} />
-                    : <Eye size={18} color={PREMIUM.iconMuted} strokeWidth={ICON_STROKE} />}
-                </Pressable>
-              </View>
-              {fieldErr.password ? <Text style={styles.fieldError}>{fieldErr.password}</Text> : null}
-              {password.length > 0 && (
-                <View style={styles.strength}>
-                  <View style={styles.strengthBar}>
-                    {[1, 2, 3].map(i => (
-                      <View
-                        key={i}
-                        style={[
-                          styles.strengthSegment,
-                          { backgroundColor: i <= strengthLevel ? strengthColor : 'rgba(255,255,255,0.12)' },
-                        ]}
-                      />
-                    ))}
-                  </View>
-                  <Text style={[styles.strengthLabel, { color: strengthColor }]}>{strengthLabel}</Text>
+            <View style={styles.form}>
+              <View style={styles.field}>
+                <Text style={styles.label}>Full Name</Text>
+                <View style={[
+                  styles.inputWrap,
+                  nameFocused && styles.inputWrapFocused,
+                  fieldErr.name ? styles.inputWrapError : null,
+                ]}>
+                  <User size={18} color={nameFocused ? '#3E6B50' : ICON_COLOR} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    value={name}
+                    onChangeText={t => {
+                      setName(t);
+                      if (fieldErr.name) setFieldErr(f => ({ ...f, name: '' }));
+                    }}
+                    onFocus={() => setNameFocused(true)}
+                    onBlur={() => setNameFocused(false)}
+                    placeholder="Your name"
+                    placeholderTextColor={ICON_COLOR}
+                    autoCapitalize="words"
+                    textContentType="name"
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                    underlineColorAndroid="transparent"
+                    onSubmitEditing={() => emailRef.current?.focus()}
+                  />
                 </View>
-              )}
+                {fieldErr.name ? <Text style={styles.fieldError}>{fieldErr.name}</Text> : null}
+              </View>
+
+              <View style={styles.field}>
+                <Text style={styles.label}>Email</Text>
+                <View style={[
+                  styles.inputWrap,
+                  emailFocused && styles.inputWrapFocused,
+                  fieldErr.email ? styles.inputWrapError : null,
+                ]}>
+                  <Mail size={18} color={emailFocused ? '#3E6B50' : ICON_COLOR} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
+                  <TextInput
+                    ref={emailRef}
+                    style={styles.input}
+                    value={email}
+                    onChangeText={t => {
+                      setEmail(t);
+                      if (fieldErr.email) setFieldErr(f => ({ ...f, email: '' }));
+                    }}
+                    onFocus={() => setEmailFocused(true)}
+                    onBlur={() => setEmailFocused(false)}
+                    placeholder="you@example.com"
+                    placeholderTextColor={ICON_COLOR}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    autoComplete="email"
+                    textContentType="emailAddress"
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                    underlineColorAndroid="transparent"
+                    onSubmitEditing={() => passwordRef.current?.focus()}
+                  />
+                </View>
+                {fieldErr.email ? <Text style={styles.fieldError}>{fieldErr.email}</Text> : null}
+              </View>
+
+              <View style={styles.field}>
+                <Text style={styles.label}>Password</Text>
+                <View style={[
+                  styles.inputWrap,
+                  passwordFocused && styles.inputWrapFocused,
+                  fieldErr.password ? styles.inputWrapError : null,
+                ]}>
+                  <Lock size={18} color={passwordFocused ? '#3E6B50' : ICON_COLOR} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
+                  <TextInput
+                    ref={passwordRef}
+                    style={[styles.input, { flex: 1 }]}
+                    value={password}
+                    onChangeText={t => {
+                      setPassword(t);
+                      if (fieldErr.password) setFieldErr(f => ({ ...f, password: '' }));
+                    }}
+                    onFocus={() => setPasswordFocused(true)}
+                    onBlur={() => setPasswordFocused(false)}
+                    placeholder="Min. 6 characters"
+                    placeholderTextColor={ICON_COLOR}
+                    secureTextEntry={!showPw}
+                    autoCapitalize="none"
+                    textContentType="newPassword"
+                    autoComplete="password-new"
+                    returnKeyType="done"
+                    underlineColorAndroid="transparent"
+                    onSubmitEditing={handleSignUp}
+                  />
+                  <Pressable onPress={() => setShowPw(v => !v)} style={styles.eyeBtn}>
+                    {showPw
+                      ? <EyeOff size={18} color={ICON_COLOR} strokeWidth={ICON_STROKE} />
+                      : <Eye size={18} color={ICON_COLOR} strokeWidth={ICON_STROKE} />}
+                  </Pressable>
+                </View>
+                {fieldErr.password ? <Text style={styles.fieldError}>{fieldErr.password}</Text> : null}
+                {password.length > 0 && (
+                  <View style={styles.strength}>
+                    <View style={styles.strengthBar}>
+                      {[1, 2, 3].map(i => (
+                        <View
+                          key={i}
+                          style={[
+                            styles.strengthSegment,
+                            { backgroundColor: i <= strengthLevel ? strengthColor : '#E4DDD2' },
+                          ]}
+                        />
+                      ))}
+                    </View>
+                    <Text style={[styles.strengthLabel, { color: strengthColor }]}>{strengthLabel}</Text>
+                  </View>
+                )}
+              </View>
+
+              <Pressable
+                style={({ pressed }) => [styles.agreeRow, pressed && { opacity: 0.75 }]}
+                onPress={() => setAgree(v => !v)}
+              >
+                <View style={[styles.checkbox, agree && styles.checkboxActive]}>
+                  {agree && <Check size={12} color="#FFFFFF" strokeWidth={ICON_STROKE + 0.5} />}
+                </View>
+                <Text style={styles.agreeText}>
+                  {"I agree to the "}
+                  <Text style={styles.agreeLink}>Terms of Service</Text>
+                  {" and "}
+                  <Text style={styles.agreeLink}>Privacy Policy</Text>
+                </Text>
+              </Pressable>
             </View>
 
-            <Pressable style={({ pressed }) => [styles.agreeRow, pressed && { opacity: 0.85 }]} onPress={() => setAgree(v => !v)}>
-              <View style={[styles.checkbox, agree && styles.checkboxActive]}>
-                {agree && <Check size={12} color="#FFFFFF" strokeWidth={ICON_STROKE + 0.5} />}
-              </View>
-              <Text style={styles.agreeText}>
-                I agree to the{' '}
-                <Text style={styles.agreeLink}>Terms of Service</Text>
-                {' '}and{' '}
-                <Text style={styles.agreeLink}>Privacy Policy</Text>
+            <Pressable
+              style={({ pressed }) => [
+                styles.primaryBtn,
+                loading && styles.primaryBtnDisabled,
+                pressed && !loading && { transform: [{ scale: 0.985 }], opacity: 0.92 },
+              ]}
+              onPress={handleSignUp}
+              disabled={loading}
+            >
+              <LinearGradient
+                colors={PREMIUM_CTA_VERTICAL}
+                start={PREMIUM_CTA_VERTICAL_START}
+                end={PREMIUM_CTA_VERTICAL_END}
+                style={styles.primaryBtnGradient}
+              >
+                {loading
+                  ? <ActivityIndicator color="#FFFFFF" />
+                  : <Text style={styles.primaryBtnText}>Create Account</Text>}
+              </LinearGradient>
+            </Pressable>
+
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <View style={styles.social}>
+              <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.75 }]}>
+                <Text style={styles.socialBtnLabel}>G</Text>
+              </Pressable>
+              <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.75 }]}>
+                <Smartphone size={20} color="#1E1E1C" strokeWidth={ICON_STROKE} />
+              </Pressable>
+            </View>
+
+            <Pressable style={styles.footer} onPress={() => navigation.navigate(ROUTES.LOGIN)}>
+              <Text style={styles.footerText}>
+                {"Already have an account? "}
+                <Text style={styles.footerLink}>Sign in</Text>
               </Text>
             </Pressable>
-          </View>
-
-          <Pressable
-            style={({ pressed }) => [styles.primaryBtn, loading && styles.primaryBtnDisabled, pressed && !loading && { opacity: 0.9 }]}
-            onPress={handleSignUp}
-            disabled={loading}
-          >
-            <LinearGradient
-              colors={PREMIUM_CTA_VERTICAL}
-              start={PREMIUM_CTA_VERTICAL_START}
-              end={PREMIUM_CTA_VERTICAL_END}
-              style={styles.primaryBtnGradient}
-            >
-              {loading
-                ? <ActivityIndicator color="#FFFFFF" />
-                : <Text style={styles.primaryBtnText}>Create Account</Text>}
-            </LinearGradient>
-          </Pressable>
-
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          <View style={styles.social}>
-            <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.85 }]}>
-              <Text style={styles.socialBtnLabel}>G</Text>
-            </Pressable>
-            <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.85 }]}>
-              <Smartphone size={20} color={PREMIUM.text} strokeWidth={ICON_STROKE} />
-            </Pressable>
-          </View>
-
-          <Pressable style={styles.footer} onPress={() => navigation.navigate(ROUTES.LOGIN)}>
-            <Text style={styles.footerText}>
-              Already have an account?{' '}
-              <Text style={styles.footerLink}>Sign in</Text>
-            </Text>
-          </Pressable>
-        </Animated.View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-    </PremiumScreenShell>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 }

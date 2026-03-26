@@ -1,21 +1,21 @@
 // src/navigation/MainNavigator.jsx
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useRef, useMemo, useCallback } from 'react';
+import { View, Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator, CardStyleInterpolators, TransitionSpecs } from '@react-navigation/stack';
-import {
-  Home,
-  ScanLine,
-  BookOpen,
-  Heart,
-  User,
-} from 'lucide-react-native';
+import { Home, ScanLine, BookOpen, Heart, User } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FONT, SHADOWS } from '../constants/theme';
 import { ROUTES } from '../constants/routes';
 import { useThemeColors } from '../context/ThemeContext';
 import { ICON_STROKE } from '../constants/icons';
+import {
+  PREMIUM_CTA_VERTICAL,
+  PREMIUM_CTA_VERTICAL_START,
+  PREMIUM_CTA_VERTICAL_END,
+} from '../constants/premiumScreenTheme';
 
 import DashboardScreen from '../screens/main/DashboardScreen';
 import ScanScreen from '../screens/main/ScanScreen';
@@ -42,14 +42,6 @@ const stackScreenOptions = {
     close: TransitionSpecs.TransitionIOSSpec,
   },
   gestureEnabled: true,
-};
-
-const TAB_ICONS = {
-  Home: Home,
-  Scan: ScanLine,
-  Recipes: BookOpen,
-  Favorites: Heart,
-  Profile: User,
 };
 
 function HomeStack() {
@@ -105,14 +97,99 @@ function ProfileStack() {
   );
 }
 
-function TabIcon({ name, focused, label, colors }) {
-  const Icon = TAB_ICONS[name];
-  const active = focused ? colors.primary : colors.textTertiary;
-  const size = focused ? 22 : 21;
+// Animated wrapper for regular tab buttons — spring bounce on press
+function TabButton({ onPress, onLongPress, accessibilityState, children, style }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const pressIn = useCallback(() => {
+    Animated.spring(scale, {
+      toValue: 0.86,
+      useNativeDriver: true,
+      speed: 80,
+      bounciness: 0,
+    }).start();
+  }, [scale]);
+
+  const pressOut = useCallback(() => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 18,
+      bounciness: 10,
+    }).start();
+  }, [scale]);
+
   return (
-    <View style={styles.tabIcon}>
-      <Icon size={size} color={active} strokeWidth={focused ? ICON_STROKE + 0.25 : ICON_STROKE} />
-      <Text style={[styles.tabLabel, { color: colors.textTertiary }, focused && { color: colors.primary, fontWeight: '600' }]}>
+    <Pressable
+      onPress={onPress}
+      onLongPress={onLongPress}
+      onPressIn={pressIn}
+      onPressOut={pressOut}
+      accessibilityState={accessibilityState}
+      style={[styles.tabButtonBase, style]}
+    >
+      <Animated.View style={{ transform: [{ scale }] }}>
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+// Animated scan button — spring scale + opacity
+function ScanButton({ onPress, onLongPress }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const pressIn = useCallback(() => {
+    Animated.spring(scale, {
+      toValue: 0.91,
+      useNativeDriver: true,
+      speed: 80,
+      bounciness: 0,
+    }).start();
+  }, [scale]);
+
+  const pressOut = useCallback(() => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 18,
+      bounciness: 12,
+    }).start();
+  }, [scale]);
+
+  return (
+    <View style={styles.scanWrapper}>
+      <Pressable
+        onPress={onPress}
+        onLongPress={onLongPress}
+        onPressIn={pressIn}
+        onPressOut={pressOut}
+        style={styles.scanPressable}
+      >
+        <Animated.View style={{ transform: [{ scale }] }}>
+          <LinearGradient
+            colors={PREMIUM_CTA_VERTICAL}
+            start={PREMIUM_CTA_VERTICAL_START}
+            end={PREMIUM_CTA_VERTICAL_END}
+            style={styles.scanCircle}
+          >
+            <ScanLine size={26} color="#FFFFFF" strokeWidth={ICON_STROKE + 0.25} />
+          </LinearGradient>
+        </Animated.View>
+      </Pressable>
+    </View>
+  );
+}
+
+function TabIcon({ focused, Icon, label, colors }) {
+  return (
+    <View style={styles.tabIconWrap}>
+      <Icon
+        size={22}
+        color={focused ? colors.primary : '#A0A0A0'}
+        strokeWidth={focused ? ICON_STROKE + 0.3 : ICON_STROKE}
+      />
+      <Text style={[styles.tabLabel, { color: focused ? colors.primary : '#A0A0A0' }, focused && styles.tabLabelActive]}>
         {label}
       </Text>
     </View>
@@ -125,15 +202,19 @@ export default function MainNavigator() {
 
   const tabBarStyle = useMemo(
     () => ({
-      backgroundColor: colors.surface,
-      borderTopColor: colors.borderLight,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      height: 60 + insets.bottom,
+      backgroundColor: 'rgba(255,255,255,0.96)',
+      borderTopColor: 'rgba(228,221,210,0.6)',
+      borderTopWidth: 1,
+      height: 64 + insets.bottom,
       paddingBottom: insets.bottom,
       paddingTop: 0,
-      ...SHADOWS.sm,
+      elevation: 16,
+      shadowColor: '#1A1410',
+      shadowOffset: { width: 0, height: -3 },
+      shadowOpacity: 0.08,
+      shadowRadius: 12,
     }),
-    [colors.surface, colors.borderLight, insets.bottom],
+    [insets.bottom],
   );
 
   return (
@@ -148,8 +229,19 @@ export default function MainNavigator() {
         name="HomeTab"
         component={HomeStack}
         options={{
+          tabBarButton: (props) => <TabButton {...props} />,
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="Home" focused={focused} label="Home" colors={colors} />
+            <TabIcon focused={focused} Icon={Home} label="Home" colors={colors} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="SavedTab"
+        component={FavoritesStack}
+        options={{
+          tabBarButton: (props) => <TabButton {...props} />,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon focused={focused} Icon={Heart} label="Saved" colors={colors} />
           ),
         }}
       />
@@ -157,35 +249,19 @@ export default function MainNavigator() {
         name="ScanTab"
         component={ScanStack}
         options={{
-          tabBarIcon: () => (
-            <Pressable
-              style={({ pressed }) => [
-                styles.scanButton,
-                { backgroundColor: colors.primary },
-                pressed && { opacity: 0.88, transform: [{ scale: 0.97 }] },
-                SHADOWS.green,
-              ]}
-            >
-              <ScanLine size={26} color={colors.white} strokeWidth={ICON_STROKE + 0.25} />
-            </Pressable>
+          tabBarButton: (props) => (
+            <ScanButton onPress={props.onPress} onLongPress={props.onLongPress} />
           ),
+          tabBarIcon: () => null,
         }}
       />
       <Tab.Screen
         name="RecipesTab"
         component={RecipesStack}
         options={{
+          tabBarButton: (props) => <TabButton {...props} />,
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="Recipes" focused={focused} label="Recipes" colors={colors} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="FavoritesTab"
-        component={FavoritesStack}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon name="Favorites" focused={focused} label="Saved" colors={colors} />
+            <TabIcon focused={focused} Icon={BookOpen} label="Recipes" colors={colors} />
           ),
         }}
       />
@@ -193,8 +269,9 @@ export default function MainNavigator() {
         name="ProfileTab"
         component={ProfileStack}
         options={{
+          tabBarButton: (props) => <TabButton {...props} />,
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="Profile" focused={focused} label="Profile" colors={colors} />
+            <TabIcon focused={focused} Icon={User} label="Profile" colors={colors} />
           ),
         }}
       />
@@ -203,22 +280,49 @@ export default function MainNavigator() {
 }
 
 const styles = StyleSheet.create({
-  tabIcon: {
+  tabButtonBase: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabIconWrap: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 10,
     gap: 3,
-    minWidth: 48,
+    minWidth: 52,
   },
   tabLabel: {
     ...FONT.caption,
+    fontSize: 10,
+    letterSpacing: 0.2,
   },
-  scanButton: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+  tabLabelActive: {
+    fontWeight: '600',
+  },
+  // Scan button
+  scanWrapper: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -20,
+  },
+  scanPressable: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: -28,
+  },
+  scanCircle: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#3E6B50',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.38,
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.9)',
   },
 });

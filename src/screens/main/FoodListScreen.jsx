@@ -123,9 +123,7 @@ function MealCard({ meal, onPress, styles, C }) {
         </View>
       </View>
 
-      <View style={styles.mealImage}>
-        <Text style={styles.mealPlaceholder}>{meal.emoji}</Text>
-      </View>
+      <View style={styles.mealImage} />
 
       <View style={styles.mealMeta}>
         <View style={styles.mealMetaItem}>

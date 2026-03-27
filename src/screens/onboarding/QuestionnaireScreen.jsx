@@ -50,13 +50,15 @@ function OptionRow({
         pressed && { opacity: 0.85 }
       ]}
     >
-      <View style={styles.optionIcon}>
-        <OptionIcon
-          size={22}
-          color="#06402B"
-          strokeWidth={ICON_STROKE}
-        />
-      </View>
+      {option.iconKey && (
+        <View style={styles.optionIcon}>
+          <OptionIcon
+            size={22}
+            color="#06402B"
+            strokeWidth={ICON_STROKE}
+          />
+        </View>
+      )}
       <View style={styles.optionCopy}>
         <Text style={[styles.optionLabel, selected && styles.optionLabelSelected]}>{option.label}</Text>
         <Text style={[styles.optionDesc, selected && styles.optionDescSelected]}>{option.desc}</Text>

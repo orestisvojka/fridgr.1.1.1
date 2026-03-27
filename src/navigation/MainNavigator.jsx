@@ -1,12 +1,12 @@
 // src/navigation/MainNavigator.jsx
 import { useRef, useMemo, useCallback } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Animated, Alert } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator, CardStyleInterpolators, TransitionSpecs } from '@react-navigation/stack';
 import { Home, ScanLine, BookOpen, Heart, User } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
+import * as ImagePicker from 'expo-image-picker';
 import { FONT, SHADOWS } from '../constants/theme';
 import { ROUTES } from '../constants/routes';
 import { useThemeColors } from '../context/ThemeContext';
@@ -248,12 +248,31 @@ export default function MainNavigator() {
       <Tab.Screen
         name="ScanTab"
         component={ScanStack}
-        options={{
+        options={({ navigation }) => ({
           tabBarButton: (props) => (
-            <ScanButton onPress={props.onPress} onLongPress={props.onLongPress} />
+            <ScanButton
+              onPress={async (e) => {
+                const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                if (status !== 'granted') {
+                  Alert.alert('Camera Access', 'Please allow camera access to scan ingredients.');
+                  navigation.navigate('ScanTab', { screen: ROUTES.SCAN });
+                  return;
+                }
+                const result = await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.8 });
+                if (!result.canceled) {
+                  navigation.navigate('ScanTab', {
+                    screen: ROUTES.SCAN,
+                    params: { autoScan: true, imageUri: result.assets[0].uri },
+                  });
+                } else {
+                  navigation.navigate('ScanTab', { screen: ROUTES.SCAN });
+                }
+              }}
+              onLongPress={props.onLongPress}
+            />
           ),
           tabBarIcon: () => null,
-        }}
+        })}
       />
       <Tab.Screen
         name="RecipesTab"

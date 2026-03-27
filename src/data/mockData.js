@@ -386,13 +386,13 @@ export const MOCK_USER = {
 
 // ─── DAILY TIPS ───────────────────────────────────────────────────────────────
 export const DAILY_TIPS = [
-  { id: 't1', tip: 'Wilting herbs? Blend them into a green oil to preserve for weeks.', icon: '🌿' },
-  { id: 't2', tip: 'Add a parmesan rind to soups — it releases umami as it simmers.', icon: '🧀' },
-  { id: 't3', tip: 'Salt pasta water as salty as the sea for the best flavour.', icon: '🧂' },
-  { id: 't4', tip: 'Let meat rest 5 minutes after cooking to keep it juicy.', icon: '🥩' },
-  { id: 't5', tip: 'Bloom your spices in oil before adding other ingredients.', icon: '🌶️' },
-  { id: 't6', tip: 'Freeze overripe bananas for instant smoothie base or banana bread.', icon: '🍌' },
-  { id: 't7', tip: 'The fond (brown bits) in your pan is pure flavour — deglaze it.', icon: '🍳' },
+  { id: 't1', tip: 'Wilting herbs? Blend them into a green oil to preserve for weeks.' },
+  { id: 't2', tip: 'Add a parmesan rind to soups — it releases umami as it simmers.' },
+  { id: 't3', tip: 'Salt pasta water as salty as the sea for the best flavour.' },
+  { id: 't4', tip: 'Let meat rest 5 minutes after cooking to keep it juicy.' },
+  { id: 't5', tip: 'Bloom your spices in oil before adding other ingredients.' },
+  { id: 't6', tip: 'Freeze overripe bananas for instant smoothie base or banana bread.' },
+  { id: 't7', tip: 'The fond (brown bits) in your pan is pure flavour — deglaze it.' },
 ];
 
 // ─── TRENDING RECIPES ─────────────────────────────────────────────────────────
@@ -400,8 +400,8 @@ export const TRENDING_IDS = ['r1', 'r10', 'r4', 'r8', 'r11'];
 
 // ─── QUICK ACTIONS ────────────────────────────────────────────────────────────
 export const QUICK_ACTIONS = [
-  { id: 'scan', label: 'Scan Food', icon: 'camera', color: '#15803D', bg: '#F0FDF4' },
-  { id: 'upload', label: 'Upload Photo', icon: 'image', color: '#0284C7', bg: '#F0F9FF' },
-  { id: 'favorites', label: 'Saved Recipes', icon: 'heart', color: '#DB2777', bg: '#FDF2F8' },
-  { id: 'planner', label: 'Meal Planner', icon: 'calendar', color: '#D97706', bg: '#FFFBEB' },
+  { id: 'scan', label: 'Scan Food', color: '#15803D', bg: '#F0FDF4' },
+  { id: 'upload', label: 'Upload Photo', color: '#0284C7', bg: '#F0F9FF' },
+  { id: 'favorites', label: 'Saved Recipes', color: '#DB2777', bg: '#FDF2F8' },
+  { id: 'planner', label: 'Meal Planner', color: '#D97706', bg: '#FFFBEB' },
 ];

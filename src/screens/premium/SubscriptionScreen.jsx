@@ -4,7 +4,7 @@ import {
   View, Text, StyleSheet, ScrollView, Pressable,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { X, Zap, CircleCheck, Star } from 'lucide-react-native';
+import { X, Star } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { useThemeColors } from '../../context/ThemeContext';
@@ -52,16 +52,14 @@ function createStyles(C) {
       backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: RADIUS.md,
       marginBottom: SPACING.lg,
     },
-    heroContent: { alignItems: 'center', gap: SPACING.md },
-    crownWrap: {
-      width: 72, height: 72, borderRadius: 36,
-      backgroundColor: 'rgba(255,255,255,0.15)',
-      alignItems: 'center', justifyContent: 'center',
-      borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
+    heroContent: { alignItems: 'center', gap: SPACING.sm },
+    heroTitle: {
+      ...FONT.h2,
+      color: '#FFFFFF',
+      textAlign: 'center',
+      marginTop: SPACING.md,
     },
-    crownEmoji: { fontSize: 36 },
-    heroTitle: { ...FONT.h2, color: '#FFFFFF', textAlign: 'center' },
-    heroSub: { ...FONT.body, color: 'rgba(255,255,255,0.65)', textAlign: 'center' },
+    heroSub: { ...FONT.body, color: 'rgba(255,255,255,0.7)', textAlign: 'center' },
     trialBadge: {
       flexDirection: 'row', alignItems: 'center', gap: SPACING.xs,
       backgroundColor: 'rgba(245,158,11,0.15)',
@@ -156,14 +154,10 @@ export default function SubscriptionScreen({ navigation }) {
         </Pressable>
 
         <View style={styles.heroContent}>
-          <View style={styles.crownWrap}>
-            <Text style={styles.crownEmoji}>👑</Text>
-          </View>
           <Text style={styles.heroTitle}>Unlock FRIDGR Premium</Text>
           <Text style={styles.heroSub}>Cook smarter. Waste less. Eat better.</Text>
 
-          <View style={styles.trialBadge}>
-            <Zap size={14} color="#F59E0B" strokeWidth={ICON_STROKE} fill="#F59E0B" />
+          <View style={[styles.trialBadge, { marginTop: SPACING.sm }]}>
             <Text style={styles.trialText}>7-day free trial, then cancel anytime</Text>
           </View>
         </View>
@@ -219,8 +213,7 @@ export default function SubscriptionScreen({ navigation }) {
               </View>
               {FREE_FEATURES.map((f, i) => (
                 <View key={i} style={styles.compRow}>
-                  <CircleCheck size={16} color={C.textTertiary} strokeWidth={ICON_STROKE} />
-                  <Text style={styles.compFeature}>{f}</Text>
+                  <Text style={styles.compFeature}>• {f}</Text>
                 </View>
               ))}
             </View>
@@ -229,13 +222,11 @@ export default function SubscriptionScreen({ navigation }) {
 
             <LinearGradient colors={['#F0FDF4', '#DCFCE7']} style={styles.compColumn}>
               <View style={styles.compHeader}>
-                <Star size={12} color={C.primary} fill={C.primaryPale} strokeWidth={ICON_STROKE} />
-                <Text style={[styles.compHeaderLabel, { color: C.primary }]}>Premium</Text>
+                <Text style={[styles.compHeaderLabel, { color: C.primary, fontWeight: '700' }]}>Premium</Text>
               </View>
               {PREMIUM_FEATURES.map((f, i) => (
                 <View key={i} style={styles.compRow}>
-                  <CircleCheck size={16} color={C.primary} strokeWidth={ICON_STROKE} />
-                  <Text style={[styles.compFeature, { color: C.text }]}>{f}</Text>
+                  <Text style={[styles.compFeature, { color: C.text, fontWeight: '500' }]}>• {f}</Text>
                 </View>
               ))}
             </LinearGradient>

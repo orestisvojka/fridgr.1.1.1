@@ -7,7 +7,6 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Check, Leaf, Camera, ChefHat, Heart } from 'lucide-react-native';
 import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
 import {
@@ -21,10 +20,10 @@ const PLANS = [
 ];
 
 const FEATURES = [
-  { Icon: Camera,   text: 'Unlimited ingredient scans' },
-  { Icon: ChefHat,  text: 'AI-generated personalized recipes' },
-  { Icon: Heart,    text: 'Save & organize your favourites' },
-  { Icon: Leaf,     text: 'Dietary & allergy filtering' },
+  'Unlimited ingredient scans',
+  'AI-generated personalized recipes',
+  'Save & organize your favourites',
+  'Dietary & allergy filtering',
 ];
 
 const TIMELINE = [
@@ -50,10 +49,6 @@ export default function TrialScreen({ navigation }) {
 
         {/* ── Header ── */}
         <View style={s.header}>
-          {/* Fridge icon pill */}
-          <View style={s.iconPill}>
-            <Text style={{ fontSize: 22 }}>🧊</Text>
-          </View>
           <Text style={s.eyebrow}>LIMITED TIME OFFER</Text>
           <Text style={s.title}>Try Fridgr free{'\n'}for 7 days</Text>
           <Text style={s.subtitle}>
@@ -64,11 +59,9 @@ export default function TrialScreen({ navigation }) {
         {/* ── Trust chips ── */}
         <View style={s.chips}>
           <View style={s.chip}>
-            <Check size={13} color="#3E6B50" strokeWidth={2.5} />
             <Text style={s.chipText}>No Payment Due Now</Text>
           </View>
           <View style={s.chip}>
-            <Check size={13} color="#3E6B50" strokeWidth={2.5} />
             <Text style={s.chipText}>Cancel Anytime</Text>
           </View>
         </View>
@@ -91,11 +84,9 @@ export default function TrialScreen({ navigation }) {
 
         {/* ── Features ── */}
         <View style={s.features}>
-          {FEATURES.map(({ Icon, text }, i) => (
+          {FEATURES.map((text, i) => (
             <View key={i} style={s.featureRow}>
-              <View style={s.featureIconWrap}>
-                <Icon size={16} color="#3E6B50" strokeWidth={2} />
-              </View>
+              <View style={s.featureDot} />
               <Text style={s.featureText}>{text}</Text>
             </View>
           ))}
@@ -174,12 +165,6 @@ const s = StyleSheet.create({
 
   // ─── Header ─────────────────────────────────────────────────────────────
   header:   { alignItems: 'center', marginBottom: SPACING.xl },
-  iconPill: {
-    width: 56, height: 56, borderRadius: 16,
-    backgroundColor: '#D4E8DA', alignItems: 'center', justifyContent: 'center',
-    marginBottom: SPACING.lg,
-    ...SHADOWS.sm,
-  },
   eyebrow: {
     fontSize: 10, fontWeight: '800', letterSpacing: 1.8,
     color: GREEN, textTransform: 'uppercase', marginBottom: SPACING.sm,
@@ -219,16 +204,13 @@ const s = StyleSheet.create({
   timelineLabel:     { fontSize: 10, color: '#8A8A84', textAlign: 'center', lineHeight: 14 },
 
   // ─── Features ───────────────────────────────────────────────────────────
-  features: { gap: SPACING.sm, marginBottom: SPACING.xl },
+  features: { gap: SPACING.sm, marginBottom: SPACING.xl, paddingHorizontal: SPACING.sm },
   featureRow: {
     flexDirection: 'row', alignItems: 'center', gap: SPACING.md,
-    backgroundColor: '#FFFFFF', borderRadius: RADIUS.lg,
-    paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-    borderWidth: 1, borderColor: '#EAE6DD',
+    paddingVertical: SPACING.xs,
   },
-  featureIconWrap: {
-    width: 32, height: 32, borderRadius: RADIUS.md,
-    backgroundColor: '#EDF5F0', alignItems: 'center', justifyContent: 'center',
+  featureDot: {
+    width: 6, height: 6, borderRadius: 3, backgroundColor: GREEN,
   },
   featureText: { ...FONT.bodyMedium, color: '#1E1E1C', flex: 1 },
 

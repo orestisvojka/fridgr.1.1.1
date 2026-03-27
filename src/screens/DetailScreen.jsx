@@ -81,7 +81,6 @@ export default function DetailScreen({ route, navigation }) {
           </View>
 
           {/* Emoji */}
-          <Text style={styles.heroEmoji}>{recipe.emoji}</Text>
 
           {/* Title + meta */}
           <Text style={styles.heroTitle}>{recipe.title}</Text>

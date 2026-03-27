@@ -34,7 +34,6 @@ function SavedCard({ recipe, onPress, onRemove }) {
     <TouchableOpacity onPress={onPress} activeOpacity={0.85} style={[styles.savedCard, shadows.sm]}>
       {/* Color strip */}
       <View style={[styles.colorStrip, { backgroundColor: palette.bg }]}>
-        <Text style={styles.cardEmoji}>{recipe.emoji}</Text>
       </View>
 
       {/* Info */}

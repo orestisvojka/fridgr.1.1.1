@@ -1,5 +1,5 @@
 // src/screens/main/ScanScreen.jsx
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import {
   View, Text, StyleSheet, Pressable, TextInput,
   ScrollView, Animated, Alert, ActivityIndicator,
@@ -135,7 +135,7 @@ function createStyles(C) {
   });
 }
 
-export default function ScanScreen({ navigation }) {
+export default function ScanScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
   const C = useThemeColors();
   const styles = useMemo(() => createStyles(C), [C]);
@@ -207,6 +207,13 @@ export default function ScanScreen({ navigation }) {
     setSearching(false);
     navigation.navigate(ROUTES.RESULTS, { ingredients, results });
   };
+
+  useEffect(() => {
+    if (route.params?.autoScan) {
+      navigation.setParams({ autoScan: undefined, imageUri: undefined });
+      simulateScan();
+    }
+  }, [route.params?.autoScan]);
 
   return (
     <View style={styles.container}>
@@ -339,7 +346,6 @@ export default function ScanScreen({ navigation }) {
 
         {ingredients.length === 0 && !scanning && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🛒</Text>
             <Text style={styles.emptyTitle}>Add your ingredients</Text>
             <Text style={styles.emptySub}>
               Scan a photo or type what's in your fridge to get personalized recipes

@@ -19,7 +19,7 @@ export default function ValuePropScreen({ navigation }) {
         <View style={styles.mockupContainer}>
           <View style={styles.mockupFrame}>
             <View style={styles.mockupImage}>
-               <Text style={styles.emoji}>📸 🥦 🥘</Text>
+               <Text style={styles.emoji}>📸</Text>
             </View>
           </View>
         </View>

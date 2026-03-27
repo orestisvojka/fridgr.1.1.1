@@ -92,13 +92,6 @@ export default function QuestionnaireScreen({ navigation }) {
     return !!answer;
   }, [answers, step.id, isMulti]);
 
-  const pulseContent = useCallback(() => {
-    Animated.sequence([
-      Animated.timing(contentOp, { toValue: 0.25, duration: 90, useNativeDriver: true }),
-      Animated.timing(contentOp, { toValue: 1, duration: 220, useNativeDriver: true }),
-    ]).start();
-  }, [contentOp]);
-
   const goNextOrFinish = useCallback(
     (fromIndex) => {
       if (fromIndex >= TOTAL - 1) {
@@ -127,21 +120,31 @@ export default function QuestionnaireScreen({ navigation }) {
   const handleContinue = useCallback(() => {
     if (!isAnswered() || advancing.current) return;
     advancing.current = true;
-    pulseContent();
-    const idx = stepIndex;
-    setTimeout(() => {
-      goNextOrFinish(idx);
+    
+    Animated.timing(contentOp, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
+    }).start(() => {
+      goNextOrFinish(stepIndex);
       advancing.current = false;
-    }, 280);
-  }, [isAnswered, stepIndex, goNextOrFinish, pulseContent]);
+    });
+  }, [isAnswered, stepIndex, goNextOrFinish, contentOp]);
 
   const handleBack = useCallback(() => {
     if (stepIndex <= 0 || advancing.current) return;
-    setStepIndex((s) => s - 1);
-  }, [stepIndex]);
+    Animated.timing(contentOp, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
+    }).start(() => {
+      setStepIndex((s) => s - 1);
+    });
+  }, [stepIndex, contentOp]);
 
   useEffect(() => {
-    contentOp.setValue(1);
+    contentOp.setValue(0);
+    Animated.timing(contentOp, { toValue: 1, duration: 350, useNativeDriver: true }).start();
   }, [stepIndex, contentOp]);
 
   const isSelected = (optionId) => {
@@ -218,10 +221,8 @@ export default function QuestionnaireScreen({ navigation }) {
           <View style={styles.hintWrap}>
             <Text style={styles.hint}>
               {isMulti
-                ? 'Select all that apply, then tap the button below'
-                : step.advance === 'confirm'
-                  ? 'Choose an option, then tap Continue'
-                  : 'Tap an answer to go to the next question'}
+                ? 'Select all that apply, then tap Continue'
+                : 'Choose an option, then tap Continue'}
             </Text>
           </View>
         </ScrollView>

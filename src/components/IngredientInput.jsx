@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     color: colors.textPrimary,
     fontWeight: fontWeight.medium,
-    paddingVertical: 0,
+    textAlignVertical: 'center',
   },
   addBtn: {
     width: 30,

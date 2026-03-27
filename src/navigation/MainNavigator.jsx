@@ -189,7 +189,7 @@ function TabIcon({ focused, Icon, label, colors }) {
         color={focused ? colors.primary : '#A0A0A0'}
         strokeWidth={focused ? ICON_STROKE + 0.3 : ICON_STROKE}
       />
-      <Text style={[styles.tabLabel, { color: focused ? colors.primary : '#A0A0A0' }, focused && styles.tabLabelActive]}>
+      <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.tabLabel, { color: focused ? colors.primary : '#A0A0A0' }, focused && styles.tabLabelActive]}>
         {label}
       </Text>
     </View>

@@ -42,7 +42,7 @@ function createStyles(C) {
       ...SHADOWS.sm,
     },
     searchIcon: { marginRight: SPACING.md },
-    searchInput: { ...FONT.body, color: C.text, flex: 1 },
+    searchInput: { flex: 1, fontSize: 15, fontWeight: '400', textAlignVertical: 'center', paddingVertical: 0, color: C.text },
     filterButton: {
       width: 40,
       height: 40,

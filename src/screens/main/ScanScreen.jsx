@@ -88,7 +88,7 @@ function createStyles(C) {
       borderWidth: 1.5, borderColor: C.border,
       paddingHorizontal: SPACING.md, height: 50,
     },
-    input: { flex: 1, ...FONT.body, color: C.text },
+    input: { flex: 1, fontSize: 15, fontWeight: '400', textAlignVertical: 'center', paddingVertical: 0, color: C.text },
     addBtn: {
       width: 50, height: 50, borderRadius: RADIUS.md,
       backgroundColor: C.primary,

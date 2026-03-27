@@ -41,7 +41,7 @@ function createStyles(C) {
       borderRadius: RADIUS.lg, paddingHorizontal: SPACING.md, height: 46,
       borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
     },
-    searchInput: { flex: 1, ...FONT.body, color: '#FFFFFF' },
+    searchInput: { flex: 1, fontSize: 15, fontWeight: '400', textAlignVertical: 'center', paddingVertical: 0, color: '#FFFFFF' },
     filtersSection: { backgroundColor: C.surface, borderBottomWidth: 1, borderBottomColor: C.borderLight },
     filters: { paddingHorizontal: SPACING.xl, paddingVertical: SPACING.sm, gap: SPACING.sm },
     filterChip: {

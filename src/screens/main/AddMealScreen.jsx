@@ -44,7 +44,10 @@ function createStyles(C) {
     },
     searchInput: {
       flex: 1,
-      ...FONT.body,
+      fontSize: 15,
+      fontWeight: '400',
+      textAlignVertical: 'center',
+      paddingVertical: 0,
       color: C.text,
     },
     quickAddGrid: { flexDirection: 'row', gap: SPACING.md },

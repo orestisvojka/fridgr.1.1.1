@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator, CardStyleInterpolators, TransitionSpecs } from '@react-navigation/stack';
 import { Home, ScanLine, BookOpen, Heart, User } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { FONT, SHADOWS } from '../constants/theme';
@@ -185,13 +186,14 @@ function TabIcon({ focused, Icon, label, colors }) {
   return (
     <View style={styles.tabIconWrap}>
       <Icon
-        size={22}
-        color={focused ? colors.primary : '#A0A0A0'}
+        size={24}
+        color={focused ? colors.primary : '#A1A19A'}
         strokeWidth={focused ? ICON_STROKE + 0.3 : ICON_STROKE}
       />
-      <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.tabLabel, { color: focused ? colors.primary : '#A0A0A0' }, focused && styles.tabLabelActive]}>
+      <Text numberOfLines={1} adjustsFontSizeToFit style={[styles.tabLabel, { color: focused ? colors.primary : '#A1A19A' }, focused && styles.tabLabelActive]}>
         {label}
       </Text>
+      {focused && <View style={styles.activeDot} />}
     </View>
   );
 }
@@ -202,17 +204,20 @@ export default function MainNavigator() {
 
   const tabBarStyle = useMemo(
     () => ({
-      backgroundColor: 'rgba(255,255,255,0.96)',
-      borderTopColor: 'rgba(228,221,210,0.6)',
-      borderTopWidth: 1,
-      height: 64 + insets.bottom,
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 70 + insets.bottom,
+      backgroundColor: 'transparent',
+      borderTopWidth: 0,
+      elevation: 12,
+      shadowColor: '#000000',
+      shadowOffset: { width: 0, height: -6 },
+      shadowOpacity: 0.08,
+      shadowRadius: 16,
       paddingBottom: insets.bottom,
       paddingTop: 0,
-      elevation: 16,
-      shadowColor: '#1A1410',
-      shadowOffset: { width: 0, height: -3 },
-      shadowOpacity: 0.08,
-      shadowRadius: 12,
     }),
     [insets.bottom],
   );
@@ -223,6 +228,20 @@ export default function MainNavigator() {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle,
+        tabBarBackground: () => (
+          <View style={StyleSheet.absoluteFill}>
+            <BlurView intensity={90} tint="light" style={StyleSheet.absoluteFill} />
+            {/* Added a firmer white gradient so it pops on solid backgrounds */}
+            <LinearGradient
+              colors={['rgba(255,255,255,0.92)', 'rgba(251,249,245,0.3)']}
+              start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }}
+              style={StyleSheet.absoluteFill}
+              pointerEvents="none"
+            />
+            {/* Crisp top border for 3D realism to show physical edge tracking */}
+            <View style={{ width: '100%', height: StyleSheet.hairlineWidth * 3, backgroundColor: 'rgba(255,255,255,1)' }} />
+          </View>
+        ),
       }}
     >
       <Tab.Screen
@@ -307,9 +326,9 @@ const styles = StyleSheet.create({
   tabIconWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 10,
-    gap: 3,
-    minWidth: 52,
+    paddingTop: 14,
+    gap: 4,
+    minWidth: 54,
   },
   tabLabel: {
     ...FONT.caption,
@@ -317,7 +336,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   tabLabelActive: {
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  activeDot: {
+    width: 4, height: 4, borderRadius: 2,
+    backgroundColor: '#3E6B50',
+    position: 'absolute', bottom: -6,
   },
   // Scan button
   scanWrapper: {
@@ -328,20 +352,20 @@ const styles = StyleSheet.create({
   scanPressable: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -28,
+    marginTop: -34,
   },
   scanCircle: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#3E6B50',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.38,
-    shadowRadius: 10,
+    shadowColor: '#0D3B26',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.28,
+    shadowRadius: 16,
     elevation: 8,
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.9)',
+    borderWidth: 4,
+    borderColor: 'rgba(255,255,255,0.95)',
   },
 });

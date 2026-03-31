@@ -58,7 +58,7 @@ function createStyles(C) {
       borderColor: C.primaryPale,
     },
     retryText: { ...FONT.bodySemiBold, color: C.primary },
-    grid: { padding: SPACING.lg, paddingBottom: 30 },
+    grid: { padding: SPACING.lg, paddingBottom: 160 },
     row: { gap: SPACING.md, justifyContent: 'space-between' },
     card: {
       flex: 1,

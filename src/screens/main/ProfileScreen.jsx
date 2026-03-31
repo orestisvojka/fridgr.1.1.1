@@ -1,29 +1,18 @@
 // src/screens/main/ProfileScreen.jsx
-import React, { useMemo } from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Pressable, Alert,
+  View, Text, StyleSheet, ScrollView, Pressable, Alert, Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import {
-  Bell,
-  Crown,
-  Settings,
-  HelpCircle,
-  FileText,
-  Star,
-  LogOut,
-  ChevronRight,
-  Calendar,
-  Heart,
-  Sparkles,
-  Flame,
-  ScanLine,
+  Bell, Crown, Settings, HelpCircle, FileText,
+  Star, LogOut, ChevronRight, Calendar,
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { useRecipes } from '../../context/RecipesContext';
-import { useOnboarding } from '../../context/OnboardingContext';
-import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
+import { FONT, SPACING, RADIUS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
 import {
   PREMIUM_HERO_COMPACT,
@@ -33,115 +22,165 @@ import {
 } from '../../constants/premiumScreenTheme';
 import { useThemeColors } from '../../context/ThemeContext';
 import { ICON_STROKE } from '../../constants/icons';
-import {
-  REFERRAL_LABELS,
-  GOAL_LABELS,
-  DIET_LABELS,
-  SKILL_LABELS,
-  TIME_LABELS,
-  formatAllergyList,
-  formatMealsFocus,
-} from '../../constants/profileLabels';
 
-const STAT_ICONS = {
-  heart: Heart,
-  sparkles: Sparkles,
-  flame: Flame,
-  scan: ScanLine,
-};
-
-function createStyles(C) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: C.background },
-    hero: { paddingBottom: SPACING.section },
-    heroContent: { alignItems: 'center', gap: SPACING.sm, paddingHorizontal: SPACING.xl },
-    avatar: {
-      width: 80, height: 80, borderRadius: 40,
-      alignItems: 'center', justifyContent: 'center',
-      borderWidth: 3, borderColor: 'rgba(255,255,255,0.3)',
-      marginBottom: SPACING.sm,
-    },
-    avatarText: { fontSize: 32, fontWeight: '700', color: '#FFFFFF' },
-    heroName: { ...FONT.h3, color: '#FFFFFF' },
-    heroEmail: { ...FONT.body, color: 'rgba(255,255,255,0.55)' },
-    joinBadge: {
-      flexDirection: 'row', alignItems: 'center', gap: SPACING.xs,
-      backgroundColor: 'rgba(255,255,255,0.1)',
-      borderRadius: RADIUS.full, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs,
-      marginTop: SPACING.xs,
-    },
-    joinText: { ...FONT.caption, color: 'rgba(255,255,255,0.6)' },
-    statsGrid: {
-      flexDirection: 'row',
-      paddingHorizontal: SPACING.lg,
-      marginTop: -SPACING.md,
-      gap: SPACING.sm,
-      marginBottom: SPACING.sm,
-    },
-    statCard: {
-      flex: 1, borderRadius: RADIUS.lg, padding: SPACING.md,
-      alignItems: 'center', gap: SPACING.xs, ...SHADOWS.sm,
-    },
-    statValue: { ...FONT.h4, textAlign: 'center' },
-    statLabel: { ...FONT.caption, color: C.textTertiary, textAlign: 'center' },
-    section: { paddingHorizontal: SPACING.xl, paddingTop: SPACING.xl, gap: SPACING.sm },
-    sectionTitle: { ...FONT.h5, color: C.textSecondary },
-    card: {
-      backgroundColor: C.surface, borderRadius: RADIUS.xl,
-      borderWidth: 1, borderColor: C.borderLight, overflow: 'hidden',
-      ...SHADOWS.xs,
-    },
-    prefRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.md,
-      gap: SPACING.md,
-    },
-    prefLabel: { ...FONT.caption, color: C.textTertiary, flexShrink: 0 },
-    prefValue: { ...FONT.bodyMedium, color: C.text, flex: 1, textAlign: 'right' },
-    prefDivider: { height: StyleSheet.hairlineWidth, backgroundColor: C.borderLight, marginLeft: SPACING.lg },
-    menuItem: {
-      flexDirection: 'row', alignItems: 'center', gap: SPACING.md,
-      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
-    },
-    menuIcon: {
-      width: 36, height: 36, borderRadius: RADIUS.md,
-      alignItems: 'center', justifyContent: 'center',
-    },
-    menuLabel: { ...FONT.bodyMedium, color: C.text, flex: 1 },
-    menuValue: { ...FONT.bodySmall, color: C.textTertiary },
-    divider: { height: 1, backgroundColor: C.borderLight, marginLeft: SPACING.lg + 36 + SPACING.md },
-    version: { ...FONT.caption, color: C.textTertiary, textAlign: 'center', marginTop: SPACING.xl },
-  });
+// ─── GlassPanel ───────────────────────────────────────────────────────────────
+function GlassPanel({ style, children, shimmerColor = 'rgba(62,107,80,0.13)' }) {
+  return (
+    <View style={[glassS.panel, style]}>
+      <BlurView intensity={75} tint="light" style={StyleSheet.absoluteFill} />
+      <LinearGradient
+        colors={['rgba(255,255,255,0.5)', 'rgba(249,247,242,0.2)']}
+        start={{ x: 0.2, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+      <LinearGradient
+        colors={['rgba(255,255,255,0.85)', 'rgba(255,255,255,0.0)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 0.38 }}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+      <LinearGradient
+        colors={[shimmerColor, 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.55, y: 1 }}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+      {children}
+    </View>
+  );
 }
 
-function MenuItem({
-  icon: Icon, label, value, onPress, iconBg, iconColor, isDestructive, styles, colors,
-}) {
+const glassS = StyleSheet.create({
+  panel: {
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.92)',
+    borderRadius: RADIUS.xl,
+  },
+});
+
+// ─── SpringCard ───────────────────────────────────────────────────────────────
+function SpringCard({ onPress, style, children, scaleTarget = 0.955 }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const pressIn = useCallback(() => {
+    Animated.spring(scale, { toValue: scaleTarget, useNativeDriver: true, speed: 120, bounciness: 0 }).start();
+  }, [scale, scaleTarget]);
+  const pressOut = useCallback(() => {
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 14, bounciness: 14 }).start();
+  }, [scale]);
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.menuItem, pressed && { opacity: 0.82 }]}
-    >
-      <View style={[styles.menuIcon, { backgroundColor: iconBg || colors.surface2 }]}>
-        <Icon size={18} color={iconColor || colors.textSecondary} strokeWidth={ICON_STROKE} />
-      </View>
-      <Text style={[styles.menuLabel, isDestructive && { color: colors.error }]}>{label}</Text>
-      {value && <Text style={styles.menuValue}>{value}</Text>}
-      {!isDestructive && <ChevronRight size={16} color={colors.textTertiary} strokeWidth={ICON_STROKE} />}
+    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut}>
+      <Animated.View style={[style, { transform: [{ scale }] }]}>{children}</Animated.View>
     </Pressable>
   );
 }
 
+// ─── SpringBtn (small pressables) ─────────────────────────────────────────────
+function SpringBtn({ onPress, style, children }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const pressIn = useCallback(() => {
+    Animated.spring(scale, { toValue: 0.90, useNativeDriver: true, speed: 120, bounciness: 0 }).start();
+  }, [scale]);
+  const pressOut = useCallback(() => {
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 16, bounciness: 18 }).start();
+  }, [scale]);
+  return (
+    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} style={style}>
+      <Animated.View style={{ transform: [{ scale }] }}>{children}</Animated.View>
+    </Pressable>
+  );
+}
+
+// ─── Stats strip (single glass bar, 4 items) ────────────────────────────────
+function StatsStrip({ stats }) {
+  return (
+    <GlassPanel style={stripS.wrap} shimmerColor="rgba(62,107,80,0.10)">
+      {stats.map((s, i) => (
+        <React.Fragment key={s.label}>
+          <View style={stripS.item}>
+            <Text style={stripS.value}>{s.value}</Text>
+            <Text style={stripS.label}>{s.label}</Text>
+          </View>
+          {i < stats.length - 1 && <View style={stripS.divider} />}
+        </React.Fragment>
+      ))}
+    </GlassPanel>
+  );
+}
+
+const stripS = StyleSheet.create({
+  wrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    shadowColor: '#2C4D38',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.09,
+    shadowRadius: 14,
+    elevation: 5,
+  },
+  item: { flex: 1, alignItems: 'center', gap: 2 },
+  value: { fontSize: 20, fontWeight: '800', color: '#1E1E1C', letterSpacing: -0.5 },
+  label: { fontSize: 10, fontWeight: '500', color: '#8A8A84', letterSpacing: 0.2 },
+  divider: { width: 1, height: 28, backgroundColor: 'rgba(62,107,80,0.12)' },
+});
+
+// ─── MenuItem (glass row inside a glass card) ─────────────────────────────────
+function MenuItem({ icon: Icon, label, value, onPress, iconBg, iconColor, isDestructive, C, isLast }) {
+  return (
+    <>
+      <SpringBtn onPress={onPress}>
+        <View style={menuS.row}>
+          <View style={[menuS.iconWrap, { backgroundColor: iconBg || 'rgba(62,107,80,0.10)' }]}>
+            <Icon
+              size={17}
+              color={isDestructive ? '#E05252' : (iconColor || C.textSecondary)}
+              strokeWidth={ICON_STROKE}
+            />
+          </View>
+          <Text style={[menuS.label, isDestructive && { color: '#E05252' }]}>{label}</Text>
+          {value ? <Text style={menuS.value}>{value}</Text> : null}
+          {!isDestructive && (
+            <ChevronRight size={15} color="rgba(62,107,80,0.30)" strokeWidth={ICON_STROKE} />
+          )}
+        </View>
+      </SpringBtn>
+      {!isLast && <View style={menuS.divider} />}
+    </>
+  );
+}
+
+const menuS = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: 14,
+  },
+  iconWrap: {
+    width: 34, height: 34, borderRadius: 10,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  label: { ...FONT.bodyMedium, color: '#1E1E1C', flex: 1 },
+  value: { ...FONT.bodySmall, color: '#8A8A84', marginRight: 2 },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(62,107,80,0.09)',
+    marginLeft: SPACING.lg + 34 + SPACING.md,
+  },
+});
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function ProfileScreen({ navigation }) {
   const insets = useSafeAreaInsets();
-  const colors = useThemeColors();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const C = useThemeColors();
   const { user, logout } = useAuth();
   const { savedRecipes } = useRecipes();
-  const { answers } = useOnboarding();
 
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -151,30 +190,36 @@ export default function ProfileScreen({ navigation }) {
   };
 
   const stats = [
-    { label: 'Saved', value: savedRecipes.length, iconKey: 'heart', color: '#22C55E', bg: '#F0FDF4' },
-    { label: 'Generated', value: user?.stats?.recipesGenerated ?? 0, iconKey: 'sparkles', color: '#15803D', bg: '#F0FDF4' },
-    { label: 'Streak', value: `${user?.stats?.cookingStreak ?? 0}d`, iconKey: 'flame', color: '#F97316', bg: '#FFF7ED' },
-    { label: 'Scanned', value: user?.stats?.ingredientsScanned ?? 0, iconKey: 'scan', color: '#3B82F6', bg: '#EFF6FF' },
+    { label: 'Saved',     value: savedRecipes.length,              iconKey: 'heart',    color: '#22C55E' },
+    { label: 'Generated', value: user?.stats?.recipesGenerated ?? 0, iconKey: 'sparkles', color: '#3E6B50' },
+    { label: 'Streak',    value: `${user?.stats?.cookingStreak ?? 0}d`, iconKey: 'flame', color: '#F97316' },
+    { label: 'Scanned',   value: user?.stats?.ingredientsScanned ?? 0, iconKey: 'scan',  color: '#3B82F6' },
   ];
 
-  const referralLabel = REFERRAL_LABELS[answers.referralSource] || 'Not set';
-  const goalLabel = GOAL_LABELS[answers.goal] || 'Not set';
-  const dietLabel = DIET_LABELS[answers.diet] || 'Not set';
-  const skillLabel = SKILL_LABELS[answers.skill] || 'Not set';
-  const timeLabel = TIME_LABELS[answers.time] || (answers.time ? `${answers.time} min` : 'Not set');
-  const allergyLabel = formatAllergyList(answers.allergies);
-  const mealsFocusLabel = formatMealsFocus(answers.mealsFocus);
-
   return (
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+    <View style={{ flex: 1, backgroundColor: '#F4F1EA' }}>
+      {/* Warm cream backdrop */}
+      <LinearGradient
+        colors={['#F9F7F2', '#F4F1EA', '#EDE8DF']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.4, y: 1 }}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 160 }}
+      >
+        {/* ── Hero ── */}
         <LinearGradient
           colors={PREMIUM_HERO_COMPACT}
           start={PREMIUM_HERO_COMPACT_START}
           end={PREMIUM_HERO_COMPACT_END}
           style={[styles.hero, { paddingTop: insets.top + SPACING.md }]}
         >
-          <View style={styles.heroContent}>
+          {/* Avatar */}
+          <View style={styles.avatarRing}>
             <LinearGradient
               colors={PREMIUM_AVATAR_GRADIENT}
               start={{ x: 0, y: 0 }}
@@ -183,132 +228,161 @@ export default function ProfileScreen({ navigation }) {
             >
               <Text style={styles.avatarText}>{(user?.name ?? 'U')[0].toUpperCase()}</Text>
             </LinearGradient>
-            <Text style={styles.heroName}>{user?.name?.trim() || 'Chef'}</Text>
-            <Text style={styles.heroEmail}>{user?.email ?? ''}</Text>
-
-            <View style={styles.joinBadge}>
-              <Calendar size={12} color="rgba(255,255,255,0.6)" strokeWidth={ICON_STROKE} />
-              <Text style={styles.joinText}>
-                Member since {user?.joinDate ?? '—'}
-              </Text>
-            </View>
           </View>
+
+          <Text style={styles.heroName}>{user?.name?.trim() || 'Chef'}</Text>
+          <Text style={styles.heroEmail}>{user?.email ?? ''}</Text>
+
+          {/* Glass join badge */}
+          <GlassPanel style={styles.joinBadge} shimmerColor="rgba(255,255,255,0.22)">
+            <Calendar size={12} color="rgba(62,107,80,0.60)" strokeWidth={ICON_STROKE} />
+            <Text style={styles.joinText}>Member since {user?.joinDate ?? '—'}</Text>
+          </GlassPanel>
         </LinearGradient>
 
-        <View style={styles.statsGrid}>
-          {stats.map((s, i) => {
-            const SIcon = STAT_ICONS[s.iconKey];
-            return (
-              <View key={i} style={[styles.statCard, { backgroundColor: s.bg }]}>
-                {SIcon ? <SIcon size={18} color={s.color} strokeWidth={ICON_STROKE} /> : null}
-                <Text style={[styles.statValue, { color: s.color }]}>{s.value}</Text>
-                <Text style={styles.statLabel}>{s.label}</Text>
-              </View>
-            );
-          })}
+        {/* ── Stats strip (glass, overlapping hero bottom) ── */}
+        <View style={styles.statsRow}>
+          <StatsStrip stats={stats} />
         </View>
 
+        {/* ── Account section ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your preferences</Text>
-          <View style={styles.card}>
-            <View style={styles.prefRow}>
-              <Text style={styles.prefLabel}>Heard about us</Text>
-              <Text style={styles.prefValue} numberOfLines={2}>{referralLabel}</Text>
-            </View>
-            <View style={styles.prefDivider} />
-            <View style={styles.prefRow}>
-              <Text style={styles.prefLabel}>Goal</Text>
-              <Text style={styles.prefValue}>{goalLabel}</Text>
-            </View>
-            <View style={styles.prefDivider} />
-            <View style={styles.prefRow}>
-              <Text style={styles.prefLabel}>Diet</Text>
-              <Text style={styles.prefValue}>{dietLabel}</Text>
-            </View>
-            <View style={styles.prefDivider} />
-            <View style={styles.prefRow}>
-              <Text style={styles.prefLabel}>Allergies</Text>
-              <Text style={styles.prefValue} numberOfLines={3}>{allergyLabel}</Text>
-            </View>
-            <View style={styles.prefDivider} />
-            <View style={styles.prefRow}>
-              <Text style={styles.prefLabel}>Skill</Text>
-              <Text style={styles.prefValue}>{skillLabel}</Text>
-            </View>
-            <View style={styles.prefDivider} />
-            <View style={styles.prefRow}>
-              <Text style={styles.prefLabel}>Cook time</Text>
-              <Text style={styles.prefValue}>{timeLabel}</Text>
-            </View>
-            <View style={styles.prefDivider} />
-            <View style={styles.prefRow}>
-              <Text style={styles.prefLabel}>Meals focus</Text>
-              <Text style={styles.prefValue} numberOfLines={2}>{mealsFocusLabel}</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
-          <View style={styles.card}>
+          <Text style={styles.sectionLabel}>Account</Text>
+          <GlassPanel style={styles.menuCard} shimmerColor="rgba(62,107,80,0.10)">
             <MenuItem
               icon={Bell} label="Notifications"
-              iconBg={colors.primaryFaint} iconColor={colors.primary}
+              iconBg="rgba(62,107,80,0.10)" iconColor={C.primary}
               onPress={() => navigation.navigate(ROUTES.SETTINGS)}
-              styles={styles} colors={colors}
+              C={C}
             />
-            <View style={styles.divider} />
             <MenuItem
-              icon={Crown} label="Go Premium"
-              iconBg="rgba(250,204,21,0.15)" iconColor="#CA8A04"
-              value="Free plan"
+              icon={Crown} label="Go Premium" value="Free plan"
+              iconBg="rgba(202,138,4,0.12)" iconColor="#B45309"
               onPress={() => navigation.navigate(ROUTES.SUBSCRIPTION)}
-              styles={styles} colors={colors}
+              C={C}
             />
-            <View style={styles.divider} />
             <MenuItem
               icon={Settings} label="Settings"
-              iconBg={colors.surface2} iconColor={colors.textSecondary}
+              iconBg="rgba(62,107,80,0.08)" iconColor={C.textSecondary}
               onPress={() => navigation.navigate(ROUTES.SETTINGS)}
-              styles={styles} colors={colors}
+              C={C} isLast
             />
-          </View>
+          </GlassPanel>
         </View>
 
+        {/* ── More section ── */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>More</Text>
-          <View style={styles.card}>
+          <Text style={styles.sectionLabel}>More</Text>
+          <GlassPanel style={styles.menuCard} shimmerColor="rgba(62,107,80,0.08)">
             <MenuItem
-              icon={HelpCircle} label="Help and support" iconBg={colors.surface2} iconColor={colors.textSecondary}
+              icon={HelpCircle} label="Help & Support"
+              iconBg="rgba(62,107,80,0.08)" iconColor={C.textSecondary}
               onPress={() => navigation.navigate(ROUTES.HELP_SUPPORT)}
-              styles={styles} colors={colors}
+              C={C}
             />
-            <View style={styles.divider} />
             <MenuItem
-              icon={FileText} label="Privacy Policy" iconBg={colors.surface2} iconColor={colors.textSecondary}
-              onPress={() => navigation.navigate(ROUTES.PRIVACY_POLICY)}
-              styles={styles} colors={colors}
-            />
-            <View style={styles.divider} />
-            <MenuItem
-              icon={Star} label="Rate FRIDGR" iconBg={colors.primaryFaint} iconColor={colors.primary}
+              icon={Star} label="Rate FRIDGR"
+              iconBg="rgba(202,138,4,0.12)" iconColor="#B45309"
               onPress={() => navigation.navigate(ROUTES.RATE_APP)}
-              styles={styles} colors={colors}
+              C={C}
             />
-          </View>
-        </View>
-
-        <View style={[styles.section, { paddingTop: 0 }]}>
-          <View style={styles.card}>
             <MenuItem
-              icon={LogOut} label="Sign Out" isDestructive onPress={handleLogout}
-              styles={styles} colors={colors}
+              icon={FileText} label="Privacy Policy"
+              iconBg="rgba(62,107,80,0.08)" iconColor={C.textSecondary}
+              onPress={() => navigation.navigate(ROUTES.PRIVACY_POLICY)}
+              C={C} isLast
             />
-          </View>
+          </GlassPanel>
         </View>
 
-        <Text style={styles.version}>FRIDGR v1.0.0 · Made with care</Text>
+        {/* ── Sign out ── */}
+        <View style={[styles.section, { paddingTop: 0 }]}>
+          <GlassPanel style={styles.menuCard} shimmerColor="rgba(224,82,82,0.08)">
+            <MenuItem
+              icon={LogOut} label="Sign Out"
+              isDestructive onPress={handleLogout}
+              C={C} isLast
+            />
+          </GlassPanel>
+        </View>
+
+        <Text style={styles.version}>FRIDGR v1.1.1 · Made with care</Text>
       </ScrollView>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  // ── Hero ──────────────────────────────────────────────────────────────────
+  hero: {
+    alignItems: 'center',
+    paddingBottom: SPACING.xl + 10,
+    gap: 3,
+  },
+  avatarRing: {
+    width: 62, height: 62, borderRadius: 31,
+    borderWidth: 2.5, borderColor: 'rgba(255,255,255,0.35)',
+    marginBottom: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  avatar: {
+    width: 57, height: 57, borderRadius: 28.5,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  avatarText: { fontSize: 22, fontWeight: '700', color: '#FFFFFF' },
+  heroName:  { fontSize: 18, fontWeight: '700', color: '#FFFFFF', letterSpacing: -0.3 },
+  heroEmail: { fontSize: 13, color: 'rgba(255,255,255,0.55)' },
+  joinBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 11,
+    paddingVertical: 5,
+    marginTop: 6,
+    borderRadius: RADIUS.full,
+    borderColor: 'rgba(255,255,255,0.80)',
+  },
+  joinText: { fontSize: 11, fontWeight: '500', color: 'rgba(30,30,28,0.65)' },
+
+  // ── Stats strip ──────────────────────────────────────────────────────────
+  statsRow: {
+    paddingHorizontal: SPACING.lg,
+    marginTop: -SPACING.lg,
+    marginBottom: SPACING.sm,
+  },
+
+  // ── Sections ──────────────────────────────────────────────────────────────
+  section: {
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    color: 'rgba(62,107,80,0.50)',
+    textTransform: 'uppercase',
+    marginLeft: 4,
+  },
+  menuCard: {
+    shadowColor: '#2C4D38',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.09,
+    shadowRadius: 14,
+    elevation: 5,
+  },
+
+  // ── Version ───────────────────────────────────────────────────────────────
+  version: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: 'rgba(62,107,80,0.38)',
+    textAlign: 'center',
+    marginTop: SPACING.xl,
+  },
+});

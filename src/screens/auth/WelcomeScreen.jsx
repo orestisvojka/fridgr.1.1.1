@@ -7,78 +7,93 @@ import {
   Pressable,
   Animated,
   Dimensions,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { Camera, ScanLine, Sparkles } from 'lucide-react-native';
+import { Camera, ScanLine, ChefHat, ArrowRight } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
 import { ICON_STROKE } from '../../constants/icons';
-import PremiumScreenShell from '../../components/PremiumScreenShell';
 import {
   PREMIUM,
   PREMIUM_CTA_VERTICAL,
   PREMIUM_CTA_VERTICAL_END,
   PREMIUM_CTA_VERTICAL_START,
 } from '../../constants/premiumScreenTheme';
+import { DEFAULT_RECIPE_IMAGE } from '../../data/recipeImages';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const FEATURES = [
   { Icon: Camera, label: 'Snap ingredients' },
-  { Icon: ScanLine, label: 'AI identifies them' },
-  { Icon: Sparkles, label: 'Get instant recipes' },
+  { Icon: ScanLine, label: 'AI identification' },
+  { Icon: ChefHat, label: 'Instant recipes' },
 ];
 
 export default function WelcomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(28)).current;
+  const slideAnim = useRef(new Animated.Value(24)).current;
   const ctaAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
       Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 1, duration: 640, useNativeDriver: true }),
-        Animated.timing(slideAnim, { toValue: 0, duration: 640, useNativeDriver: true }),
+        Animated.timing(fadeAnim, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(slideAnim, { toValue: 0, duration: 700, useNativeDriver: true }),
       ]),
-      Animated.timing(ctaAnim, { toValue: 1, duration: 380, useNativeDriver: true, delay: 80 }),
+      Animated.timing(ctaAnim, { toValue: 1, duration: 450, useNativeDriver: true, delay: 100 }),
     ]).start();
   }, [fadeAnim, slideAnim, ctaAnim]);
 
   return (
-    <PremiumScreenShell>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, backgroundColor: '#F9F7F2' }}>
+      <StatusBar style="dark" />
+
+      {/* 100% Full Screen Background Image */}
+      <Image 
+        source={{ uri: DEFAULT_RECIPE_IMAGE }}
+        style={StyleSheet.absoluteFill}
+        resizeMode="cover"
+      />
+
+      {/* Professional Soft Cream Fade allowing the top 35% of the image to shine clearly */}
+      <LinearGradient 
+        colors={['transparent', 'rgba(249,247,242,0.6)', 'rgba(249,247,242,0.95)', '#F9F7F2']}
+        locations={[0, 0.45, 0.65, 1]}
+        style={StyleSheet.absoluteFill} 
+      />
+
+      {/* Optional ultra-light blur to ensure text remains 100% crisp without using dark shadows */}
+      <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
 
       <View style={styles.hero}>
-        <View style={styles.heroGlow} />
         <Animated.View
           style={[
             styles.heroInner,
             { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
           ]}
         >
-          <View style={styles.badge}>
-            <Sparkles size={12} color="#FACC15" strokeWidth={ICON_STROKE} />
-            <Text style={styles.badgeText}>AI-powered cooking</Text>
-          </View>
-
           <View style={styles.logoRow}>
             <View style={styles.logoDot} />
             <Text style={styles.logoText}>FRIDGR</Text>
           </View>
 
-          <Text style={styles.heroTitle}>Cook with what you already have</Text>
+          <Text style={styles.heroTitle}>Your Personal AI Chef</Text>
           <Text style={styles.heroSubtitle}>
-            Turn ingredients into recipes in seconds — less waste, more flavor.
+            Take a photo of your fridge and discover incredible meals you can make right now.
           </Text>
 
-          <View style={styles.features}>
+          <View style={styles.featuresWrap}>
             {FEATURES.map(({ Icon, label }, i) => (
-              <View key={i} style={styles.featurePill}>
-                <Icon size={16} color="rgba(249,250,251,0.95)" strokeWidth={ICON_STROKE} />
+              <View key={i} style={styles.featureRow}>
+                <View style={styles.iconCircle}>
+                  <Icon size={18} color="#0D3B26" strokeWidth={ICON_STROKE + 0.5} />
+                </View>
                 <Text style={styles.featureText}>{label}</Text>
               </View>
             ))}
@@ -88,16 +103,15 @@ export default function WelcomeScreen({ navigation }) {
 
       <Animated.View
         style={[
-          styles.bottom,
+          styles.bottomWrap,
           {
             opacity: ctaAnim,
-            backgroundColor: PREMIUM.footerBg,
-            paddingBottom: insets.bottom + SPACING.lg,
+            paddingBottom: insets.bottom + SPACING.xl,
           },
         ]}
       >
         <Pressable
-          style={({ pressed }) => [styles.primaryBtn, pressed && { opacity: 0.92, transform: [{ scale: 0.99 }] }]}
+          style={({ pressed }) => [styles.primaryBtn, pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }]}
           onPress={() => navigation.navigate(ROUTES.SIGN_UP)}
         >
           <LinearGradient
@@ -106,12 +120,13 @@ export default function WelcomeScreen({ navigation }) {
             end={PREMIUM_CTA_VERTICAL_END}
             style={styles.primaryGradient}
           >
-            <Text style={styles.primaryText}>Create account</Text>
+            <Text style={styles.primaryText}>Get Started</Text>
+            <ArrowRight size={20} color="#FFFFFF" strokeWidth={ICON_STROKE} />
           </LinearGradient>
         </Pressable>
 
         <Pressable
-          style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.85 }]}
+          style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.7 }]}
           onPress={() => navigation.navigate(ROUTES.LOGIN)}
         >
           <Text style={styles.secondaryText}>
@@ -121,10 +136,10 @@ export default function WelcomeScreen({ navigation }) {
         </Pressable>
 
         <Text style={styles.legal}>
-          By continuing, you agree to our Terms and Privacy Policy
+          By continuing, you agree to our Terms and Privacy Policy.
         </Text>
       </Animated.View>
-    </PremiumScreenShell>
+    </View>
   );
 }
 
@@ -132,100 +147,112 @@ const styles = StyleSheet.create({
   hero: {
     flex: 1,
     paddingHorizontal: SPACING.xl,
-    paddingTop: 72,
-    justifyContent: 'flex-end',
-    paddingBottom: SPACING.xxl,
-    overflow: 'hidden',
-  },
-  heroGlow: {
-    position: 'absolute',
-    top: width * 0.05,
-    right: -width * 0.15,
-    width: width * 0.65,
-    height: width * 0.65,
-    borderRadius: width * 0.325,
-    backgroundColor: 'rgba(250,204,21,0.08)',
+    justifyContent: 'flex-end', // Pushes content downwards
+    paddingBottom: SPACING.xl,
   },
   heroInner: {
-    gap: SPACING.md,
+    alignItems: 'center',
+    gap: SPACING.xs,
   },
-  badge: {
+  logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: RADIUS.full,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs + 2,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
+    gap: 8,
+    marginBottom: SPACING.xl,
   },
-  badgeText: {
-    ...FONT.labelSmall,
-    color: 'rgba(6,64,43,0.88)',
-    letterSpacing: 0.3,
-    textTransform: 'uppercase',
-  },
-  logoRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginTop: SPACING.sm },
   logoDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#FACC15',
-    marginTop: 8,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#3E6B50',
   },
   logoText: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '800',
-    color: '#06402B',
-    letterSpacing: -1.2,
+    color: '#0D3B26',
+    letterSpacing: -0.5,
   },
   heroTitle: {
-    ...FONT.hero,
-    color: '#06402B',
-    marginTop: SPACING.sm,
+    ...FONT.h1,
+    color: '#0D3B26',
+    textAlign: 'center',
+    marginBottom: SPACING.xs,
   },
   heroSubtitle: {
     ...FONT.body,
-    color: 'rgba(6,64,43,0.62)',
+    color: 'rgba(13, 59, 38, 0.65)',
+    textAlign: 'center',
     lineHeight: 24,
-    maxWidth: 360,
+    maxWidth: 300,
   },
-  features: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginTop: SPACING.md },
-  featurePill: {
+  featuresWrap: {
+    marginTop: SPACING.xxl,
+    gap: SPACING.md,
+    alignSelf: 'stretch',
+    paddingHorizontal: SPACING.md,
+  },
+  featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: SPACING.xs,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: RADIUS.full,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs + 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)', // Solid crisp cards to separate from background
+    padding: SPACING.md,
+    borderRadius: RADIUS.xl,
+    gap: SPACING.md,
+    ...SHADOWS.sm,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: 'rgba(62,107,80,0.06)',
   },
-  featureText: { ...FONT.bodySmallMedium, color: 'rgba(6,64,43,0.9)' },
-  bottom: {
-    borderTopLeftRadius: RADIUS.xxl,
-    borderTopRightRadius: RADIUS.xxl,
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(62,107,80,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  featureText: {
+    ...FONT.bodySemiBold,
+    color: '#0D3B26',
+    fontSize: 15,
+  },
+  bottomWrap: {
     paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.xxl,
-    borderTopWidth: 1,
-    borderTopColor: PREMIUM.glassBorder,
-    ...SHADOWS.lg,
+    paddingTop: SPACING.xl,
   },
   primaryBtn: {
-    borderRadius: RADIUS.xl,
+    borderRadius: RADIUS.full,
     overflow: 'hidden',
     ...SHADOWS.green,
+    marginBottom: SPACING.lg,
   },
   primaryGradient: {
-    paddingVertical: SPACING.lg + 2,
+    flexDirection: 'row',
+    paddingVertical: SPACING.lg,
+    justifyContent: 'center',
     alignItems: 'center',
+    gap: SPACING.sm,
   },
-  primaryText: { ...FONT.h5, color: '#06402B', fontWeight: '700' },
-  secondaryBtn: { alignItems: 'center', paddingVertical: SPACING.md },
-  secondaryText: { ...FONT.body, color: PREMIUM.textMuted },
-  secondaryLink: { fontWeight: '700', color: PREMIUM.accent },
-  legal: { ...FONT.caption, textAlign: 'center', marginTop: SPACING.sm, color: 'rgba(6,64,43,0.4)' },
+  primaryText: {
+    ...FONT.h5,
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  secondaryBtn: {
+    alignItems: 'center',
+    paddingVertical: SPACING.md,
+  },
+  secondaryText: {
+    ...FONT.body,
+    color: 'rgba(13, 59, 38, 0.6)',
+  },
+  secondaryLink: {
+    fontWeight: '700',
+    color: '#3E6B50',
+  },
+  legal: {
+    ...FONT.caption,
+    textAlign: 'center',
+    marginTop: SPACING.md,
+    color: 'rgba(13, 59, 38, 0.4)',
+  },
 });

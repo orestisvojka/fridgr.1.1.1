@@ -10,6 +10,7 @@ import {
   ScrollView,
   Animated,
   Dimensions,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Check, ChevronRight } from 'lucide-react-native';
@@ -19,8 +20,9 @@ import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { QUESTIONNAIRE_STEPS } from '../../data/questionnaireSteps';
 import { ICON_STROKE } from '../../constants/icons';
 import { getQuestionnaireIcon } from '../../constants/questionnaireIcons';
+import { BlurView } from 'expo-blur';
 import { ROUTES } from '../../constants/routes';
-import PremiumScreenShell from '../../components/PremiumScreenShell';
+import { DEFAULT_RECIPE_IMAGE } from '../../data/recipeImages';
 import {
   PREMIUM,
   PREMIUM_CTA_VERTICAL,
@@ -154,7 +156,22 @@ export default function QuestionnaireScreen({ navigation }) {
   };
 
   return (
-    <PremiumScreenShell>
+    <View style={{ flex: 1, backgroundColor: '#F9F7F2' }}>
+      {/* 100% Background Photo for the glass effect backdrop */}
+      <Image 
+        source={{ uri: DEFAULT_RECIPE_IMAGE }}
+        style={StyleSheet.absoluteFill}
+        resizeMode="cover"
+      />
+      
+      {/* Soft Frosted Glass Overlay mapping the entire screen to the Warm Cream aesthetic */}
+      <LinearGradient 
+        colors={['rgba(249,247,242,0.6)', 'rgba(249,247,242,0.95)']}
+        locations={[0, 1]}
+        style={StyleSheet.absoluteFill} 
+      />
+      <BlurView intensity={50} tint="light" style={StyleSheet.absoluteFill} pointerEvents="none" />
+
       <View style={[styles.header, { paddingTop: insets.top + SPACING.sm }]}>
         <Pressable
           onPress={handleBack}
@@ -259,8 +276,8 @@ export default function QuestionnaireScreen({ navigation }) {
               </View>
             )}
           </Pressable>
-        </View>
-    </PremiumScreenShell>
+      </View>
+    </View>
   );
 }
 
@@ -362,58 +379,68 @@ const styles = StyleSheet.create({
   },
   options: { gap: SPACING.md },
   optionShell: {
-    borderRadius: RADIUS.xl,
+    borderRadius: RADIUS.xl, // smaller radius
     overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: '#DDDDDD',
-    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5, // thinner border
+    borderColor: 'rgba(255, 255, 255, 0.85)', // frost edge
+    backgroundColor: 'rgba(255, 255, 255, 0.65)', // glass surface
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.sm + 2, // much smaller vertical padding
     paddingHorizontal: SPACING.md,
     gap: SPACING.md,
   },
   optionShellSelected: {
-    backgroundColor: '#06402B',
-    borderColor: '#06402B',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)', // brighter white focus
+    borderColor: '#3E6B50', // green focus border
+    shadowColor: '#3E6B50',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
   optionIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    backgroundColor: '#F5F5F5',
+    width: 44, // smaller glass icon wrap
+    height: 44,
+    borderRadius: RADIUS.md, // smaller border radius
+    backgroundColor: 'rgba(255,255,255,0.7)',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.5)',
   },
-  optionCopy: { flex: 1, gap: 3 },
+  optionCopy: { flex: 1, gap: 1 },
   optionLabel: {
     ...FONT.bodySemiBold,
-    fontSize: 16,
-    color: '#06402B',
+    fontSize: 15, // slightly smaller font
+    color: '#0D3B26',
   },
   optionLabelSelected: {
-    color: '#FFFFFF',
+    color: '#0D3B26', // Keep dark text so it doesn't get lost on pure white
+    fontWeight: '800',
   },
   optionDesc: {
     ...FONT.bodySmall,
-    color: '#666666',
+    color: 'rgba(13, 59, 38, 0.65)', // subtle sage green matching theme
     lineHeight: 18,
+    fontSize: 12,
   },
   optionDescSelected: {
-    color: '#FFFFFF',
+    color: 'rgba(13, 59, 38, 0.9)',
   },
   tick: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#CCCCCC',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   tickOn: {
-    backgroundColor: '#06402B',
-    borderColor: '#06402B',
+    backgroundColor: '#3E6B50',
+    borderColor: '#3E6B50',
   },
   hintWrap: {
     marginTop: SPACING.xxl,
@@ -438,9 +465,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     paddingHorizontal: SPACING.xl,
     paddingTop: SPACING.lg,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(249, 247, 242, 0.85)', // translucent Warm Cream footer
     borderTopWidth: 1,
-    borderTopColor: '#EEEEEE',
+    borderTopColor: 'rgba(255, 255, 255, 0.5)',
   },
   continueBtnOuter: {
     borderRadius: RADIUS.xl,

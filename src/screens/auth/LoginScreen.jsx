@@ -3,16 +3,18 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import {
   View, Text, Pressable, TextInput,
   KeyboardAvoidingView, ScrollView, Platform, Animated,
-  ActivityIndicator,
+  ActivityIndicator, StyleSheet, Image,
 } from 'react-native';
 import {
   ArrowLeft, AlertCircle, Mail, Lock, Eye, EyeOff, Smartphone,
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { useAuth } from '../../context/AuthContext';
 import { SPACING } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
+import { RECIPE_IMAGE_URLS } from '../../data/recipeImages';
 import { useThemeColors } from '../../context/ThemeContext';
 import { ICON_STROKE } from '../../constants/icons';
 import { createPremiumAuthStyles } from '../../constants/premiumAuthStyles';
@@ -23,6 +25,8 @@ import {
 } from '../../constants/premiumScreenTheme';
 
 const ICON_COLOR = '#9A9A94';
+import { Dimensions } from 'react-native';
+const { width } = Dimensions.get('window');
 
 export default function LoginScreen({ navigation }) {
   const { login, loading, error, clearError } = useAuth();
@@ -65,18 +69,28 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* Cinematic 100% Background Photo */}
+      <Image 
+        source={{ uri: RECIPE_IMAGE_URLS.r2 }}
+        style={StyleSheet.absoluteFill}
+        resizeMode="cover"
+      />
+      
+      {/* Soft Frosted Glass Overlay mapping the entire screen to the Warm Cream aesthetic */}
+      <LinearGradient 
+        colors={['rgba(249,247,242,0.3)', 'rgba(249,247,242,0.9)']}
+        locations={[0, 1]}
+        style={StyleSheet.absoluteFill} 
+      />
+      <BlurView intensity={35} tint="light" style={StyleSheet.absoluteFill} pointerEvents="none" />
+
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior="padding"
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         <View style={[styles.header, { paddingTop: insets.top + SPACING.sm }]}>
-          <Pressable
-            style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.6 }]}
-            onPress={() => navigation.goBack()}
-          >
-            <ArrowLeft size={22} color="#1E1E1C" strokeWidth={ICON_STROKE} />
-          </Pressable>
+          {/* Back button removed to prevent unwanted navigation */}
           <View style={styles.logoBadge}>
             <Text style={styles.logoBadgeText}>FRIDGR</Text>
           </View>
@@ -99,7 +113,7 @@ export default function LoginScreen({ navigation }) {
               </View>
             ) : null}
 
-            <View style={styles.form}>
+            <BlurView intensity={70} tint="light" style={styles.form}>
               <View style={styles.field}>
                 <Text style={styles.label}>Email</Text>
                 <View style={[
@@ -174,43 +188,43 @@ export default function LoginScreen({ navigation }) {
                 </View>
                 {fieldErr.password ? <Text style={styles.fieldError}>{fieldErr.password}</Text> : null}
               </View>
-            </View>
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.primaryBtn,
-                loading && styles.primaryBtnDisabled,
-                pressed && !loading && { transform: [{ scale: 0.985 }], opacity: 0.92 },
-              ]}
-              onPress={handleLogin}
-              disabled={loading}
-            >
-              <LinearGradient
-                colors={PREMIUM_CTA_VERTICAL}
-                start={PREMIUM_CTA_VERTICAL_START}
-                end={PREMIUM_CTA_VERTICAL_END}
-                style={styles.primaryBtnGradient}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.primaryBtn,
+                  loading && styles.primaryBtnDisabled,
+                  pressed && !loading && { transform: [{ scale: 0.985 }], opacity: 0.92 },
+                ]}
+                onPress={handleLogin}
+                disabled={loading}
               >
-                {loading
-                  ? <ActivityIndicator color="#FFFFFF" />
-                  : <Text style={styles.primaryBtnText}>Sign In</Text>}
-              </LinearGradient>
-            </Pressable>
-
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            <View style={styles.social}>
-              <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.75 }]}>
-                <Text style={styles.socialBtnLabel}>G</Text>
+                <LinearGradient
+                  colors={PREMIUM_CTA_VERTICAL}
+                  start={PREMIUM_CTA_VERTICAL_START}
+                  end={PREMIUM_CTA_VERTICAL_END}
+                  style={styles.primaryBtnGradient}
+                >
+                  {loading
+                    ? <ActivityIndicator color="#FFFFFF" />
+                    : <Text style={styles.primaryBtnText}>Sign In</Text>}
+                </LinearGradient>
               </Pressable>
-              <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.75 }]}>
-                <Smartphone size={20} color="#1E1E1C" strokeWidth={ICON_STROKE} />
-              </Pressable>
-            </View>
+
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>or continue with</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              <View style={styles.social}>
+                <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.75 }]}>
+                  <Text style={styles.socialBtnLabel}>G</Text>
+                </Pressable>
+                <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.75 }]}>
+                  <Smartphone size={20} color="#1E1E1C" strokeWidth={ICON_STROKE} />
+                </Pressable>
+              </View>
+            </BlurView>
 
             <Pressable style={styles.footer} onPress={() => navigation.navigate(ROUTES.SIGN_UP)}>
               <Text style={styles.footerText}>
@@ -224,3 +238,12 @@ export default function LoginScreen({ navigation }) {
     </View>
   );
 }
+
+const localStyles = StyleSheet.create({
+  orb: {
+    position: 'absolute',
+    width: width * 0.9,
+    height: width * 0.9,
+    borderRadius: width * 0.45,
+  },
+});

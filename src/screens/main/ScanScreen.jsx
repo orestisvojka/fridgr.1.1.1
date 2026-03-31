@@ -1,17 +1,18 @@
 // src/screens/main/ScanScreen.jsx
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, Pressable, TextInput,
-  ScrollView, Animated, Alert, ActivityIndicator,
+  ScrollView, Animated, Alert, ActivityIndicator, Keyboard,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import {
   Camera,
   Image as ImageIcon,
   Search,
   Plus,
   X,
-  Sparkles,
+  ArrowRight,
 } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,14 +20,6 @@ import { useRecipes } from '../../context/RecipesContext';
 import { findMatchingRecipes } from '../../services/recipeService';
 import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
-import {
-  PREMIUM_HERO_COMPACT,
-  PREMIUM_HERO_COMPACT_END,
-  PREMIUM_HERO_COMPACT_START,
-  PREMIUM_CTA_VERTICAL,
-  PREMIUM_CTA_VERTICAL_END,
-  PREMIUM_CTA_VERTICAL_START,
-} from '../../constants/premiumScreenTheme';
 import { useThemeColors } from '../../context/ThemeContext';
 import { ICON_STROKE } from '../../constants/icons';
 
@@ -43,102 +36,83 @@ const SIMULATED_SCAN_WORDS = [
   ['avocado', 'lemon', 'sourdough bread'],
 ];
 
-function createStyles(C) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: C.background },
-    header: {
-      paddingHorizontal: SPACING.xl,
-      paddingBottom: SPACING.xxl,
-    },
-    headerTitle: { ...FONT.h2, color: '#FFFFFF', marginBottom: SPACING.xs },
-    headerSub: { ...FONT.body, color: 'rgba(255,255,255,0.6)', marginBottom: SPACING.xl },
-    scanBtns: { flexDirection: 'row', gap: SPACING.md },
-    scanBtn: { flex: 1 },
-    scanBtnInner: {
-      backgroundColor: 'rgba(255,255,255,0.12)',
-      borderRadius: RADIUS.xl,
-      padding: SPACING.lg,
-      alignItems: 'center',
-      gap: SPACING.sm,
-      borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.18)',
-    },
-    scanIcon: {
-      width: 56, height: 56, borderRadius: RADIUS.lg,
-      backgroundColor: '#F0FDF4',
-      alignItems: 'center', justifyContent: 'center',
-    },
-    scanBtnLabel: { ...FONT.bodySemiBold, color: '#FFFFFF' },
-    scanBtnSub: { ...FONT.caption, color: 'rgba(255,255,255,0.5)' },
-    scroll: { padding: SPACING.xl, paddingBottom: 100 },
-    scanningBanner: {
-      flexDirection: 'row', alignItems: 'center', gap: SPACING.md,
-      backgroundColor: C.primaryFaint,
-      borderRadius: RADIUS.lg, padding: SPACING.md,
-      marginBottom: SPACING.lg,
-      borderWidth: 1, borderColor: C.primaryPale,
-    },
-    scanningText: { ...FONT.bodyMedium, color: C.primary },
-    inputSection: { gap: SPACING.sm, marginBottom: SPACING.lg },
-    inputLabel: { ...FONT.label, color: C.text },
-    inputRow: { flexDirection: 'row', gap: SPACING.sm },
-    inputWrap: {
-      flex: 1, flexDirection: 'row', alignItems: 'center',
-      backgroundColor: C.surface, borderRadius: RADIUS.md,
-      borderWidth: 1.5, borderColor: C.border,
-      paddingHorizontal: SPACING.md, height: 50,
-    },
-    input: { flex: 1, fontSize: 15, fontWeight: '400', textAlignVertical: 'center', paddingVertical: 0, color: C.text },
-    addBtn: {
-      width: 50, height: 50, borderRadius: RADIUS.md,
-      backgroundColor: C.primary,
-      alignItems: 'center', justifyContent: 'center',
-    },
-    addBtnDisabled: { backgroundColor: C.surface2 },
-    suggestions: { marginBottom: SPACING.lg },
-    suggestionsLabel: { ...FONT.label, color: C.textSecondary, marginBottom: SPACING.sm },
-    suggestionChips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-    suggestionChip: {
-      backgroundColor: C.surface2,
-      borderRadius: RADIUS.full, paddingHorizontal: SPACING.md, paddingVertical: SPACING.xs + 2,
-      borderWidth: 1, borderColor: C.border,
-    },
-    suggestionChipText: { ...FONT.bodySmallMedium, color: C.textSecondary },
-    ingredientsSection: { gap: SPACING.md },
-    ingredientsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    ingredientsTitle: { ...FONT.bodySemiBold, color: C.text },
-    clearAll: { ...FONT.bodySmallMedium, color: C.error },
-    chips: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-    chip: {
-      flexDirection: 'row', alignItems: 'center', gap: SPACING.xs,
-      backgroundColor: C.primaryFaint, borderRadius: RADIUS.full,
-      paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm,
-      borderWidth: 1, borderColor: C.primaryPale,
-    },
-    chipText: { ...FONT.bodySmallMedium, color: C.primary },
-    emptyState: { alignItems: 'center', paddingTop: SPACING.section, gap: SPACING.md },
-    emptyEmoji: { fontSize: 56 },
-    emptyTitle: { ...FONT.h4, color: C.text },
-    emptySub: { ...FONT.body, color: C.textSecondary, textAlign: 'center', lineHeight: 24 },
-    ctaWrap: {
-      position: 'absolute', bottom: 0, left: 0, right: 0,
-      paddingHorizontal: SPACING.xl,
-      paddingTop: SPACING.md,
-      backgroundColor: C.background,
-      borderTopWidth: 1, borderTopColor: C.borderLight,
-      ...SHADOWS.md,
-    },
-    ctaBtn: { borderRadius: RADIUS.lg, overflow: 'hidden', ...SHADOWS.green },
-    ctaBtnGradient: { height: 54, alignItems: 'center', justifyContent: 'center' },
-    ctaBtnContent: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
-    ctaBtnText: { ...FONT.h5, color: C.white },
-  });
+// ─── Spring Animations ────────────────────────────────────────────────────────
+function SpringCard({ onPress, style, children, scaleTarget = 0.955, disabled }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const pressIn = useCallback(() => {
+    if (disabled) return;
+    Animated.spring(scale, { toValue: scaleTarget, useNativeDriver: true, speed: 120, bounciness: 0 }).start();
+  }, [scale, scaleTarget, disabled]);
+  const pressOut = useCallback(() => {
+    if (disabled) return;
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 14, bounciness: 14 }).start();
+  }, [scale, disabled]);
+  return (
+    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} disabled={disabled}>
+      <Animated.View style={[style, { transform: [{ scale }], opacity: disabled ? 0.6 : 1 }]}>
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
 }
 
+function SpringBtn({ onPress, style, children, disabled }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const pressIn = useCallback(() => {
+    if (disabled) return;
+    Animated.spring(scale, { toValue: 0.90, useNativeDriver: true, speed: 120, bounciness: 0 }).start();
+  }, [scale, disabled]);
+  const pressOut = useCallback(() => {
+    if (disabled) return;
+    Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 16, bounciness: 18 }).start();
+  }, [scale, disabled]);
+  return (
+    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} disabled={disabled} style={style}>
+      <Animated.View style={{ transform: [{ scale }], opacity: disabled ? 0.6 : 1 }}>
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+// ─── GlassPanel ───────────────────────────────────────────────────────────────
+function GlassPanel({ style, children, shimmerColor = 'rgba(62,107,80,0.14)' }) {
+  return (
+    <View style={[glassS.panel, style]}>
+      <BlurView intensity={75} tint="light" style={StyleSheet.absoluteFill} />
+      <LinearGradient
+        colors={['rgba(255,255,255,0.5)', 'rgba(249,247,242,0.2)']}
+        start={{ x: 0.2, y: 0 }} end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill} pointerEvents="none"
+      />
+      <LinearGradient
+        colors={['rgba(255,255,255,0.85)', 'rgba(255,255,255,0.0)']}
+        start={{ x: 0, y: 0 }} end={{ x: 0, y: 0.40 }}
+        style={StyleSheet.absoluteFill} pointerEvents="none"
+      />
+      <LinearGradient
+        colors={[shimmerColor, 'transparent']}
+        start={{ x: 0, y: 0 }} end={{ x: 0.55, y: 1 }}
+        style={StyleSheet.absoluteFill} pointerEvents="none"
+      />
+      {children}
+    </View>
+  );
+}
+
+const glassS = StyleSheet.create({
+  panel: {
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.92)',
+    borderRadius: RADIUS.xl,
+  },
+});
+
+// ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function ScanScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
   const C = useThemeColors();
-  const styles = useMemo(() => createStyles(C), [C]);
   const { addRecentScan } = useRecipes();
 
   const [ingredients, setIngredients] = useState([]);
@@ -184,7 +158,7 @@ export default function ScanScreen({ navigation, route }) {
     setScanning(true);
     Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.08, duration: 600, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1.05, duration: 600, useNativeDriver: true }),
         Animated.timing(pulseAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
       ]),
       { iterations: 3 },
@@ -217,128 +191,127 @@ export default function ScanScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+      {/* Warm beige backdrop to make glass panels pop */}
       <LinearGradient
-        colors={PREMIUM_HERO_COMPACT}
-        start={PREMIUM_HERO_COMPACT_START}
-        end={PREMIUM_HERO_COMPACT_END}
-        style={[styles.header, { paddingTop: insets.top + SPACING.md }]}
-      >
-        <Text style={styles.headerTitle}>Scan Ingredients</Text>
-        <Text style={styles.headerSub}>Take a photo or type what you have</Text>
+        colors={['#F9F7F2', '#F4F1EA', '#EDE8DF']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
 
-        <View style={styles.scanBtns}>
-          <Pressable
-            style={({ pressed }) => [styles.scanBtn, pressed && { opacity: 0.88 }]}
-            onPress={handleScan}
-            disabled={scanning}
-          >
-            <Animated.View style={[styles.scanBtnInner, { transform: [{ scale: pulseAnim }] }]}>
-              <View style={styles.scanIcon}>
-                <Camera size={26} color={C.primary} strokeWidth={ICON_STROKE + 0.25} />
-              </View>
-              <Text style={styles.scanBtnLabel}>Camera</Text>
-              <Text style={styles.scanBtnSub}>Take a photo</Text>
-            </Animated.View>
-          </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [styles.scanBtn, pressed && { opacity: 0.88 }]}
-            onPress={handleGallery}
-            disabled={scanning}
-          >
-            <View style={styles.scanBtnInner}>
-              <View style={[styles.scanIcon, { backgroundColor: '#EDE9FE' }]}>
-                <ImageIcon size={26} color="#7C3AED" strokeWidth={ICON_STROKE + 0.25} />
-              </View>
-              <Text style={styles.scanBtnLabel}>Gallery</Text>
-              <Text style={styles.scanBtnSub}>Upload photo</Text>
-            </View>
-          </Pressable>
-        </View>
-      </LinearGradient>
-
-      <ScrollView
+      <Animated.ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={{ paddingBottom: 140, paddingTop: insets.top + SPACING.xl }}
         keyboardShouldPersistTaps="handled"
+        onScrollBeginDrag={Keyboard.dismiss}
       >
+        <View style={styles.header}>
+          <Text style={[styles.headerTitle, { textAlign: 'center' }]}>Scan Ingredients</Text>
+          <Text style={[styles.headerSub, { textAlign: 'center' }]}>Take a photo or type what you have</Text>
+        </View>
+
+        {/* ── Premium Scan Hero ── */}
+        <View style={styles.scanBtns}>
+          <SpringCard onPress={handleScan} disabled={scanning} scaleTarget={0.96}>
+             <Animated.View style={{ transform: [{ scale: scanning ? pulseAnim : 1 }] }}>
+               <LinearGradient
+                  colors={['#0D3B26', '#1A5C3A', '#0D3B26']}
+                  start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                  style={styles.cameraHeroCard}
+               >
+                 {/* Premium Glass reflection overlay */}
+                 <LinearGradient
+                    colors={['rgba(255,255,255,0.12)', 'transparent']}
+                    start={{ x: 0, y: 0 }} end={{ x: 0, y: 0.5 }}
+                    style={StyleSheet.absoluteFill} pointerEvents="none"
+                 />
+                 
+                 <View style={styles.cameraViewfinder}>
+                   <Camera size={38} color="#FBD96A" strokeWidth={ICON_STROKE} />
+                 </View>
+                 <Text style={styles.cameraHeroTitle}>Smart Scan</Text>
+                 <Text style={styles.cameraHeroSub}>Point at your fridge to detect ingredients instantly</Text>
+               </LinearGradient>
+             </Animated.View>
+          </SpringCard>
+
+          {/* ── Gallery Pill ── */}
+          <SpringBtn onPress={handleGallery} disabled={scanning}>
+             <GlassPanel style={styles.galleryPill} shimmerColor="rgba(124,58,237,0.10)">
+               <ImageIcon size={18} color="#7C3AED" strokeWidth={ICON_STROKE + 0.5} />
+               <Text style={styles.galleryPillText}>Upload from Gallery</Text>
+             </GlassPanel>
+          </SpringBtn>
+        </View>
+
+        {/* ── Scanning Indicator ── */}
         {scanning && (
-          <View style={styles.scanningBanner}>
-            <ActivityIndicator size="small" color={C.primary} />
-            <Text style={styles.scanningText}>AI is detecting your ingredients…</Text>
+          <View style={{ paddingHorizontal: SPACING.xl, marginBottom: SPACING.lg }}>
+            <GlassPanel style={styles.scanningBanner} shimmerColor="rgba(62,107,80,0.20)">
+              <ActivityIndicator size="small" color="#3E6B50" />
+              <Text style={styles.scanningText}>AI is detecting your ingredients…</Text>
+            </GlassPanel>
           </View>
         )}
 
-        <View style={styles.inputSection}>
-          <Text style={styles.inputLabel}>Or type ingredients manually</Text>
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { textAlign: 'center' }]}>Or type ingredients manually</Text>
+          
+          {/* Glass Input Row (Symmetrical, full width) */}
           <View style={styles.inputRow}>
-            <View style={styles.inputWrap}>
+            <GlassPanel style={styles.inputWrap} shimmerColor="transparent">
               <Search size={18} color={C.textTertiary} strokeWidth={ICON_STROKE} style={{ marginRight: SPACING.sm }} />
               <TextInput
                 ref={inputRef}
                 style={styles.input}
                 value={inputText}
                 onChangeText={setInputText}
-                placeholder="Add ingredient…"
+                placeholder="Type and press return..."
                 placeholderTextColor={C.textTertiary}
                 onSubmitEditing={() => addIngredient(inputText)}
                 returnKeyType="done"
                 autoCapitalize="none"
               />
-            </View>
-            <Pressable
-              style={({ pressed }) => [
-                styles.addBtn,
-                !inputText.trim() && styles.addBtnDisabled,
-                pressed && inputText.trim() && { opacity: 0.88 },
-              ]}
-              onPress={() => addIngredient(inputText)}
-              disabled={!inputText.trim()}
-            >
-              <Plus
-                size={22}
-                color={inputText.trim() ? C.white : C.textTertiary}
-                strokeWidth={ICON_STROKE + 0.25}
-              />
-            </Pressable>
+            </GlassPanel>
           </View>
         </View>
 
+        {/* ── Suggestions (Quick Add) ── */}
         {ingredients.length < 5 && (
-          <View style={styles.suggestions}>
-            <Text style={styles.suggestionsLabel}>Quick add</Text>
-            <View style={styles.suggestionChips}>
+          <View style={styles.section}>
+            <Text style={[styles.sectionLabel, { textAlign: 'center' }]}>Quick add</Text>
+            <View style={styles.chipsRow}>
               {SUGGESTIONS.filter(s => !ingredients.includes(s)).slice(0, 8).map(s => (
-                <Pressable
-                  key={s}
-                  style={({ pressed }) => [styles.suggestionChip, pressed && { opacity: 0.85 }]}
-                  onPress={() => addIngredient(s)}
-                >
-                  <Text style={styles.suggestionChipText}>+ {s}</Text>
-                </Pressable>
+                <SpringBtn key={s} onPress={() => addIngredient(s)}>
+                  <GlassPanel style={styles.suggestionChip} shimmerColor="transparent">
+                    <Text style={styles.suggestionChipText}>{s}</Text>
+                  </GlassPanel>
+                </SpringBtn>
               ))}
             </View>
           </View>
         )}
 
+        {/* ── Added Ingredients ── */}
         {ingredients.length > 0 && (
-          <View style={styles.ingredientsSection}>
-            <View style={styles.ingredientsHeader}>
-              <Text style={styles.ingredientsTitle}>
+          <View style={[styles.section, { borderTopWidth: 1, borderTopColor: 'rgba(62,107,80,0.1)', paddingTop: SPACING.xl, marginTop: SPACING.xs }]}>
+            <View style={styles.addedHeader}>
+              <Text style={styles.addedTitle}>
                 {ingredients.length} ingredient{ingredients.length !== 1 ? 's' : ''} added
               </Text>
-              <Pressable onPress={() => setIngredients([])}>
+              <SpringBtn onPress={() => setIngredients([])}>
                 <Text style={styles.clearAll}>Clear all</Text>
-              </Pressable>
+              </SpringBtn>
             </View>
-            <View style={styles.chips}>
+            <View style={styles.chipsRow}>
               {ingredients.map(item => (
-                <View key={item} style={styles.chip}>
-                  <Text style={styles.chipText}>{item}</Text>
-                  <Pressable onPress={() => removeIngredient(item)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                    <X size={14} color={C.primary} strokeWidth={ICON_STROKE + 0.5} />
-                  </Pressable>
-                </View>
+                <SpringBtn key={item} onPress={() => removeIngredient(item)}>
+                  <GlassPanel style={styles.activeChip} shimmerColor="rgba(62,107,80,0.25)">
+                    <Text style={styles.activeChipText}>{item}</Text>
+                    <X size={14} color="#3E6B50" strokeWidth={ICON_STROKE + 0.5} style={{ marginLeft: 4 }} />
+                  </GlassPanel>
+                </SpringBtn>
               ))}
             </View>
           </View>
@@ -346,39 +319,131 @@ export default function ScanScreen({ navigation, route }) {
 
         {ingredients.length === 0 && !scanning && (
           <View style={styles.emptyState}>
+            <GlassPanel style={styles.emptyIcon} shimmerColor="rgba(62,107,80,0.15)">
+              <Search size={32} color="#3E6B50" strokeWidth={ICON_STROKE} />
+            </GlassPanel>
             <Text style={styles.emptyTitle}>Add your ingredients</Text>
             <Text style={styles.emptySub}>
-              Scan a photo or type what's in your fridge to get personalized recipes
+              Scan a photo or type what's in your fridge to get personalized recipe recommendations.
             </Text>
           </View>
         )}
-      </ScrollView>
+      </Animated.ScrollView>
 
+      {/* ── Floatin CTA ── */}
       {ingredients.length > 0 && (
-        <View style={[styles.ctaWrap, { paddingBottom: insets.bottom + SPACING.md }]}>
-          <Pressable
-            style={({ pressed }) => [styles.ctaBtn, searching && { opacity: 0.8 }, pressed && !searching && { opacity: 0.92 }]}
-            onPress={handleFindRecipes}
-            disabled={searching}
-          >
-            <LinearGradient
-              colors={PREMIUM_CTA_VERTICAL}
-              start={PREMIUM_CTA_VERTICAL_START}
-              end={PREMIUM_CTA_VERTICAL_END}
-              style={styles.ctaBtnGradient}
-            >
-              {searching ? (
-                <ActivityIndicator color={C.white} />
-              ) : (
-                <View style={styles.ctaBtnContent}>
-                  <Sparkles size={20} color={C.white} strokeWidth={ICON_STROKE} />
-                  <Text style={styles.ctaBtnText}>Find Recipes ({ingredients.length})</Text>
-                </View>
-              )}
-            </LinearGradient>
-          </Pressable>
+        <View style={[styles.ctaWrap, { paddingBottom: insets.bottom + SPACING.lg }]}>
+          <SpringCard onPress={handleFindRecipes} disabled={searching} scaleTarget={0.97}>
+             <LinearGradient
+                colors={['#0D3B26', '#1A5C3A', '#0D3B26']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.ctaBtn}
+             >
+               <LinearGradient
+                  colors={['rgba(255,255,255,0.12)', 'transparent']}
+                  start={{ x: 0, y: 0 }} end={{ x: 0, y: 0.5 }}
+                  style={StyleSheet.absoluteFill} pointerEvents="none"
+               />
+               {searching ? (
+                 <ActivityIndicator color="#FFF" />
+               ) : (
+                 <View style={styles.ctaBtnContent}>
+                   <Text style={styles.ctaBtnText}>Generate Recipes ({ingredients.length})</Text>
+                   <ArrowRight size={20} color="#FBD96A" strokeWidth={ICON_STROKE + 0.5} />
+                 </View>
+               )}
+             </LinearGradient>
+          </SpringCard>
         </View>
       )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#F4F1EA' },
+  header: { paddingHorizontal: SPACING.xl, marginBottom: SPACING.xl },
+  headerTitle: { fontSize: 26, fontWeight: '800', color: '#1E1E1C', letterSpacing: -0.5, marginBottom: 4 },
+  headerSub: { fontSize: 13, color: '#8A8A84' },
+  
+  scanBtns: { gap: SPACING.md, paddingHorizontal: SPACING.xl, marginBottom: SPACING.xl },
+  cameraHeroCard: {
+    height: 180,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    overflow: 'hidden',
+    shadowColor: '#0D3B26',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.22,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  cameraViewfinder: {
+    width: 72, height: 72, borderRadius: 36,
+    backgroundColor: 'rgba(251,217,106,0.12)',
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 4,
+  },
+  cameraHeroTitle: { fontSize: 20, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.3 },
+  cameraHeroSub: { fontSize: 13, color: 'rgba(255,255,255,0.7)', textAlign: 'center' },
+
+  galleryPill: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
+    height: 54, borderRadius: RADIUS.full,
+  },
+  galleryPillText: { fontSize: 14, fontWeight: '700', color: '#1E1E1C' },
+  
+  scanningBanner: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12,
+    padding: SPACING.lg, borderRadius: RADIUS.xl,
+  },
+  scanningText: { fontSize: 14, fontWeight: '600', color: '#3E6B50' },
+
+  section: { paddingHorizontal: SPACING.xl, marginBottom: SPACING.xl },
+  sectionLabel: { fontSize: 12, fontWeight: '700', color: 'rgba(62,107,80,0.6)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10, marginLeft: 4 },
+  
+  inputRow: { flexDirection: 'row' },
+  inputWrap: {
+    flex: 1, flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: SPACING.lg, height: 54, borderRadius: RADIUS.xl,
+  },
+  input: { flex: 1, fontSize: 16, fontWeight: '500', color: '#1E1E1C', paddingVertical: 0, paddingRight: 10 },
+
+  chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center' },
+  suggestionChip: {
+    paddingHorizontal: 16, paddingVertical: 10, borderRadius: RADIUS.full,
+  },
+  suggestionChipText: { fontSize: 13, fontWeight: '600', color: '#8A8A84' },
+  
+  addedHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md },
+  addedTitle: { fontSize: 15, fontWeight: '700', color: '#1E1E1C' },
+  clearAll: { fontSize: 12, fontWeight: '700', color: '#E05252' },
+  
+  activeChip: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 16, paddingVertical: 10, borderRadius: RADIUS.full,
+    borderWidth: 1.5, borderColor: 'rgba(62,107,80,0.2)'
+  },
+  activeChipText: { fontSize: 13, fontWeight: '700', color: '#3E6B50' },
+
+  emptyState: { alignItems: 'center', paddingTop: 20, paddingHorizontal: 40, gap: 16 },
+  emptyIcon: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  emptyTitle: { fontSize: 20, fontWeight: '800', color: '#1E1E1C' },
+  emptySub: { fontSize: 14, color: '#8A8A84', textAlign: 'center', lineHeight: 22 },
+
+  ctaWrap: {
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    paddingHorizontal: SPACING.xl, paddingTop: SPACING.lg,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+  },
+  ctaBtn: {
+    height: 60, borderRadius: RADIUS.xl, alignItems: 'center', justifyContent: 'center',
+    overflow: 'hidden', shadowColor: '#0D3B26', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.2, shadowRadius: 20, elevation: 12,
+  },
+  ctaBtnContent: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  ctaBtnText: { fontSize: 17, fontWeight: '800', color: '#FFF' },
+});

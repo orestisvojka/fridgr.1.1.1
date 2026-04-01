@@ -96,14 +96,13 @@ export function createPremiumAuthStyles(C) {
       alignItems: 'center',
       backgroundColor: 'rgba(255,255,255,0.6)',
       borderRadius: 16,
-      borderWidth: 1,
+      borderWidth: 1.5,
       borderColor: 'rgba(255,255,255,0.85)',
       paddingHorizontal: SPACING.md,
       height: 52,
     },
     inputWrapFocused: {
       borderColor: LIGHT.borderFocus,
-      borderWidth: 1.5,
       backgroundColor: 'rgba(255,255,255,0.9)',
       shadowColor: LIGHT.borderFocus,
       shadowOffset: { width: 0, height: 0 },
@@ -112,7 +111,6 @@ export function createPremiumAuthStyles(C) {
     },
     inputWrapError: {
       borderColor: C.error,
-      borderWidth: 1.5,
     },
     fieldError: { ...FONT.caption, color: C.error, marginTop: 2 },
     inputIcon: { marginRight: SPACING.sm },

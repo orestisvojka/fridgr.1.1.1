@@ -3,15 +3,14 @@ import { useState, useRef, useEffect } from 'react';
 import {
   View, Text, Pressable, TextInput,
   KeyboardAvoidingView, ScrollView, Platform,
-  ActivityIndicator, StyleSheet, Image,
+  ActivityIndicator, StyleSheet,
 } from 'react-native';
-import { AlertCircle, Mail, Lock, Eye, EyeOff, Smartphone } from 'lucide-react-native';
+import { AlertCircle, Mail, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
-import { SPACING } from '../../constants/theme';
+import { SPACING, RADIUS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
-import { RECIPE_IMAGE_URLS } from '../../data/recipeImages';
 import { useThemeColors } from '../../context/ThemeContext';
 import { ICON_STROKE } from '../../constants/icons';
 import {
@@ -19,9 +18,6 @@ import {
   PREMIUM_CTA_VERTICAL_END,
   PREMIUM_CTA_VERTICAL_START,
 } from '../../constants/premiumScreenTheme';
-
-const ICON_COLOR = '#9A9A94';
-const ACCENT = '#3E6B50';
 
 export default function LoginScreen({ navigation }) {
   const { login, loading, error, clearError } = useAuth();
@@ -52,24 +48,21 @@ export default function LoginScreen({ navigation }) {
   };
 
   const displayError = localErr || error;
+  const ACCENT = C.primary;
+  const ICON_C = C.textTertiary;
 
   return (
-    <View style={styles.root}>
-      <Image source={{ uri: RECIPE_IMAGE_URLS.r2 }} style={StyleSheet.absoluteFill} resizeMode="cover" />
-      <LinearGradient
-        colors={['rgba(249,247,242,0.3)', 'rgba(249,247,242,0.92)']}
-        style={StyleSheet.absoluteFill}
-      />
-
+    <View style={[styles.root, { backgroundColor: C.background }]}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
         {/* Header */}
-        <View style={[styles.header, { paddingTop: insets.top + SPACING.sm }]}>
+        <View style={[styles.header, { paddingTop: insets.top + SPACING.md }]}>
           <View style={styles.logoBadge}>
-            <Text style={styles.logoBadgeText}>FRIDGR</Text>
+            <View style={styles.logoDot} />
+            <Text style={[styles.logoText, { color: C.text }]}>FRIDGR</Text>
           </View>
         </View>
 
@@ -78,35 +71,36 @@ export default function LoginScreen({ navigation }) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>Sign in to your account</Text>
+          <Text style={[styles.title, { color: C.text }]}>Welcome back</Text>
+          <Text style={[styles.subtitle, { color: C.textSecondary }]}>Sign in to your account</Text>
 
           {displayError ? (
-            <View style={styles.errorBanner}>
-              <AlertCircle size={16} color={C.error} strokeWidth={ICON_STROKE} />
+            <View style={[styles.errorBanner, { backgroundColor: C.errorLight, borderColor: C.error + '33' }]}>
+              <AlertCircle size={14} color={C.error} strokeWidth={ICON_STROKE} />
               <Text style={[styles.errorText, { color: C.error }]}>{displayError}</Text>
             </View>
           ) : null}
 
-          {/* Form card */}
-          <View style={styles.form}>
+          {/* Form */}
+          <View style={[styles.form, { backgroundColor: C.surface, borderColor: C.border }]}>
             {/* Email */}
             <View style={styles.field}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={[styles.label, { color: C.textSecondary }]}>Email</Text>
               <View style={[
                 styles.inputWrap,
-                emailFocused && styles.inputWrapFocused,
-                fieldErr.email ? styles.inputWrapError : null,
+                { backgroundColor: C.surface2, borderColor: C.border },
+                emailFocused && { borderColor: ACCENT },
+                fieldErr.email ? { borderColor: C.error } : null,
               ]}>
-                <Mail size={18} color={emailFocused ? ACCENT : ICON_COLOR} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
+                <Mail size={15} color={emailFocused ? ACCENT : ICON_C} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: C.text }]}
                   value={email}
                   onChangeText={t => { setEmail(t); if (fieldErr.email) setFieldErr(f => ({ ...f, email: '' })); }}
                   onFocus={() => setEmailFocused(true)}
                   onBlur={() => setEmailFocused(false)}
                   placeholder="you@example.com"
-                  placeholderTextColor={ICON_COLOR}
+                  placeholderTextColor={C.textTertiary}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -122,26 +116,27 @@ export default function LoginScreen({ navigation }) {
             {/* Password */}
             <View style={styles.field}>
               <View style={styles.labelRow}>
-                <Text style={styles.label}>Password</Text>
+                <Text style={[styles.label, { color: C.textSecondary }]}>Password</Text>
                 <Pressable onPress={() => navigation.navigate(ROUTES.FORGOT_PW)}>
-                  <Text style={styles.forgotText}>Forgot password?</Text>
+                  <Text style={[styles.forgotText, { color: ACCENT }]}>Forgot password?</Text>
                 </Pressable>
               </View>
               <View style={[
                 styles.inputWrap,
-                passwordFocused && styles.inputWrapFocused,
-                fieldErr.password ? styles.inputWrapError : null,
+                { backgroundColor: C.surface2, borderColor: C.border },
+                passwordFocused && { borderColor: ACCENT },
+                fieldErr.password ? { borderColor: C.error } : null,
               ]}>
-                <Lock size={18} color={passwordFocused ? ACCENT : ICON_COLOR} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
+                <Lock size={15} color={passwordFocused ? ACCENT : ICON_C} strokeWidth={ICON_STROKE} style={styles.inputIcon} />
                 <TextInput
                   ref={passwordRef}
-                  style={[styles.input, { flex: 1 }]}
+                  style={[styles.input, { flex: 1, color: C.text }]}
                   value={password}
                   onChangeText={t => { setPassword(t); if (fieldErr.password) setFieldErr(f => ({ ...f, password: '' })); }}
                   onFocus={() => setPasswordFocused(true)}
                   onBlur={() => setPasswordFocused(false)}
                   placeholder="Enter your password"
-                  placeholderTextColor={ICON_COLOR}
+                  placeholderTextColor={C.textTertiary}
                   secureTextEntry={!showPw}
                   autoCapitalize="none"
                   textContentType="password"
@@ -151,8 +146,8 @@ export default function LoginScreen({ navigation }) {
                 />
                 <Pressable onPress={() => setShowPw(v => !v)} style={styles.eyeBtn} hitSlop={8}>
                   {showPw
-                    ? <EyeOff size={18} color={ICON_COLOR} strokeWidth={ICON_STROKE} />
-                    : <Eye size={18} color={ICON_COLOR} strokeWidth={ICON_STROKE} />}
+                    ? <EyeOff size={16} color={ICON_C} strokeWidth={ICON_STROKE} />
+                    : <Eye size={16} color={ICON_C} strokeWidth={ICON_STROKE} />}
                 </Pressable>
               </View>
               {fieldErr.password ? <Text style={[styles.fieldError, { color: C.error }]}>{fieldErr.password}</Text> : null}
@@ -162,7 +157,7 @@ export default function LoginScreen({ navigation }) {
             <Pressable
               style={({ pressed }) => [
                 styles.primaryBtn,
-                loading && styles.primaryBtnDisabled,
+                loading && { opacity: 0.5 },
                 pressed && !loading && { opacity: 0.88 },
               ]}
               onPress={handleLogin}
@@ -175,34 +170,34 @@ export default function LoginScreen({ navigation }) {
                 style={styles.primaryBtnGradient}
               >
                 {loading
-                  ? <ActivityIndicator color="#FFFFFF" />
+                  ? <ActivityIndicator color="#FFFFFF" size="small" />
                   : <Text style={styles.primaryBtnText}>Sign In</Text>}
               </LinearGradient>
             </Pressable>
 
             {/* Divider */}
             <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
+              <View style={[styles.dividerLine, { backgroundColor: C.border }]} />
+              <Text style={[styles.dividerText, { color: C.textTertiary }]}>or</Text>
+              <View style={[styles.dividerLine, { backgroundColor: C.border }]} />
             </View>
 
             {/* Social */}
             <View style={styles.social}>
-              <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.75 }]}>
-                <Text style={styles.socialBtnLabel}>G</Text>
+              <Pressable style={({ pressed }) => [styles.socialBtn, { backgroundColor: C.surface2, borderColor: C.border }, pressed && { opacity: 0.7 }]}>
+                <Text style={[styles.socialBtnLabel, { color: C.text }]}>G</Text>
               </Pressable>
-              <Pressable style={({ pressed }) => [styles.socialBtn, pressed && { opacity: 0.75 }]}>
-                <Smartphone size={20} color="#1E1E1C" strokeWidth={ICON_STROKE} />
+              <Pressable style={({ pressed }) => [styles.socialBtn, { backgroundColor: C.surface2, borderColor: C.border }, pressed && { opacity: 0.7 }]}>
+                <Text style={[styles.socialBtnLabel, { color: C.text }]}>󰍃</Text>
               </Pressable>
             </View>
           </View>
 
           {/* Footer */}
           <Pressable style={styles.footer} onPress={() => navigation.navigate(ROUTES.SIGN_UP)}>
-            <Text style={styles.footerText}>
+            <Text style={[styles.footerText, { color: C.textSecondary }]}>
               {"Don't have an account? "}
-              <Text style={styles.footerLink}>Sign up</Text>
+              <Text style={[styles.footerLink, { color: ACCENT }]}>Sign up</Text>
             </Text>
           </Pressable>
         </ScrollView>
@@ -212,114 +207,87 @@ export default function LoginScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F9F7F2' },
+  root: { flex: 1 },
   header: {
     alignItems: 'center',
     paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.sm,
+    paddingBottom: SPACING.lg,
   },
-  logoBadge: {
-    paddingHorizontal: 18,
-    paddingVertical: 6,
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    borderRadius: 99,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.9)',
-  },
-  logoBadgeText: { color: '#0D3B26', fontWeight: '800', letterSpacing: 1.5, fontSize: 11 },
+  logoBadge: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  logoDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#4ADE80' },
+  logoText: { fontSize: 13, fontWeight: '800', letterSpacing: 1.4 },
   scroll: {
-    paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.md,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.sm,
     paddingBottom: 48,
   },
-  title: { fontSize: 30, fontWeight: '800', color: '#0D3B26', marginBottom: 4 },
-  subtitle: { fontSize: 15, color: 'rgba(13,59,38,0.6)', marginBottom: SPACING.lg },
+  title: { fontSize: 22, fontWeight: '800', letterSpacing: -0.4, marginBottom: 3 },
+  subtitle: { fontSize: 13, marginBottom: SPACING.lg },
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.sm,
-    backgroundColor: 'rgba(254,226,226,0.92)',
-    borderRadius: 12,
+    borderRadius: RADIUS.md,
     padding: SPACING.md,
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: 'rgba(220,80,80,0.2)',
   },
-  errorText: { fontSize: 13, flex: 1 },
+  errorText: { fontSize: 12, flex: 1 },
   form: {
-    gap: SPACING.md + 4,
+    gap: SPACING.md,
     marginBottom: SPACING.lg,
-    backgroundColor: 'rgba(255,255,255,0.75)',
     paddingHorizontal: SPACING.lg,
-    paddingTop: SPACING.xl,
-    paddingBottom: SPACING.xl,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.9)',
-    width: '90%',
-    maxWidth: 340,
-    alignSelf: 'center',
+    paddingVertical: SPACING.xl,
+    borderRadius: RADIUS.xl,
+    borderWidth: 1,
   },
-  field: { gap: 6 },
-  label: { color: '#0D3B26', fontWeight: '700', fontSize: 13, letterSpacing: 0.3 },
+  field: { gap: 5 },
+  label: { fontWeight: '600', fontSize: 11, letterSpacing: 0.3 },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  forgotText: { color: ACCENT, fontWeight: '700', fontSize: 12 },
+  forgotText: { fontWeight: '600', fontSize: 11 },
   inputWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(200,200,200,0.6)',
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
     paddingHorizontal: SPACING.md,
-    height: 52,
+    height: 44,
   },
-  inputWrapFocused: {
-    borderColor: ACCENT,
-    backgroundColor: '#FFFFFF',
-  },
-  inputWrapError: {
-    borderColor: '#DC2626',
-  },
-  fieldError: { fontSize: 12, marginTop: 2 },
+  fieldError: { fontSize: 11, marginTop: 2 },
   inputIcon: { marginRight: SPACING.sm },
   input: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '500',
-    color: '#0D3B26',
     paddingVertical: 0,
   },
   eyeBtn: { padding: 4 },
   primaryBtn: {
-    borderRadius: 99,
+    borderRadius: RADIUS.full,
     overflow: 'hidden',
-    marginTop: SPACING.sm,
+    marginTop: SPACING.xs,
     elevation: 4,
-    shadowColor: ACCENT,
+    shadowColor: '#3E6B50',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.25,
     shadowRadius: 8,
   },
-  primaryBtnDisabled: { opacity: 0.5 },
-  primaryBtnGradient: { height: 54, alignItems: 'center', justifyContent: 'center' },
-  primaryBtnText: { color: '#FFFFFF', fontWeight: '800', fontSize: 17, letterSpacing: 0.3 },
+  primaryBtnGradient: { height: 46, alignItems: 'center', justifyContent: 'center' },
+  primaryBtnText: { color: '#FFFFFF', fontWeight: '800', fontSize: 14, letterSpacing: 0.2 },
   divider: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md },
-  dividerLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(13,59,38,0.2)' },
-  dividerText: { color: 'rgba(13,59,38,0.5)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 },
+  dividerLine: { flex: 1, height: StyleSheet.hairlineWidth },
+  dividerText: { fontSize: 10, textTransform: 'uppercase', letterSpacing: 0.8 },
   social: { flexDirection: 'row', justifyContent: 'center', gap: SPACING.md },
   socialBtn: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: 'rgba(255,255,255,0.7)',
+    width: 46,
+    height: 46,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: 'rgba(200,200,200,0.5)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  socialBtnLabel: { fontSize: 18, color: '#1E1E1C', fontWeight: '700' },
+  socialBtnLabel: { fontSize: 15, fontWeight: '700' },
   footer: { alignItems: 'center', marginTop: SPACING.md },
-  footerText: { color: 'rgba(13,59,38,0.6)', fontSize: 14 },
-  footerLink: { color: ACCENT, fontWeight: '800' },
+  footerText: { fontSize: 13 },
+  footerLink: { fontWeight: '700' },
 });

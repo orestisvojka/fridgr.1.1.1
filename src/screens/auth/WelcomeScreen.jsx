@@ -1,258 +1,228 @@
 // src/screens/auth/WelcomeScreen.jsx
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Animated,
-  Dimensions,
-  Image,
+  View, Text, StyleSheet, Pressable, Animated,
+  Dimensions, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { Camera, ScanLine, ChefHat, ArrowRight } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BlurView } from 'expo-blur';
-import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
+import { RADIUS, SHADOWS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
 import { ICON_STROKE } from '../../constants/icons';
 import {
-  PREMIUM,
   PREMIUM_CTA_VERTICAL,
   PREMIUM_CTA_VERTICAL_END,
   PREMIUM_CTA_VERTICAL_START,
 } from '../../constants/premiumScreenTheme';
 import { DEFAULT_RECIPE_IMAGE } from '../../data/recipeImages';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
+// Smaller image — leaves more room for content on small screens
+const IMG_HEIGHT = height * 0.40;
 
 const FEATURES = [
-  { Icon: Camera, label: 'Snap ingredients' },
-  { Icon: ScanLine, label: 'AI identification' },
-  { Icon: ChefHat, label: 'Instant recipes' },
+  { Icon: Camera,   label: 'Snap ingredients',  sub: 'Point at your fridge' },
+  { Icon: ScanLine, label: 'AI identification', sub: 'Detects what you have' },
+  { Icon: ChefHat,  label: 'Instant recipes',   sub: 'Ready in seconds' },
 ];
 
 export default function WelcomeScreen({ navigation }) {
   const insets = useSafeAreaInsets();
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(24)).current;
-  const ctaAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim  = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(18)).current;
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(slideAnim, { toValue: 0, duration: 700, useNativeDriver: true }),
-      ]),
-      Animated.timing(ctaAnim, { toValue: 1, duration: 450, useNativeDriver: true, delay: 100 }),
+    Animated.parallel([
+      Animated.timing(fadeAnim,  { toValue: 1, duration: 550, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 550, useNativeDriver: true }),
     ]).start();
-  }, [fadeAnim, slideAnim, ctaAnim]);
+  }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F9F7F2' }}>
-      <StatusBar style="dark" />
+    <View style={styles.root}>
+      <StatusBar style="light" />
 
-      {/* 100% Full Screen Background Image */}
-      <Image 
-        source={{ uri: DEFAULT_RECIPE_IMAGE }}
-        style={StyleSheet.absoluteFill}
-        resizeMode="cover"
-      />
+      {/* ── Image section ── */}
+      <View style={[styles.imageSection, { height: IMG_HEIGHT }]}>
+        <Image
+          source={{ uri: DEFAULT_RECIPE_IMAGE }}
+          style={StyleSheet.absoluteFill}
+          resizeMode="cover"
+        />
+        <LinearGradient
+          colors={['transparent', '#F9F7F2']}
+          locations={[0.65, 1]}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+        />
+        {/* Logo */}
+        <View style={[styles.logoBadge, { top: insets.top + 14 }]}>
+          <View style={styles.logoDot} />
+          <Text style={styles.logoText}>FRIDGR</Text>
+        </View>
+      </View>
 
-      {/* Professional Soft Cream Fade allowing the top 35% of the image to shine clearly */}
-      <LinearGradient 
-        colors={['transparent', 'rgba(249,247,242,0.6)', 'rgba(249,247,242,0.95)', '#F9F7F2']}
-        locations={[0, 0.45, 0.65, 1]}
-        style={StyleSheet.absoluteFill} 
-      />
-
-      {/* Optional ultra-light blur to ensure text remains 100% crisp without using dark shadows */}
-      <BlurView intensity={20} tint="light" style={StyleSheet.absoluteFill} />
-
-      <View style={styles.hero}>
-        <Animated.View
-          style={[
-            styles.heroInner,
-            { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-          ]}
-        >
-          <View style={styles.logoRow}>
-            <View style={styles.logoDot} />
-            <Text style={styles.logoText}>FRIDGR</Text>
-          </View>
-
-          <Text style={styles.heroTitle}>Your Personal AI Chef</Text>
+      {/* ── Content panel — fills remaining space, buttons pinned to bottom ── */}
+      <Animated.View
+        style={[styles.panel, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
+      >
+        {/* Top: text + features */}
+        <View style={styles.topContent}>
+          <Text style={styles.heroTitle}>Your Personal{'\n'}AI Chef</Text>
           <Text style={styles.heroSubtitle}>
-            Take a photo of your fridge and discover incredible meals you can make right now.
+            Snap your fridge. Get instant recipes tailored to what you have.
           </Text>
 
           <View style={styles.featuresWrap}>
-            {FEATURES.map(({ Icon, label }, i) => (
-              <View key={i} style={styles.featureRow}>
+            {FEATURES.map(({ Icon, label, sub }) => (
+              <View key={label} style={styles.featureRow}>
                 <View style={styles.iconCircle}>
-                  <Icon size={18} color="#0D3B26" strokeWidth={ICON_STROKE + 0.5} />
+                  <Icon size={14} color="#3E6B50" strokeWidth={ICON_STROKE + 0.3} />
                 </View>
-                <Text style={styles.featureText}>{label}</Text>
+                <View style={styles.featureTextWrap}>
+                  <Text style={styles.featureLabel}>{label}</Text>
+                  <Text style={styles.featureSub}>{sub}</Text>
+                </View>
               </View>
             ))}
           </View>
-        </Animated.View>
-      </View>
+        </View>
 
-      <Animated.View
-        style={[
-          styles.bottomWrap,
-          {
-            opacity: ctaAnim,
-            paddingBottom: insets.bottom + SPACING.xl,
-          },
-        ]}
-      >
-        <Pressable
-          style={({ pressed }) => [styles.primaryBtn, pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }]}
-          onPress={() => navigation.navigate(ROUTES.SIGN_UP)}
-        >
-          <LinearGradient
-            colors={PREMIUM_CTA_VERTICAL}
-            start={PREMIUM_CTA_VERTICAL_START}
-            end={PREMIUM_CTA_VERTICAL_END}
-            style={styles.primaryGradient}
+        {/* Bottom: CTA — always visible, pinned to bottom */}
+        <View style={[styles.ctaSection, { paddingBottom: insets.bottom + 16 }]}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.primaryBtn,
+              pressed && { opacity: 0.88, transform: [{ scale: 0.985 }] },
+            ]}
+            onPress={() => navigation.navigate(ROUTES.SIGN_UP)}
           >
-            <Text style={styles.primaryText}>Get Started</Text>
-            <ArrowRight size={20} color="#FFFFFF" strokeWidth={ICON_STROKE} />
-          </LinearGradient>
-        </Pressable>
+            <LinearGradient
+              colors={PREMIUM_CTA_VERTICAL}
+              start={PREMIUM_CTA_VERTICAL_START}
+              end={PREMIUM_CTA_VERTICAL_END}
+              style={styles.primaryGradient}
+            >
+              <Text style={styles.primaryText}>Get Started — It's Free</Text>
+              <ArrowRight size={16} color="#FFFFFF" strokeWidth={ICON_STROKE} />
+            </LinearGradient>
+          </Pressable>
 
-        <Pressable
-          style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.7 }]}
-          onPress={() => navigation.navigate(ROUTES.LOGIN)}
-        >
-          <Text style={styles.secondaryText}>
-            Already have an account?{' '}
-            <Text style={styles.secondaryLink}>Sign in</Text>
+          <Pressable
+            style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.6 }]}
+            onPress={() => navigation.navigate(ROUTES.LOGIN)}
+          >
+            <Text style={styles.secondaryText}>
+              Already have an account?{'  '}
+              <Text style={styles.secondaryLink}>Sign in</Text>
+            </Text>
+          </Pressable>
+
+          <Text style={styles.legal}>
+            By continuing you agree to our Terms &amp; Privacy Policy
           </Text>
-        </Pressable>
-
-        <Text style={styles.legal}>
-          By continuing, you agree to our Terms and Privacy Policy.
-        </Text>
+        </View>
       </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: {
+  root: { flex: 1, backgroundColor: '#F9F7F2' },
+
+  imageSection: { width: '100%', backgroundColor: '#E8E4DC' },
+
+  logoBadge: {
+    position: 'absolute', left: 20,
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: 'rgba(0,0,0,0.30)',
+    paddingHorizontal: 12, paddingVertical: 7,
+    borderRadius: RADIUS.full,
+  },
+  logoDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#4ADE80' },
+  logoText: { fontSize: 13, fontWeight: '800', color: '#FFFFFF', letterSpacing: 1.4 },
+
+  // Panel fills everything below the image, pinned layout
+  panel: {
     flex: 1,
-    paddingHorizontal: SPACING.xl,
-    justifyContent: 'flex-end', // Pushes content downwards
-    paddingBottom: SPACING.xl,
+    backgroundColor: '#F9F7F2',
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    justifyContent: 'space-between', // top content + bottom CTA always visible
   },
-  heroInner: {
-    alignItems: 'center',
-    gap: SPACING.xs,
-  },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: SPACING.xl,
-  },
-  logoDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#3E6B50',
-  },
-  logoText: {
-    fontSize: 28,
+
+  topContent: { gap: 0 },
+
+  heroTitle: {
+    fontSize: 26,
     fontWeight: '800',
     color: '#0D3B26',
-    letterSpacing: -0.5,
-  },
-  heroTitle: {
-    ...FONT.h1,
-    color: '#0D3B26',
-    textAlign: 'center',
-    marginBottom: SPACING.xs,
+    letterSpacing: -0.6,
+    lineHeight: 32,
+    marginBottom: 6,
   },
   heroSubtitle: {
-    ...FONT.body,
-    color: 'rgba(13, 59, 38, 0.65)',
-    textAlign: 'center',
-    lineHeight: 24,
-    maxWidth: 300,
+    fontSize: 13,
+    color: 'rgba(13,59,38,0.52)',
+    lineHeight: 20,
+    marginBottom: 14,
   },
-  featuresWrap: {
-    marginTop: SPACING.xxl,
-    gap: SPACING.md,
-    alignSelf: 'stretch',
-    paddingHorizontal: SPACING.md,
-  },
+
+  featuresWrap: { gap: 7 },
   featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)', // Solid crisp cards to separate from background
-    padding: SPACING.md,
-    borderRadius: RADIUS.xl,
-    gap: SPACING.md,
-    ...SHADOWS.sm,
+    gap: 10,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(62,107,80,0.06)',
+    borderColor: 'rgba(62,107,80,0.07)',
+    ...SHADOWS.xs,
   },
   iconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(62,107,80,0.1)',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(62,107,80,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
-  featureText: {
-    ...FONT.bodySemiBold,
-    color: '#0D3B26',
-    fontSize: 15,
-  },
-  bottomWrap: {
-    paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.xl,
-  },
+  featureTextWrap: { gap: 1 },
+  featureLabel: { fontSize: 12, fontWeight: '700', color: '#0D3B26' },
+  featureSub: { fontSize: 10.5, color: 'rgba(13,59,38,0.45)' },
+
+  // CTA section — pinned to bottom
+  ctaSection: { gap: 0 },
   primaryBtn: {
     borderRadius: RADIUS.full,
     overflow: 'hidden',
     ...SHADOWS.green,
-    marginBottom: SPACING.lg,
+    marginBottom: 10,
   },
   primaryGradient: {
     flexDirection: 'row',
-    paddingVertical: SPACING.lg,
+    paddingVertical: 15,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: SPACING.sm,
+    gap: 8,
   },
-  primaryText: {
-    ...FONT.h5,
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  secondaryBtn: {
-    alignItems: 'center',
-    paddingVertical: SPACING.md,
-  },
-  secondaryText: {
-    ...FONT.body,
-    color: 'rgba(13, 59, 38, 0.6)',
-  },
-  secondaryLink: {
-    fontWeight: '700',
-    color: '#3E6B50',
-  },
+  primaryText: { fontSize: 15, fontWeight: '800', color: '#FFFFFF' },
+
+  secondaryBtn: { alignItems: 'center', paddingVertical: 8 },
+  secondaryText: { fontSize: 13, color: 'rgba(13,59,38,0.52)' },
+  secondaryLink: { fontWeight: '800', color: '#3E6B50' },
+
   legal: {
-    ...FONT.caption,
+    fontSize: 10,
     textAlign: 'center',
-    marginTop: SPACING.md,
-    color: 'rgba(13, 59, 38, 0.4)',
+    color: 'rgba(13,59,38,0.32)',
+    marginTop: 4,
+    lineHeight: 15,
   },
 });

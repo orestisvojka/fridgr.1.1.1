@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, Pressable, Animated,
-  Dimensions, Image,
+  Dimensions, Image, ScrollView
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
@@ -20,7 +20,7 @@ import { DEFAULT_RECIPE_IMAGE } from '../../data/recipeImages';
 
 const { height } = Dimensions.get('window');
 // Smaller image — leaves more room for content on small screens
-const IMG_HEIGHT = height * 0.40;
+const IMG_HEIGHT = height * 0.35;
 
 const FEATURES = [
   { Icon: Camera,   label: 'Snap ingredients',  sub: 'Point at your fridge' },
@@ -69,62 +69,68 @@ export default function WelcomeScreen({ navigation }) {
       <Animated.View
         style={[styles.panel, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
       >
-        {/* Top: text + features */}
-        <View style={styles.topContent}>
-          <Text style={styles.heroTitle}>Your Personal{'\n'}AI Chef</Text>
-          <Text style={styles.heroSubtitle}>
-            Snap your fridge. Get instant recipes tailored to what you have.
-          </Text>
-
-          <View style={styles.featuresWrap}>
-            {FEATURES.map(({ Icon, label, sub }) => (
-              <View key={label} style={styles.featureRow}>
-                <View style={styles.iconCircle}>
-                  <Icon size={14} color="#3E6B50" strokeWidth={ICON_STROKE + 0.3} />
-                </View>
-                <View style={styles.featureTextWrap}>
-                  <Text style={styles.featureLabel}>{label}</Text>
-                  <Text style={styles.featureSub}>{sub}</Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Bottom: CTA — always visible, pinned to bottom */}
-        <View style={[styles.ctaSection, { paddingBottom: insets.bottom + 16 }]}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.primaryBtn,
-              pressed && { opacity: 0.88, transform: [{ scale: 0.985 }] },
-            ]}
-            onPress={() => navigation.navigate(ROUTES.SIGN_UP)}
-          >
-            <LinearGradient
-              colors={PREMIUM_CTA_VERTICAL}
-              start={PREMIUM_CTA_VERTICAL_START}
-              end={PREMIUM_CTA_VERTICAL_END}
-              style={styles.primaryGradient}
-            >
-              <Text style={styles.primaryText}>Get Started — It's Free</Text>
-              <ArrowRight size={16} color="#FFFFFF" strokeWidth={ICON_STROKE} />
-            </LinearGradient>
-          </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.6 }]}
-            onPress={() => navigation.navigate(ROUTES.LOGIN)}
-          >
-            <Text style={styles.secondaryText}>
-              Already have an account?{'  '}
-              <Text style={styles.secondaryLink}>Sign in</Text>
+        <ScrollView 
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-between' }}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          {/* Top: text + features */}
+          <View style={styles.topContent}>
+            <Text style={styles.heroTitle}>Your Personal{'\n'}AI Chef</Text>
+            <Text style={styles.heroSubtitle}>
+              Snap your fridge. Get instant recipes tailored to what you have.
             </Text>
-          </Pressable>
 
-          <Text style={styles.legal}>
-            By continuing you agree to our Terms &amp; Privacy Policy
-          </Text>
-        </View>
+            <View style={styles.featuresWrap}>
+              {FEATURES.map(({ Icon, label, sub }) => (
+                <View key={label} style={styles.featureRow}>
+                  <View style={styles.iconCircle}>
+                    <Icon size={14} color="#3E6B50" strokeWidth={ICON_STROKE + 0.3} />
+                  </View>
+                  <View style={styles.featureTextWrap}>
+                    <Text style={styles.featureLabel}>{label}</Text>
+                    <Text style={styles.featureSub}>{sub}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Bottom: CTA — always visible, pinned to bottom */}
+          <View style={[styles.ctaSection, { paddingBottom: insets.bottom + 16, paddingTop: 24 }]}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.primaryBtn,
+                pressed && { opacity: 0.88, transform: [{ scale: 0.985 }] },
+              ]}
+              onPress={() => navigation.navigate(ROUTES.SIGN_UP)}
+            >
+              <LinearGradient
+                colors={PREMIUM_CTA_VERTICAL}
+                start={PREMIUM_CTA_VERTICAL_START}
+                end={PREMIUM_CTA_VERTICAL_END}
+                style={styles.primaryGradient}
+              >
+                <Text style={styles.primaryText}>Get Started — It's Free</Text>
+                <ArrowRight size={16} color="#FFFFFF" strokeWidth={ICON_STROKE} />
+              </LinearGradient>
+            </Pressable>
+
+            <Pressable
+              style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.6 }]}
+              onPress={() => navigation.navigate(ROUTES.LOGIN)}
+            >
+              <Text style={styles.secondaryText}>
+                Already have an account?{'  '}
+                <Text style={styles.secondaryLink}>Sign in</Text>
+              </Text>
+            </Pressable>
+
+            <Text style={styles.legal}>
+              By continuing you agree to our Terms &amp; Privacy Policy
+            </Text>
+          </View>
+        </ScrollView>
       </Animated.View>
     </View>
   );
@@ -151,7 +157,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F7F2',
     paddingHorizontal: 20,
     paddingTop: 18,
-    justifyContent: 'space-between', // top content + bottom CTA always visible
   },
 
   topContent: { gap: 0 },

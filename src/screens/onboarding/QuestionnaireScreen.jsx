@@ -11,6 +11,7 @@ import {
   Animated,
   Dimensions,
   Image,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Check, ChevronRight } from 'lucide-react-native';
@@ -48,8 +49,9 @@ function OptionRow({
       style={({ pressed }) => [
         styles.optionShell,
         selected && styles.optionShellSelected,
-        pressed && { opacity: 0.85 }
+        pressed && Platform.OS === 'ios' && { opacity: 0.85 }
       ]}
+      android_ripple={null}
     >
       {option.iconKey && (
         <View style={styles.optionIcon}>
@@ -80,6 +82,7 @@ export default function QuestionnaireScreen({ navigation }) {
   const [stepIndex, setStepIndex] = useState(0);
   const advancing = useRef(false);
   const contentOp = useRef(new Animated.Value(1)).current;
+  const scrollViewRef = useRef(null);
 
   const step = QUESTIONNAIRE_STEPS[stepIndex];
   const isMulti = step.type === 'multi';
@@ -124,6 +127,9 @@ export default function QuestionnaireScreen({ navigation }) {
       duration: 150,
       useNativeDriver: true,
     }).start(() => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollTo({ y: 0, animated: false });
+      }
       goNextOrFinish(stepIndex);
       advancing.current = false;
     });
@@ -203,12 +209,14 @@ export default function QuestionnaireScreen({ navigation }) {
 
       <Animated.View style={[styles.body, { opacity: contentOp }]}>
         <ScrollView
+          ref={scrollViewRef}
           contentContainerStyle={[
             styles.scrollInner,
             { paddingBottom: insets.bottom + 140 },
           ]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          bounces={false}
         >
           <View style={styles.questionCard}>
             <View style={styles.kickerRow}>
@@ -244,10 +252,11 @@ export default function QuestionnaireScreen({ navigation }) {
           <Pressable
             onPress={handleContinue}
             disabled={!isAnswered()}
+            android_ripple={null}
             style={({ pressed }) => [
               styles.continueBtnOuter,
               isAnswered() && styles.continueBtnOuterEnabled,
-              pressed && isAnswered() && { transform: [{ scale: 0.985 }] },
+              pressed && isAnswered() && Platform.OS === 'ios' && { transform: [{ scale: 0.985 }] },
             ]}
           >
             {isAnswered() ? (

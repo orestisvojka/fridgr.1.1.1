@@ -28,7 +28,7 @@ function ToggleRow({
   return (
     <View style={styles.settingRow}>
       <View style={[styles.settingIcon, { backgroundColor: iconBg || 'rgba(30,41,59,0.9)' }]}>
-        <Icon size={18} color={iconColor || PREMIUM.textMuted} strokeWidth={ICON_STROKE} />
+        <Icon size={20} color={iconColor || PREMIUM.textMuted} strokeWidth={ICON_STROKE} />
       </View>
       <Text style={styles.settingLabel}>{label}</Text>
       <Switch
@@ -48,22 +48,22 @@ function createStyles(colors) {
     sectionTitle: { ...FONT.h5, color: PREMIUM.textMuted },
     card: {
       backgroundColor: PREMIUM.cardBg,
-      borderRadius: RADIUS.xl,
+      borderRadius: RADIUS.xxl,
       borderWidth: 1,
       borderColor: PREMIUM.cardBorder,
       overflow: 'hidden',
-      ...SHADOWS.xs,
+      ...SHADOWS.sm,
     },
     settingRow: {
-      flexDirection: 'row', alignItems: 'center', gap: SPACING.md,
-      paddingHorizontal: SPACING.lg, paddingVertical: SPACING.md,
+      flexDirection: 'row', alignItems: 'center', gap: SPACING.lg,
+      paddingHorizontal: SPACING.xl, paddingVertical: SPACING.lg,
     },
     settingIcon: {
-      width: 36, height: 36, borderRadius: RADIUS.md,
+      width: 42, height: 42, borderRadius: RADIUS.lg,
       alignItems: 'center', justifyContent: 'center',
     },
-    settingLabel: { ...FONT.bodyMedium, color: PREMIUM.text, flex: 1 },
-    divider: { height: 1, backgroundColor: PREMIUM.glassBorder, marginLeft: SPACING.lg + 36 + SPACING.md },
+    settingLabel: { ...FONT.bodyMedium, color: PREMIUM.text, flex: 1, fontSize: 16 },
+    divider: { height: 1, backgroundColor: PREMIUM.glassBorder, marginLeft: SPACING.xl + 42 + SPACING.lg },
     versionText: { ...FONT.caption, color: PREMIUM.textMuted, textAlign: 'center' },
     linkRow: { flexDirection: 'row', alignItems: 'center' },
   });
@@ -136,12 +136,12 @@ export default function SettingsScreen({ navigation }) {
                   style={({ pressed }) => [styles.settingRow, pressed && { opacity: 0.82 }]}
                 >
                   <View style={[styles.settingIcon, { backgroundColor: item.bg }]}>
-                    <RowIcon size={18} color={item.color} strokeWidth={ICON_STROKE} />
+                    <RowIcon size={20} color={item.color} strokeWidth={ICON_STROKE} />
                   </View>
                   <Text style={[styles.settingLabel, item.destructive && { color: '#FCA5A5' }]}>
                     {item.label}
                   </Text>
-                  <ChevronRight size={16} color={PREMIUM.textMuted} strokeWidth={ICON_STROKE} />
+                  <ChevronRight size={18} color={PREMIUM.textMuted} strokeWidth={ICON_STROKE} />
                 </Pressable>
                 {i < arr.length - 1 && <View style={styles.divider} />}
               </View>

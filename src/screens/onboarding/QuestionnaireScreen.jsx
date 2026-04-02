@@ -39,7 +39,6 @@ function OptionRow({
   option,
   selected,
   onPress,
-  showCheck,
 }) {
   const OptionIcon = getQuestionnaireIcon(option.iconKey);
 
@@ -61,17 +60,15 @@ function OptionRow({
           />
         </View>
       )}
-      <View style={styles.optionCopy}>
+        <View style={styles.optionCopy}>
         <Text style={[styles.optionLabel, selected && styles.optionLabelSelected]}>{option.label}</Text>
         <Text style={[styles.optionDesc, selected && styles.optionDescSelected]}>{option.desc}</Text>
       </View>
-      {showCheck ? (
-        <View style={[styles.tick, selected && styles.tickOn]}>
-          {selected ? (
-            <Check size={16} color="#FFFFFF" strokeWidth={ICON_STROKE + 0.5} />
-          ) : null}
-        </View>
-      ) : null}
+      <View style={[styles.tick, selected && styles.tickOn]}>
+        {selected ? (
+          <Check size={16} color="#FFFFFF" strokeWidth={ICON_STROKE + 0.5} />
+        ) : null}
+      </View>
     </Pressable>
   );
 }
@@ -86,7 +83,6 @@ export default function QuestionnaireScreen({ navigation }) {
 
   const step = QUESTIONNAIRE_STEPS[stepIndex];
   const isMulti = step.type === 'multi';
-  const showOptionCheck = isMulti || step.advance === 'confirm';
 
   const isAnswered = useCallback(() => {
     const answer = answers[step.id];
@@ -230,7 +226,6 @@ export default function QuestionnaireScreen({ navigation }) {
                 option={option}
                 selected={isSelected(option.id)}
                 onPress={() => (isMulti ? handleMultiTap(option.id) : handleSingleTap(option.id))}
-                showCheck={showOptionCheck}
               />
             ))}
           </View>

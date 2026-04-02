@@ -79,10 +79,10 @@ function TimelineStep({ item, isLast, C }) {
 }
 
 const tl = StyleSheet.create({
-  row: { flexDirection: 'row', gap: SPACING.md, minHeight: 52 },
-  leftCol: { alignItems: 'center', width: 40 },
-  iconWrap: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  line: { flex: 1, width: 2, marginTop: 3, marginBottom: -3 },
+  row: { flexDirection: 'row', gap: SPACING.lg, minHeight: 64 },
+  leftCol: { alignItems: 'center', width: 44 },
+  iconWrap: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  line: { flex: 1, width: 2, marginTop: 4, marginBottom: -4 },
   textWrap: { flex: 1, paddingTop: 8, paddingBottom: SPACING.lg },
   title: { fontSize: 13, fontWeight: '700', marginBottom: 2 },
   sub: { fontSize: 12, lineHeight: 18 },
@@ -121,13 +121,13 @@ function PlanCard({ plan, selected, onPress, C }) {
 const pc = StyleSheet.create({
   card: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    padding: SPACING.md, borderRadius: RADIUS.lg,
+    padding: SPACING.lg, borderRadius: RADIUS.xl,
     borderWidth: 1.5,
     ...SHADOWS.xs,
   },
-  left: { flex: 1, gap: 2 },
-  title: { fontSize: 14, fontWeight: '700' },
-  sub: { fontSize: 12 },
+  left: { flex: 1, gap: 4 },
+  title: { fontSize: 16, fontWeight: '700' },
+  sub: { fontSize: 13 },
   radioOuter: {
     width: 22, height: 22, borderRadius: 11,
     borderWidth: 2,
@@ -205,7 +205,11 @@ export default function SubscriptionScreen({ navigation }) {
       </ScrollView>
 
       {/* ── Sticky CTA ── */}
-      <View style={[styles.ctaWrap, { paddingBottom: Math.max(insets.bottom, SPACING.md) + 70 + SPACING.xs, backgroundColor: C.background, borderTopColor: C.border }]}>
+      <View style={[styles.ctaWrap, { 
+        bottom: Platform.OS === 'android' ? 70 + insets.bottom : 0,
+        paddingBottom: Platform.OS === 'android' ? Math.max(insets.bottom, SPACING.md) + SPACING.xs : Math.max(insets.bottom, SPACING.md) + 70 + SPACING.xs, 
+        backgroundColor: C.background, borderTopColor: C.border 
+      }]}>
         <Pressable
           style={({ pressed }) => [styles.ctaBtn, pressed && Platform.OS === 'ios' && { opacity: 0.88, transform: [{ scale: 0.985 }] }, { overflow: 'hidden' }]}
           android_ripple={{ color: 'rgba(255,255,255,0.15)' }}
@@ -249,7 +253,7 @@ const styles = StyleSheet.create({
 
   divider: { height: 1, marginBottom: SPACING.lg },
 
-  plansWrap: { gap: SPACING.md },
+  plansWrap: { gap: SPACING.lg },
 
   ctaWrap: {
     position: 'absolute', bottom: 0, left: 0, right: 0,

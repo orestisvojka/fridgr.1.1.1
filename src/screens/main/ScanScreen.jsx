@@ -284,7 +284,10 @@ export default function ScanScreen({ navigation, route }) {
 
       {/* ── Floating CTA ── */}
       {ingredients.length > 0 && (
-        <View style={[styles.ctaWrap, { paddingBottom: insets.bottom + 70 + SPACING.md }]}>
+        <View style={[styles.ctaWrap, { 
+          bottom: Platform.OS === 'android' ? 70 + insets.bottom : 0,
+          paddingBottom: Platform.OS === 'android' ? SPACING.md : insets.bottom + 70 + SPACING.md 
+        }]}>
           <Pressable
             onPress={handleFindRecipes}
             onPressIn={ctaIn}

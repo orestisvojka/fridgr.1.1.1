@@ -81,7 +81,8 @@ export default function QuestionnaireScreen({ navigation }) {
 
   const [stepIndex, setStepIndex] = useState(0);
   const advancing = useRef(false);
-  const contentOp = useRef(new Animated.Value(1)).current;
+  const contentOp = useRef(new Animated.Value(0)).current;
+  const contentTransY = useRef(new Animated.Value(15)).current;
   const scrollViewRef = useRef(null);
 
   const step = QUESTIONNAIRE_STEPS[stepIndex];
@@ -122,34 +123,43 @@ export default function QuestionnaireScreen({ navigation }) {
     if (!isAnswered() || advancing.current) return;
     advancing.current = true;
     
-    Animated.timing(contentOp, {
-      toValue: 0,
-      duration: 150,
-      useNativeDriver: true,
-    }).start(() => {
+    Animated.parallel([
+      Animated.timing(contentOp, { toValue: 0, duration: 180, useNativeDriver: true }),
+      Animated.timing(contentTransY, { toValue: -15, duration: 180, useNativeDriver: true }),
+    ]).start(() => {
       if (scrollViewRef.current) {
         scrollViewRef.current.scrollTo({ y: 0, animated: false });
       }
       goNextOrFinish(stepIndex);
+      contentTransY.setValue(15);
       advancing.current = false;
     });
-  }, [isAnswered, stepIndex, goNextOrFinish, contentOp]);
+  }, [isAnswered, stepIndex, goNextOrFinish, contentOp, contentTransY]);
 
   const handleBack = useCallback(() => {
     if (stepIndex <= 0 || advancing.current) return;
-    Animated.timing(contentOp, {
-      toValue: 0,
-      duration: 150,
-      useNativeDriver: true,
-    }).start(() => {
+    advancing.current = true;
+    
+    Animated.parallel([
+      Animated.timing(contentOp, { toValue: 0, duration: 180, useNativeDriver: true }),
+      Animated.timing(contentTransY, { toValue: 15, duration: 180, useNativeDriver: true }),
+    ]).start(() => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollTo({ y: 0, animated: false });
+      }
       setStepIndex((s) => s - 1);
+      contentTransY.setValue(-15);
+      advancing.current = false;
     });
-  }, [stepIndex, contentOp]);
+  }, [stepIndex, contentOp, contentTransY]);
 
   useEffect(() => {
     contentOp.setValue(0);
-    Animated.timing(contentOp, { toValue: 1, duration: 350, useNativeDriver: true }).start();
-  }, [stepIndex, contentOp]);
+    Animated.parallel([
+      Animated.timing(contentOp, { toValue: 1, duration: 350, useNativeDriver: true }),
+      Animated.timing(contentTransY, { toValue: 0, duration: 350, useNativeDriver: true }),
+    ]).start();
+  }, [stepIndex, contentOp, contentTransY]);
 
   const isSelected = (optionId) => {
     const answer = answers[step.id];
@@ -207,7 +217,7 @@ export default function QuestionnaireScreen({ navigation }) {
         <View style={{ width: 44 }} />
       </View>
 
-      <Animated.View style={[styles.body, { opacity: contentOp }]}>
+      <Animated.View style={[styles.body, { opacity: contentOp, transform: [{ translateY: contentTransY }] }]}>
         <ScrollView
           ref={scrollViewRef}
           contentContainerStyle={[

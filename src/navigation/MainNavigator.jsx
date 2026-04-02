@@ -1,6 +1,5 @@
-// src/navigation/MainNavigator.jsx
 import { useRef, useMemo, useCallback } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Animated, Alert, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator, CardStyleInterpolators, TransitionSpecs } from '@react-navigation/stack';
 import { Home, ScanLine, BookOpen, Heart, User } from 'lucide-react-native';
@@ -127,6 +126,7 @@ function TabButton({ onPress, onLongPress, accessibilityState, children, style }
       onPressIn={pressIn}
       onPressOut={pressOut}
       accessibilityState={accessibilityState}
+      android_ripple={{ color: 'rgba(62,107,80,0.08)', borderless: true, radius: 36 }}
       style={[styles.tabButtonBase, style]}
     >
       <Animated.View style={{ transform: [{ scale }] }}>
@@ -165,6 +165,7 @@ function ScanButton({ onPress, onLongPress }) {
         onLongPress={onLongPress}
         onPressIn={pressIn}
         onPressOut={pressOut}
+        android_ripple={{ color: 'rgba(255,255,255,0.2)', borderless: true, radius: 34 }}
         style={styles.scanPressable}
       >
         <Animated.View style={{ transform: [{ scale }] }}>

@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, Pressable, TextInput,
-  ScrollView, Animated, Alert, ActivityIndicator, Keyboard,
+  ScrollView, Animated, Alert, ActivityIndicator, Keyboard, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Camera, Image as ImageIcon, Search, X, ArrowRight } from 'lucide-react-native';
@@ -142,7 +142,14 @@ export default function ScanScreen({ navigation, route }) {
 
         {/* ── Scan hero card ── */}
         <View style={styles.scanSection}>
-          <Pressable onPress={handleScan} onPressIn={scanIn} onPressOut={scanOut} disabled={scanning}>
+          <Pressable 
+            onPress={handleScan} 
+            onPressIn={scanIn} 
+            onPressOut={scanOut} 
+            disabled={scanning}
+            android_ripple={{ color: 'rgba(255,255,255,0.15)', borderless: false }}
+            style={({ pressed }) => [{ borderRadius: RADIUS.xl, overflow: 'hidden' }]}
+          >
             <Animated.View style={{ transform: [{ scale: scanScale }] }}>
               <Animated.View style={{ transform: [{ scale: scanning ? pulseAnim : new Animated.Value(1) }] }}>
                 <LinearGradient
@@ -166,7 +173,14 @@ export default function ScanScreen({ navigation, route }) {
           </Pressable>
 
           {/* Gallery pill */}
-          <Pressable onPress={handleGallery} onPressIn={galIn} onPressOut={galOut} disabled={scanning}>
+          <Pressable 
+            onPress={handleGallery} 
+            onPressIn={galIn} 
+            onPressOut={galOut} 
+            disabled={scanning}
+            android_ripple={{ color: 'rgba(124,58,237,0.08)', borderless: false }}
+            style={({ pressed }) => [{ borderRadius: RADIUS.full, overflow: 'hidden' }]}
+          >
             <Animated.View style={[styles.galleryPill, { transform: [{ scale: galScale }] }]}>
               <ImageIcon size={18} color="#7C3AED" strokeWidth={ICON_STROKE + 0.5} />
               <Text style={styles.galleryText}>Upload from Gallery</Text>
@@ -216,7 +230,8 @@ export default function ScanScreen({ navigation, route }) {
                 <Pressable
                   key={s}
                   onPress={() => addIngredient(s)}
-                  style={({ pressed }) => [styles.suggestionChip, pressed && { opacity: 0.7 }]}
+                  style={({ pressed }) => [styles.suggestionChip, pressed && Platform.OS === 'ios' && { opacity: 0.7 }]}
+                  android_ripple={{ color: 'rgba(62,107,80,0.1)', radius: 40 }}
                 >
                   <Text style={styles.suggestionText}>{s}</Text>
                 </Pressable>
@@ -242,6 +257,8 @@ export default function ScanScreen({ navigation, route }) {
                   key={item}
                   onPress={() => removeIngredient(item)}
                   style={styles.activeChip}
+                  android_ripple={{ color: 'rgba(62,107,80,0.1)', radius: 30 }}
+                  hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
                 >
                   <Text style={styles.activeChipText}>{item}</Text>
                   <X size={13} color="#3E6B50" strokeWidth={ICON_STROKE + 0.5} />
@@ -273,7 +290,8 @@ export default function ScanScreen({ navigation, route }) {
             onPressIn={ctaIn}
             onPressOut={ctaOut}
             disabled={searching}
-            style={({ pressed }) => [{ opacity: searching ? 0.7 : 1 }]}
+            style={({ pressed }) => [{ opacity: searching ? 0.7 : 1, borderRadius: RADIUS.xl, overflow: 'hidden' }]}
+            android_ripple={{ color: 'rgba(255,255,255,0.15)' }}
           >
             <Animated.View style={{ transform: [{ scale: ctaScale }] }}>
               <LinearGradient

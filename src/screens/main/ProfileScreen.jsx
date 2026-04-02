@@ -2,7 +2,7 @@
 import { useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Bell, Crown, Settings, HelpCircle, FileText, Star, LogOut, ChevronRight, Calendar } from 'lucide-react-native';
+import { Bell, Crown, Settings, HelpCircle, FileText, Star, LogOut, ChevronRight, Calendar, RefreshCw } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { useRecipes } from '../../context/RecipesContext';
@@ -97,7 +97,7 @@ export default function ProfileScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const C = useThemeColors();
   const { user, logout } = useAuth();
-  const { savedRecipes } = useRecipes();
+  const { savedRecipes, clearStorage } = useRecipes();
 
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -165,9 +165,16 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.section}>
           <SectionTitle label="More" />
           <MenuCard>
-            <MenuItem icon={HelpCircle} label="Help & Support" iconBg="rgba(62,107,80,0.08)" iconColor="#4A4A46" onPress={() => navigation.navigate(ROUTES.HELP_SUPPORT)} />
-            <MenuItem icon={Star}       label="Rate FRIDGR" iconBg="rgba(202,138,4,0.12)" iconColor="#B45309" onPress={() => navigation.navigate(ROUTES.RATE_APP)} />
-            <MenuItem icon={FileText}   label="Privacy Policy" iconBg="rgba(62,107,80,0.08)" iconColor="#4A4A46" onPress={() => navigation.navigate(ROUTES.PRIVACY_POLICY)} isLast />
+            <MenuItem icon={FileText}   label="Privacy Policy" iconBg="rgba(62,107,80,0.08)" iconColor="#4A4A46" onPress={() => navigation.navigate(ROUTES.PRIVACY_POLICY)} />
+            <MenuItem icon={RefreshCw} label="Clear Cache" iconBg="rgba(224,82,82,0.08)" iconColor="#E05252" onPress={() => {
+              Alert.alert('Clear Cache', 'This will remove all saved recipes and reset app preferences. Proceed?', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Clear', style: 'destructive', onPress: async () => {
+                  await clearStorage();
+                  Alert.alert('Storage Cleared', 'Your local storage has been reset.');
+                }},
+              ]);
+            }} isLast />
           </MenuCard>
         </View>
 

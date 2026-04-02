@@ -1,7 +1,7 @@
 // src/screens/recipe/ResultsScreen.jsx
 import React, { useRef, useEffect, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, FlatList, Pressable, Animated,
+  View, Text, StyleSheet, FlatList, Pressable, Animated, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -34,7 +34,7 @@ function createStyles(C) {
       gap: SPACING.md,
     },
     backBtn: {
-      width: 38, height: 38, borderRadius: RADIUS.md,
+      width: 44, height: 44, borderRadius: RADIUS.md,
       backgroundColor: 'rgba(255,255,255,0.12)',
       alignItems: 'center', justifyContent: 'center',
     },
@@ -64,7 +64,7 @@ function createStyles(C) {
     cardHero: { height: 160, position: 'relative' },
     heartBtn: {
       position: 'absolute', top: SPACING.md, right: SPACING.md,
-      width: 36, height: 36, borderRadius: 18,
+      width: 44, height: 44, borderRadius: 22,
       backgroundColor: C.surface,
       alignItems: 'center', justifyContent: 'center',
       ...SHADOWS.sm,
@@ -104,10 +104,10 @@ function createStyles(C) {
     viewBtn: {
       flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
       gap: SPACING.xs, backgroundColor: C.primaryFaint,
-      borderRadius: RADIUS.lg, paddingVertical: SPACING.md,
+      borderRadius: RADIUS.lg, height: 48,
       borderWidth: 1.5, borderColor: C.primaryPale,
     },
-    viewBtnText: { ...FONT.bodySemiBold, color: C.primary },
+    viewBtnText: { ...FONT.bodySemiBold, color: C.primary, fontSize: 13 },
     emptyState: {
       flex: 1, alignItems: 'center', justifyContent: 'center', gap: SPACING.md,
       paddingHorizontal: SPACING.xxl,
@@ -164,11 +164,12 @@ function RecipeResultCard({ item, index, navigation, styles, C }) {
         <View style={styles.cardHero}>
           <RecipeImage recipe={item.recipe} height={160} borderRadius={0} style={{ width: '100%' }} />
           <Pressable
-            style={({ pressed }) => [styles.heartBtn, saved && styles.heartBtnActive, pressed && { opacity: 0.85 }]}
+            style={({ pressed }) => [styles.heartBtn, saved && styles.heartBtnActive, pressed && Platform.OS === 'ios' && { opacity: 0.85 }, { overflow: 'hidden' }]}
             onPress={() => toggleSave(item.recipe)}
+            android_ripple={{ color: saved ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.06)' }}
           >
             <Heart
-              size={18}
+              size={20}
               color={saved ? '#FFFFFF' : C.primary}
               fill={saved ? '#FFFFFF' : 'transparent'}
               strokeWidth={ICON_STROKE}
@@ -222,8 +223,9 @@ function RecipeResultCard({ item, index, navigation, styles, C }) {
           </View>
 
           <Pressable
-            style={({ pressed }) => [styles.viewBtn, pressed && { opacity: 0.88 }]}
+            style={({ pressed }) => [styles.viewBtn, pressed && Platform.OS === 'ios' && { opacity: 0.88 }, { overflow: 'hidden' }]}
             onPress={() => navigation.navigate(ROUTES.DETAIL, { recipe: item.recipe })}
+            android_ripple={{ color: 'rgba(62,107,80,0.08)' }}
           >
             <Text style={styles.viewBtnText}>View Recipe</Text>
             <ArrowRight size={16} color={C.primary} strokeWidth={ICON_STROKE} />
@@ -249,8 +251,9 @@ export default function ResultsScreen({ navigation, route }) {
         style={[styles.header, { paddingTop: insets.top + SPACING.md }]}
       >
         <Pressable
-          style={({ pressed }) => [styles.backBtn, pressed && { opacity: 0.8 }]}
+          style={({ pressed }) => [styles.backBtn, pressed && Platform.OS === 'ios' && { opacity: 0.8 }, { overflow: 'hidden' }]}
           onPress={() => navigation.goBack()}
+          android_ripple={{ color: 'rgba(255,255,255,0.2)', borderless: true, radius: 22 }}
         >
           <ArrowLeft size={20} color="#FFFFFF" strokeWidth={ICON_STROKE} />
         </Pressable>

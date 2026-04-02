@@ -14,6 +14,14 @@ export const RECIPE_IMAGE_URLS = {
   r10: `https://images.unsplash.com/photo-1467003909585-2f8a72700288?${Q}`,
   r11: `https://images.unsplash.com/photo-1565299585323-38d6b0865b47?${Q}`,
   r12: `https://images.unsplash.com/photo-1476124369491-e7add408a792?${Q}`,
+  r13: `https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?${Q}`,
+  r14: `https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?${Q}`,
+  r15: `https://images.unsplash.com/photo-1512621776951-a57141f2eefd?${Q}`,
+  r16: `https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?${Q}`,
+  r17: `https://images.unsplash.com/photo-1473093295043-cdd812d0e601?${Q}`,
+  r18: `https://images.unsplash.com/photo-1547592166-23ac45744acd?${Q}`,
+  r19: `https://images.unsplash.com/photo-1510627489930-0c1b0ba94488?${Q}`,
+  r20: `https://images.unsplash.com/photo-1541518138351-3c889a247f8c?${Q}`,
 };
 
 export const DEFAULT_RECIPE_IMAGE = `https://images.unsplash.com/photo-1490645935967-10de6ba17061?${Q}`;

@@ -31,7 +31,12 @@ function FilterChip({ label, active, onPress }) {
     Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 16, bounciness: 18 }).start(), [scale]);
 
   return (
-    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut}>
+    <Pressable 
+      onPress={onPress} 
+      onPressIn={pressIn} 
+      onPressOut={pressOut}
+      android_ripple={{ color: 'rgba(62,107,80,0.1)', borderless: true, radius: 40 }}
+    >
       <Animated.View style={{ transform: [{ scale }] }}>
         {active ? (
           <LinearGradient
@@ -69,7 +74,13 @@ function RecipeCard({ recipe, onPress, isSaved, C }) {
   const diffColor = recipe.difficulty === 'Easy' ? '#3E6B50' : recipe.difficulty === 'Medium' ? '#8A6820' : '#8A2828';
 
   return (
-    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut}>
+    <Pressable 
+      onPress={onPress} 
+      onPressIn={pressIn} 
+      onPressOut={pressOut}
+      android_ripple={{ color: 'rgba(62,107,80,0.08)' }}
+      style={({ pressed }) => [{ borderRadius: RADIUS.xl, overflow: 'hidden' }]}
+    >
       <Animated.View style={[card.wrap, { transform: [{ scale }] }]}>
         {/* Thumb */}
         <View style={card.thumb}>
@@ -253,8 +264,8 @@ const styles = StyleSheet.create({
   },
   searchInput: { flex: 1, fontSize: 14, fontWeight: '500', color: '#1E1E1C', paddingVertical: 0 },
   filtersBar: { backgroundColor: 'rgba(255,255,255,0.7)', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'rgba(62,107,80,0.12)' },
-  filtersRow: { paddingHorizontal: SPACING.xl, paddingVertical: SPACING.sm, gap: SPACING.sm, flexDirection: 'row' },
-  list: { padding: SPACING.xl, gap: SPACING.sm, paddingBottom: 160 },
+  filtersRow: { paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md, gap: SPACING.sm, flexDirection: 'row' },
+  list: { padding: SPACING.xl, gap: SPACING.md, paddingBottom: 160 },
   empty: { alignItems: 'center', paddingTop: 80, gap: SPACING.sm },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: '#1E1E1C' },
   emptySub: { fontSize: 14, color: '#8A8A84' },

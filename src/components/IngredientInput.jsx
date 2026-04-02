@@ -24,6 +24,10 @@ const SUGGESTIONS = [
   'eggs', 'tomato', 'pasta', 'chicken', 'rice',
   'cheese', 'garlic', 'spinach', 'onion', 'butter',
   'olive oil', 'lemon', 'pepper', 'mushrooms', 'potato',
+  'salmon', 'honey', 'soy sauce', 'curry powder', 'coconut milk',
+  'chickpeas', 'quinoa', 'feta', 'basil', 'pine nuts',
+  'lentils', 'zucchini', 'flour', 'tortilla', 'yogurt',
+  'avocado', 'bell pepper', 'cucumber', 'broccoli', 'carrots',
 ];
 
 // Simulated ingredient detection groups (random pick on camera scan)
@@ -33,6 +37,13 @@ const DETECTED_SETS = [
   ['tomato', 'pasta', 'olive oil'],
   ['rice', 'spinach', 'lemon'],
   ['potato', 'mushrooms', 'pepper'],
+  ['salmon', 'soy sauce', 'honey'],
+  ['chickpeas', 'coconut milk', 'curry powder'],
+  ['quinoa', 'cucumber', 'feta'],
+  ['basil', 'pine nuts', 'parmesan'],
+  ['lentils', 'carrot', 'celery'],
+  ['zucchini', 'eggs', 'flour'],
+  ['tortilla', 'tahini', 'parsley'],
 ];
 
 export default function IngredientInput({ ingredients, onChange }) {

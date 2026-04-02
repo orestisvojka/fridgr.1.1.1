@@ -1,7 +1,7 @@
 // src/screens/recipe/DetailScreen.jsx
 import React, { useState, useRef, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Pressable, Animated,
+  View, Text, StyleSheet, ScrollView, Pressable, Animated, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -51,13 +51,13 @@ function createStyles(C) {
       ...SHADOWS.sm,
     },
     floatBack: {
-      width: 36, height: 36, borderRadius: RADIUS.md,
+      width: 44, height: 44, borderRadius: RADIUS.md,
       backgroundColor: C.surface2,
       alignItems: 'center', justifyContent: 'center',
     },
-    floatTitle: { ...FONT.h5, color: C.text, flex: 1 },
+    floatTitle: { ...FONT.h5, color: C.text, flex: 1, fontSize: 13 },
     floatHeart: {
-      width: 36, height: 36, borderRadius: 18,
+      width: 44, height: 44, borderRadius: 22,
       backgroundColor: C.primaryFaint,
       alignItems: 'center', justifyContent: 'center',
     },
@@ -69,7 +69,7 @@ function createStyles(C) {
     },
     navBtn: {
       position: 'absolute',
-      width: 38, height: 38, borderRadius: RADIUS.md,
+      width: 44, height: 44, borderRadius: RADIUS.md,
       backgroundColor: 'rgba(255,255,255,0.85)',
       alignItems: 'center', justifyContent: 'center',
       ...SHADOWS.sm,
@@ -158,8 +158,9 @@ function Step({ number, text, styles }) {
   const [done, setDone] = useState(false);
   return (
     <Pressable
-      style={({ pressed }) => [styles.step, done && styles.stepDone, pressed && { opacity: 0.92 }]}
+      style={({ pressed }) => [styles.step, done && styles.stepDone, pressed && Platform.OS === 'ios' && { opacity: 0.92 }, { overflow: 'hidden' }]}
       onPress={() => setDone(v => !v)}
+      android_ripple={{ color: 'rgba(62,107,80,0.06)' }}
     >
       <View style={[styles.stepNum, done && styles.stepNumDone]}>
         {done
@@ -205,13 +206,18 @@ export default function DetailScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.floatingHeader, { opacity: headerOp, paddingTop: insets.top + SPACING.sm }]}>
-        <Pressable style={({ pressed }) => [styles.floatBack, pressed && { opacity: 0.8 }]} onPress={() => navigation.goBack()}>
+        <Pressable 
+          style={({ pressed }) => [styles.floatBack, pressed && Platform.OS === 'ios' && { opacity: 0.8 }, { overflow: 'hidden' }]} 
+          onPress={() => navigation.goBack()}
+          android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true, radius: 22 }}
+        >
           <ArrowLeft size={20} color={C.text} strokeWidth={ICON_STROKE} />
         </Pressable>
         <Text style={styles.floatTitle} numberOfLines={1}>{recipe.title}</Text>
         <Pressable
-          style={({ pressed }) => [styles.floatHeart, saved && styles.floatHeartActive, pressed && { opacity: 0.85 }]}
+          style={({ pressed }) => [styles.floatHeart, saved && styles.floatHeartActive, pressed && Platform.OS === 'ios' && { opacity: 0.85 }, { overflow: 'hidden' }]}
           onPress={() => toggleSave(recipe)}
+          android_ripple={{ color: saved ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.06)', borderless: true, radius: 22 }}
         >
           <Heart size={18} color={saved ? '#FFFFFF' : C.primary} fill={saved ? '#FFFFFF' : 'transparent'} strokeWidth={ICON_STROKE} />
         </Pressable>
@@ -226,8 +232,9 @@ export default function DetailScreen({ navigation, route }) {
         <Animated.View style={[styles.hero, { transform: [{ scale: heroScale }] }]}>
           <RecipeImage recipe={recipe} height={260} borderRadius={0} style={{ width: '100%' }} />
           <Pressable
-            style={[styles.navBtn, { top: insets.top + SPACING.md, left: SPACING.lg }]}
+            style={({ pressed }) => [styles.navBtn, { top: insets.top + SPACING.md, left: SPACING.lg }, { overflow: 'hidden' }]}
             onPress={() => navigation.goBack()}
+            android_ripple={{ color: 'rgba(0,0,0,0.06)', borderless: true, radius: 22 }}
           >
             <ArrowLeft size={20} color={C.text} strokeWidth={ICON_STROKE} />
           </Pressable>
@@ -236,9 +243,11 @@ export default function DetailScreen({ navigation, route }) {
               styles.navBtn,
               { top: insets.top + SPACING.md, right: SPACING.lg },
               saved && styles.navBtnHeartActive,
-              pressed && { opacity: 0.9 },
+              pressed && Platform.OS === 'ios' && { opacity: 0.9 },
+              { overflow: 'hidden' }
             ]}
             onPress={() => toggleSave(recipe)}
+            android_ripple={{ color: saved ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.06)', borderless: true, radius: 22 }}
           >
             <Heart size={20} color={saved ? '#FFFFFF' : C.primary} fill={saved ? '#FFFFFF' : 'transparent'} strokeWidth={ICON_STROKE} />
           </Pressable>
@@ -309,10 +318,11 @@ export default function DetailScreen({ navigation, route }) {
         </View>
       </Animated.ScrollView>
 
-      <View style={[styles.saveBtnWrap, { paddingBottom: insets.bottom + SPACING.sm }]}>
+      <View style={[styles.saveBtnWrap, { paddingBottom: Math.max(insets.bottom, SPACING.md) + SPACING.xs }]}>
         <Pressable
-          style={({ pressed }) => [styles.saveBtn, saved && styles.saveBtnSaved, pressed && { opacity: 0.9 }]}
+          style={({ pressed }) => [styles.saveBtn, saved && styles.saveBtnSaved, pressed && Platform.OS === 'ios' && { opacity: 0.9 }, { overflow: 'hidden' }]}
           onPress={() => toggleSave(recipe)}
+          android_ripple={{ color: 'rgba(255,255,255,0.15)' }}
         >
           <LinearGradient
             colors={PREMIUM_CTA_VERTICAL}

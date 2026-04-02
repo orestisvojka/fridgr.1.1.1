@@ -2,7 +2,7 @@
 import { useRef, useEffect, useMemo, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Pressable, FlatList,
-  Dimensions, Animated, Alert,
+  Dimensions, Animated, Alert, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Bell, Heart, Clock, Sparkles, ArrowRight, ChefHat } from 'lucide-react-native';
@@ -36,7 +36,12 @@ function useSpring(target = 0.96) {
 function InspirationCard({ recipe, onPress, isSaved }) {
   const { scale, pressIn, pressOut } = useSpring(0.965);
   return (
-    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut}>
+    <Pressable 
+      onPress={onPress} 
+      onPressIn={pressIn} 
+      onPressOut={pressOut}
+      android_ripple={RIPPLE_LIGHT}
+    >
       <Animated.View style={[ic.card, { transform: [{ scale }] }]}>
         <RecipeImage recipe={recipe} height={CARD_H} borderRadius={RADIUS.xl} style={StyleSheet.absoluteFill} />
         <LinearGradient
@@ -84,6 +89,10 @@ const ic = StyleSheet.create({
   authorName: { fontSize: 12, color: 'rgba(255,255,255,0.75)', flex: 1 },
 });
 
+// ─── Touch Config ─────────────────────────────────────────────────────────────
+const RIPPLE_LIGHT = { color: 'rgba(255,255,255,0.2)', borderless: false };
+const RIPPLE_DARK  = { color: 'rgba(0,0,0,0.06)', borderless: false };
+
 // ─── CategoryItem ─────────────────────────────────────────────────────────────
 function CategoryItem({ item, onPress }) {
   const { scale, pressIn, pressOut } = useSpring(0.9);
@@ -111,8 +120,13 @@ function SectionHeader({ title, onSeeAll }) {
   return (
     <View style={sh.row}>
       <Text style={sh.title}>{title}</Text>
-      <Pressable onPress={onSeeAll} onPressIn={pressIn} onPressOut={pressOut}>
-        <Animated.Text style={[sh.seeAll, { transform: [{ scale }] }]}>See all</Animated.Text>
+      <Pressable 
+        onPress={onSeeAll} 
+        onPressIn={pressIn} 
+        onPressOut={pressOut}
+        android_ripple={{ color: 'rgba(62,107,80,0.08)', borderless: true, radius: 40 }}
+      >
+        <Animated.Text style={[sh.seeAll, { transform: [{ scale: scale }] }]}>See all</Animated.Text>
       </Pressable>
     </View>
   );
@@ -184,7 +198,12 @@ export default function DashboardScreen({ navigation }) {
                 <Text style={styles.nameText}>{firstName} 👋</Text>
               </View>
             </View>
-            <Pressable onPressIn={bellIn} onPressOut={bellOut} onPress={() => Alert.alert('Notifications', 'No new notifications.')}>
+            <Pressable 
+              onPressIn={bellIn} 
+              onPressOut={bellOut} 
+              onPress={() => Alert.alert('Notifications', 'No new notifications.')}
+              android_ripple={{ color: 'rgba(0,0,0,0.08)', borderless: true, radius: 24 }}
+            >
               <Animated.View style={[styles.bellBtn, { transform: [{ scale: bellScale }] }]}>
                 <Bell size={18} color="#1E1E1C" strokeWidth={ICON_STROKE} />
               </Animated.View>
@@ -194,8 +213,9 @@ export default function DashboardScreen({ navigation }) {
           {/* ── What to cook card ── */}
           <View style={styles.cookCardWrap}>
             <Pressable
-              style={({ pressed }) => [styles.cookCard, pressed && { opacity: 0.92 }]}
+              style={({ pressed }) => [styles.cookCard, pressed && Platform.OS === 'ios' && { opacity: 0.92 }]}
               onPress={() => navigation.navigate('ScanTab')}
+              android_ripple={{ color: 'rgba(255,255,255,0.15)', borderless: false }}
             >
               <LinearGradient
                 colors={['#2C4D38', '#3E6B50', '#4A7C5E']}
@@ -275,8 +295,9 @@ export default function DashboardScreen({ navigation }) {
         {savedRecipes.length < 3 && (
           <View style={styles.premiumWrap}>
             <Pressable
-              style={({ pressed }) => [styles.premiumCard, pressed && { opacity: 0.92, transform: [{ scale: 0.985 }] }]}
+              style={({ pressed }) => [styles.premiumCard, pressed && Platform.OS === 'ios' && { opacity: 0.92, transform: [{ scale: 0.985 }] }]}
               onPress={() => navigation.navigate(ROUTES.SUBSCRIPTION)}
+              android_ripple={{ color: 'rgba(255,255,255,0.1)' }}
             >
               <LinearGradient
                 colors={['#0D3B26', '#1A5C3A', '#0D3B26']}

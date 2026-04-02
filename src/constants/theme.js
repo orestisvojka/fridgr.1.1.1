@@ -114,6 +114,14 @@ export const RADIUS = {
   xl:   20,
   xxl:  28,
   full: 999,
+  round: 999, // For perfectly circular buttons
+};
+
+// ─── Touch Targets (Native/Android UX) ──────────────────────────────────────────
+export const TOUCH = {
+  min: 44,      // Apple guidelines (min 44pt)
+  android: 48,  // Google Material guidelines (min 48dp)
+  padding: 8,   // Safe horizontal inset for smaller screens
 };
 
 // ─── Typography ───────────────────────────────────────────────────────────────

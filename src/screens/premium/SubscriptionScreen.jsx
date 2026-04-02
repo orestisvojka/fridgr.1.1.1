@@ -6,6 +6,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { X, Lock, Bell, Crown } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Platform } from 'react-native';
 import { SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { ICON_STROKE } from '../../constants/icons';
 import { useThemeColors } from '../../context/ThemeContext';
@@ -97,8 +98,9 @@ function PlanCard({ plan, selected, onPress, C }) {
         pc.card,
         { backgroundColor: C.surface, borderColor: C.border },
         active && { borderColor: C.primary, backgroundColor: C.primaryFaint },
-        pressed && { opacity: 0.88 },
+        pressed && Platform.OS === 'ios' && { opacity: 0.88 },
       ]}
+      android_ripple={{ color: 'rgba(62,107,80,0.06)' }}
     >
       <View style={pc.left}>
         <Text style={[pc.title, { color: C.text }]}>{plan.title}</Text>
@@ -203,9 +205,10 @@ export default function SubscriptionScreen({ navigation }) {
       </ScrollView>
 
       {/* ── Sticky CTA ── */}
-      <View style={[styles.ctaWrap, { paddingBottom: insets.bottom + SPACING.md, backgroundColor: C.background, borderTopColor: C.border }]}>
+      <View style={[styles.ctaWrap, { paddingBottom: Math.max(insets.bottom, SPACING.md) + SPACING.xs, backgroundColor: C.background, borderTopColor: C.border }]}>
         <Pressable
-          style={({ pressed }) => [styles.ctaBtn, pressed && { opacity: 0.88, transform: [{ scale: 0.985 }] }]}
+          style={({ pressed }) => [styles.ctaBtn, pressed && Platform.OS === 'ios' && { opacity: 0.88, transform: [{ scale: 0.985 }] }, { overflow: 'hidden' }]}
+          android_ripple={{ color: 'rgba(255,255,255,0.15)' }}
         >
           <LinearGradient
             colors={PREMIUM_CTA_VERTICAL}

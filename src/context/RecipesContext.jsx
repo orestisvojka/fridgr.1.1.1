@@ -114,6 +114,7 @@ export function RecipesProvider({ children }) {
           if (legacy) {
             raw = legacy;
             await AsyncStorage.setItem(storageKey(userId), legacy);
+            await AsyncStorage.removeItem(LEGACY_SAVED_KEY); // Move-only migration, prevents storage bloat
           }
         }
         if (cancelled) return;
@@ -152,7 +153,15 @@ export function RecipesProvider({ children }) {
         await AsyncStorage.setItem(storageKey(userId), JSON.stringify(minimal));
         if (!cancelled) setPersistError(null);
       } catch (e) {
-        if (!cancelled) setPersistError(e?.message || 'Could not save');
+        const errorMsg = e?.message || '';
+        // If storage is full, attempt a graceful recovery by clearing old keys if possible
+        if (!cancelled) {
+          if (errorMsg.toLowerCase().includes('full')) {
+            setPersistError('Storage full. Try clearing space in Settings.');
+          } else {
+            setPersistError(errorMsg || 'Could not save');
+          }
+        }
       }
     })();
     return () => {
@@ -213,6 +222,17 @@ export function RecipesProvider({ children }) {
     hydrationError: hydration === 'error' ? persistError : null,
     persistError,
     retryHydration,
+    clearStorage: async () => {
+      try {
+        const keys = await AsyncStorage.getAllKeys();
+        const appKeys = keys.filter(k => k.startsWith('@fridgr'));
+        await AsyncStorage.multiRemove(appKeys);
+        dispatch({ type: 'CLEAR_SAVED' });
+        setPersistError(null);
+      } catch (e) {
+        setPersistError('Failed to clear storage');
+      }
+    }
   };
 
   return <RecipesContext.Provider value={value}>{children}</RecipesContext.Provider>;

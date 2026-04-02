@@ -205,7 +205,7 @@ export default function SubscriptionScreen({ navigation }) {
       </ScrollView>
 
       {/* ── Sticky CTA ── */}
-      <View style={[styles.ctaWrap, { paddingBottom: Math.max(insets.bottom, SPACING.md) + SPACING.xs, backgroundColor: C.background, borderTopColor: C.border }]}>
+      <View style={[styles.ctaWrap, { paddingBottom: Math.max(insets.bottom, SPACING.md) + 70 + SPACING.xs, backgroundColor: C.background, borderTopColor: C.border }]}>
         <Pressable
           style={({ pressed }) => [styles.ctaBtn, pressed && Platform.OS === 'ios' && { opacity: 0.88, transform: [{ scale: 0.985 }] }, { overflow: 'hidden' }]}
           android_ripple={{ color: 'rgba(255,255,255,0.15)' }}

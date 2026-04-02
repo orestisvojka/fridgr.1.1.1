@@ -318,7 +318,7 @@ export default function DetailScreen({ navigation, route }) {
         </View>
       </Animated.ScrollView>
 
-      <View style={[styles.saveBtnWrap, { paddingBottom: Math.max(insets.bottom, SPACING.md) + SPACING.xs }]}>
+      <View style={[styles.saveBtnWrap, { paddingBottom: Math.max(insets.bottom, SPACING.md) + 70 + SPACING.xs }]}>
         <Pressable
           style={({ pressed }) => [styles.saveBtn, saved && styles.saveBtnSaved, pressed && Platform.OS === 'ios' && { opacity: 0.9 }, { overflow: 'hidden' }]}
           onPress={() => toggleSave(recipe)}

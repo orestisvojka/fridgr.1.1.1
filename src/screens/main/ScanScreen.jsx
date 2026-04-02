@@ -284,7 +284,7 @@ export default function ScanScreen({ navigation, route }) {
 
       {/* ── Floating CTA ── */}
       {ingredients.length > 0 && (
-        <View style={[styles.ctaWrap, { paddingBottom: insets.bottom + SPACING.md }]}>
+        <View style={[styles.ctaWrap, { paddingBottom: insets.bottom + 70 + SPACING.md }]}>
           <Pressable
             onPress={handleFindRecipes}
             onPressIn={ctaIn}

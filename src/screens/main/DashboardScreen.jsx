@@ -5,7 +5,7 @@ import {
   Dimensions, Animated, Alert, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Bell, Heart, Clock, Sparkles, ArrowRight, ChefHat } from 'lucide-react-native';
+import { Bell, Bookmark, Clock, Sparkles, ArrowRight, ChefHat } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { useRecipes } from '../../context/RecipesContext';
@@ -59,7 +59,7 @@ function InspirationCard({ recipe, onPress, isSaved }) {
           </View>
           {isSaved && (
             <View style={ic.heartBadge}>
-              <Heart size={12} color="#F87171" fill="#F87171" strokeWidth={0} />
+              <Bookmark size={12} color="#FFFFFF" fill="#FFFFFF" strokeWidth={0} />
             </View>
           )}
         </View>
@@ -81,7 +81,7 @@ const ic = StyleSheet.create({
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12 },
   timeBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 9, paddingVertical: 4, borderRadius: RADIUS.full },
   timeText: { fontSize: 11, fontWeight: '700', color: '#fff' },
-  heartBadge: { width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(255,255,255,0.92)', alignItems: 'center', justifyContent: 'center' },
+  heartBadge: { width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(62,107,80,0.92)', alignItems: 'center', justifyContent: 'center' },
   bottom: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 14, gap: 6 },
   title: { fontSize: 15, fontWeight: '700', color: '#FFFFFF', lineHeight: 20 },
   authorRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -242,6 +242,27 @@ export default function DashboardScreen({ navigation }) {
             </Pressable>
           </View>
         </Animated.View>
+
+        {/* ── Saved for later (Only if has data) ── */}
+        {savedRecipes.length > 0 && (
+          <View style={styles.section}>
+            <SectionHeader title="My Collection" onSeeAll={() => navigation.navigate('SavedTab')} />
+            <FlatList
+              data={savedRecipes.slice(0, 5)}
+              keyExtractor={r => `saved_${r.id}`}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.hList}
+              renderItem={({ item }) => (
+                <InspirationCard
+                  recipe={item}
+                  isSaved={true}
+                  onPress={() => navigation.navigate(ROUTES.DETAIL, { recipe: item })}
+                />
+              )}
+            />
+          </View>
+        )}
 
         {/* ── Daily Inspiration ── */}
         <View style={styles.section}>

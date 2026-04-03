@@ -49,7 +49,7 @@ function OptionRow({
       style={({ pressed }) => [
         styles.optionShell,
         selected && styles.optionShellSelected,
-        pressed && Platform.OS === 'ios' && { opacity: 0.85 }
+        pressed && { opacity: 0.85 }
       ]}
       android_ripple={null}
     >
@@ -266,7 +266,7 @@ export default function QuestionnaireScreen({ navigation }) {
             style={({ pressed }) => [
               styles.continueBtnOuter,
               isAnswered() && styles.continueBtnOuterEnabled,
-              pressed && isAnswered() && Platform.OS === 'ios' && { transform: [{ scale: 0.985 }] },
+              pressed && isAnswered() && { transform: [{ scale: 0.985 }] },
             ]}
           >
             {isAnswered() ? (

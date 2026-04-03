@@ -1,12 +1,12 @@
 // src/screens/recipe/DetailScreen.jsx
 import React, { useState, useRef, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Pressable, Animated, Platform,
+  View, Text, StyleSheet, ScrollView, Pressable, Animated, Platform, Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   ArrowLeft,
-  Heart,
+  Bookmark,
   Check,
   Clock,
   Users,
@@ -219,7 +219,7 @@ export default function DetailScreen({ navigation, route }) {
           onPress={() => toggleSave(recipe)}
           android_ripple={{ color: saved ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.06)', borderless: true, radius: 22 }}
         >
-          <Heart size={18} color={saved ? '#FFFFFF' : C.primary} fill={saved ? '#FFFFFF' : 'transparent'} strokeWidth={ICON_STROKE} />
+          <Bookmark size={18} color={saved ? '#FFFFFF' : C.primary} fill={saved ? '#FFFFFF' : 'transparent'} strokeWidth={ICON_STROKE} />
         </Pressable>
       </Animated.View>
 
@@ -249,7 +249,7 @@ export default function DetailScreen({ navigation, route }) {
             onPress={() => toggleSave(recipe)}
             android_ripple={{ color: saved ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.06)', borderless: true, radius: 22 }}
           >
-            <Heart size={20} color={saved ? '#FFFFFF' : C.primary} fill={saved ? '#FFFFFF' : 'transparent'} strokeWidth={ICON_STROKE} />
+            <Bookmark size={20} color={saved ? '#FFFFFF' : C.primary} fill={saved ? '#FFFFFF' : 'transparent'} strokeWidth={ICON_STROKE} />
           </Pressable>
         </Animated.View>
 
@@ -324,17 +324,33 @@ export default function DetailScreen({ navigation, route }) {
       }]}>
         <Pressable
           style={({ pressed }) => [styles.saveBtn, saved && styles.saveBtnSaved, pressed && Platform.OS === 'ios' && { opacity: 0.9 }, { overflow: 'hidden' }]}
-          onPress={() => toggleSave(recipe)}
+          onPress={() => {
+            if (!saved) {
+              toggleSave(recipe);
+            } else {
+              // Functional "Start Cooking" could lead to a step-by-step mode
+              Alert.alert('Start Cooking', 'Step-by-step mode coming soon!');
+            }
+          }}
           android_ripple={{ color: 'rgba(255,255,255,0.15)' }}
         >
           <LinearGradient
-            colors={PREMIUM_CTA_VERTICAL}
+            colors={saved ? ['#3E6B50', '#2C4D38'] : PREMIUM_CTA_VERTICAL}
             start={PREMIUM_CTA_VERTICAL_START}
             end={PREMIUM_CTA_VERTICAL_END}
             style={styles.saveBtnGradient}
           >
-            <UtensilsCrossed size={20} color="#FFFFFF" strokeWidth={ICON_STROKE} />
-            <Text style={styles.saveBtnText}>Start Cooking</Text>
+            {saved ? (
+              <>
+                <Check size={20} color="#FFFFFF" strokeWidth={ICON_STROKE + 0.5} />
+                <Text style={styles.saveBtnText}>Saved to Collection</Text>
+              </>
+            ) : (
+              <>
+                <Bookmark size={20} color="#FFFFFF" fill="transparent" strokeWidth={ICON_STROKE + 0.5} />
+                <Text style={styles.saveBtnText}>Save to Collection</Text>
+              </>
+            )}
           </LinearGradient>
         </Pressable>
       </View>

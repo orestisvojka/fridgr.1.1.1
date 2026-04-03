@@ -2,7 +2,7 @@ import { useRef, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable, Animated, Alert, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator, CardStyleInterpolators, TransitionSpecs } from '@react-navigation/stack';
-import { Home, ScanLine, BookOpen, Heart, User } from 'lucide-react-native';
+import { Home, ScanLine, BookOpen, User, Bookmark } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -261,7 +261,7 @@ export default function MainNavigator() {
         options={{
           tabBarButton: (props) => <TabButton {...props} />,
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} Icon={Heart} label="Saved" colors={colors} />
+            <TabIcon focused={focused} Icon={Bookmark} label="Collection" colors={colors} />
           ),
         }}
       />

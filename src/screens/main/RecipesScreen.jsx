@@ -4,7 +4,7 @@ import {
   View, Text, StyleSheet, FlatList, Pressable,
   TextInput, ScrollView, Animated,
 } from 'react-native';
-import { Search, XCircle, Heart, Clock, Flame, ChevronRight } from 'lucide-react-native';
+import { Search, XCircle, Bookmark, Clock, Flame, ChevronRight } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRecipes } from '../../context/RecipesContext';
@@ -74,57 +74,68 @@ function RecipeCard({ recipe, onPress, isSaved, C }) {
   const diffColor = recipe.difficulty === 'Easy' ? '#3E6B50' : recipe.difficulty === 'Medium' ? '#8A6820' : '#8A2828';
 
   return (
-    <Pressable 
-      onPress={onPress} 
-      onPressIn={pressIn} 
-      onPressOut={pressOut}
-      android_ripple={{ color: 'rgba(62,107,80,0.08)' }}
-      style={({ pressed }) => [{ borderRadius: RADIUS.xl, overflow: 'hidden' }]}
-    >
-      <Animated.View style={[card.wrap, { transform: [{ scale }] }]}>
-        {/* Thumb */}
-        <View style={card.thumb}>
-          <RecipeImage recipe={recipe} height={70} borderRadius={RADIUS.lg} style={{ width: 70 }} />
-        </View>
-        {/* Body */}
-        <View style={card.body}>
-          <View style={card.titleRow}>
-            <Text style={[card.title, { color: C.text }]} numberOfLines={1}>{recipe.title}</Text>
-            {isSaved && <Heart size={13} color="#DB2777" fill="#FBCFE8" strokeWidth={ICON_STROKE} />}
+    <View style={card.wrap}>
+      <Pressable 
+        onPress={onPress} 
+        onPressIn={pressIn} 
+        onPressOut={pressOut}
+        android_ripple={{ color: 'rgba(62,107,80,0.08)' }}
+        style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}
+      >
+        <Animated.View style={{ transform: [{ scale }], flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+          {/* Thumb */}
+          <View style={card.thumb}>
+            <RecipeImage recipe={recipe} height={70} borderRadius={RADIUS.lg} style={{ width: 70 }} />
           </View>
-          <Text style={card.desc} numberOfLines={1}>{recipe.description}</Text>
-          <View style={card.meta}>
-            <View style={card.metaPill}>
-              <Clock size={11} color={C.textTertiary} strokeWidth={ICON_STROKE} />
-              <Text style={[card.metaText, { color: C.textTertiary }]}>{recipe.prepTime}m</Text>
+          {/* Body */}
+          <View style={card.body}>
+            <View style={card.titleRow}>
+              <Text style={[card.title, { color: C.text }]} numberOfLines={1}>{recipe.title}</Text>
             </View>
-            <View style={card.metaPill}>
-              <Flame size={11} color={C.textTertiary} strokeWidth={ICON_STROKE} />
-              <Text style={[card.metaText, { color: C.textTertiary }]}>{recipe.calories} cal</Text>
-            </View>
-            <View style={[card.diffBadge, { backgroundColor: diffBg }]}>
-              <Text style={{ fontSize: 9, fontWeight: '700', color: diffColor }}>{recipe.difficulty}</Text>
+            <Text style={card.desc} numberOfLines={1}>{recipe.description}</Text>
+            <View style={card.meta}>
+              <View style={card.metaPill}>
+                <Clock size={11} color={C.textTertiary} strokeWidth={ICON_STROKE} />
+                <Text style={[card.metaText, { color: C.textTertiary }]}>{recipe.prepTime}m</Text>
+              </View>
+              <View style={card.metaPill}>
+                <Flame size={11} color={C.textTertiary} strokeWidth={ICON_STROKE} />
+                <Text style={[card.metaText, { color: C.textTertiary }]}>{recipe.calories} cal</Text>
+              </View>
+              <View style={[card.diffBadge, { backgroundColor: diffBg }]}>
+                <Text style={{ fontSize: 9, fontWeight: '700', color: diffColor }}>{recipe.difficulty}</Text>
+              </View>
             </View>
           </View>
-        </View>
-        {/* Arrow */}
-        <View style={card.arrow}>
-          <ChevronRight size={14} color="#3E6B50" strokeWidth={ICON_STROKE + 0.5} />
-        </View>
-      </Animated.View>
-    </Pressable>
+        </Animated.View>
+      </Pressable>
+
+      {/* Heart Toggle — placed outside the main pressable but inside the card wrap to be individually tappable */}
+      <Pressable 
+        onPress={(e) => {
+          e.stopPropagation();
+          onToggleSave(recipe);
+        }}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        style={({ pressed }) => [card.heartBtn, isSaved && card.heartBtnSaved, pressed && { opacity: 0.7 }]}
+      >
+        <Bookmark size={16} color={isSaved ? '#3E6B50' : '#8A8A84'} fill={isSaved ? '#3E6B50' : 'transparent'} strokeWidth={ICON_STROKE + 0.2} />
+      </Pressable>
+    </View>
   );
 }
 
 const card = StyleSheet.create({
   wrap: {
-    flexDirection: 'row', alignItems: 'center', padding: 12, gap: 12,
+    flexDirection: 'row', alignItems: 'center', 
     backgroundColor: '#FFFFFF', borderRadius: RADIUS.xl,
     borderWidth: 1, borderColor: 'rgba(228,221,210,0.8)',
     ...SHADOWS.sm,
+    position: 'relative',
+    overflow: 'hidden',
   },
   thumb: { width: 70, height: 70, borderRadius: RADIUS.lg, overflow: 'hidden', flexShrink: 0, backgroundColor: '#F4F1EA' },
-  body: { flex: 1, gap: 4 },
+  body: { flex: 1, gap: 4, paddingVertical: 12 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   title: { fontSize: 14, fontWeight: '700', flex: 1 },
   desc: { fontSize: 11, color: '#8A8A84' },
@@ -132,14 +143,19 @@ const card = StyleSheet.create({
   metaPill: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   metaText: { fontSize: 11, fontWeight: '500' },
   diffBadge: { borderRadius: RADIUS.full, paddingHorizontal: 7, paddingVertical: 2 },
-  arrow: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#EDF5F0', alignItems: 'center', justifyContent: 'center' },
+  heartBtn: {
+    padding: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heartBtnSaved: {},
 });
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function RecipesScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const C = useThemeColors();
-  const { isSaved } = useRecipes();
+  const { isSaved, toggleSave } = useRecipes();
 
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
@@ -241,6 +257,7 @@ export default function RecipesScreen({ navigation }) {
           <RecipeCard
             recipe={item}
             isSaved={isSaved(item.id)}
+            onToggleSave={toggleSave}
             C={C}
             onPress={() => navigation.navigate(ROUTES.DETAIL, { recipe: item })}
           />

@@ -98,7 +98,7 @@ function PlanCard({ plan, selected, onPress, C }) {
         pc.card,
         { backgroundColor: C.surface, borderColor: C.border },
         active && { borderColor: C.primary, backgroundColor: C.primaryFaint },
-        pressed && Platform.OS === 'ios' && { opacity: 0.88 },
+        pressed && { opacity: 0.88 },
       ]}
       android_ripple={{ color: 'rgba(62,107,80,0.06)' }}
     >
@@ -211,7 +211,7 @@ export default function SubscriptionScreen({ navigation }) {
         backgroundColor: C.background, borderTopColor: C.border 
       }]}>
         <Pressable
-          style={({ pressed }) => [styles.ctaBtn, pressed && Platform.OS === 'ios' && { opacity: 0.88, transform: [{ scale: 0.985 }] }, { overflow: 'hidden' }]}
+          style={({ pressed }) => [styles.ctaBtn, pressed && { opacity: 0.88, transform: [{ scale: 0.985 }] }, { overflow: 'hidden' }]}
           android_ripple={{ color: 'rgba(255,255,255,0.15)' }}
         >
           <LinearGradient

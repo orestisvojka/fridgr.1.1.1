@@ -1,245 +1,335 @@
 // src/screens/main/FavoritesScreen.jsx
-import { useMemo, useRef, useCallback, useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, FlatList, Pressable,
-  ActivityIndicator, Animated,
+  View, Text, StyleSheet, FlatList, Pressable, TextInput,
+  Animated, ActivityIndicator, Dimensions
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Heart, Clock, Flame, RefreshCw, Bookmark } from 'lucide-react-native';
+import { Bookmark, Search, Trash2, Clock, Flame, ChevronRight, RefreshCw, Layers, XCircle } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
+
 import { useRecipes } from '../../context/RecipesContext';
+import { useThemeColors } from '../../context/ThemeContext';
 import { SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
-import { useThemeColors } from '../../context/ThemeContext';
 import { ICON_STROKE } from '../../constants/icons';
 import RecipeImage from '../../components/RecipeImage';
-import { PREMIUM_HEADER_WIDE } from '../../constants/premiumScreenTheme';
 
-// ─── Favorite Card ────────────────────────────────────────────────────────────
-function FavoriteCard({ recipe, onPress, onRemove, C }) {
-  const heartScale = useRef(new Animated.Value(1)).current;
+const { width } = Dimensions.get('window');
 
-  const diffBg    = recipe.difficulty === 'Easy' ? C.primaryFaint : recipe.difficulty === 'Medium' ? 'rgba(250,204,21,0.12)' : C.errorLight;
-  const diffColor = recipe.difficulty === 'Easy' ? C.primary      : recipe.difficulty === 'Medium' ? C.accent               : C.error;
-
-  const handleRemove = useCallback(() => {
-    Animated.sequence([
-      Animated.spring(heartScale, { toValue: 1.25, friction: 4, useNativeDriver: true }),
-      Animated.spring(heartScale, { toValue: 1,    friction: 5, useNativeDriver: true }),
-    ]).start();
-    onRemove();
-  }, [heartScale, onRemove]);
+// ─── Filter Tab ──────────────────────────────────────────────────────────────
+function FilterTab({ label, active, onPress }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const pressIn = useCallback(() => Animated.spring(scale, { toValue: 0.95, useNativeDriver: true }).start(), []);
+  const pressOut = useCallback(() => Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start(), []);
 
   return (
-    <Pressable style={({ pressed }) => [pressed && { opacity: 0.93 }]} onPress={onPress}>
-      <View style={styles.card}>
-        {/* Hero image */}
-        <View style={styles.cardHero}>
-          <RecipeImage recipe={recipe} height={130} borderRadius={0} style={{ width: '100%' }} />
-          {/* Gradient overlay for title readability */}
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.35)']}
-            style={StyleSheet.absoluteFill}
-            pointerEvents="none"
-          />
-          {/* Remove button */}
-          <Pressable
-            style={({ pressed }) => [styles.removeBtn, pressed && { opacity: 0.85 }]}
-            onPress={handleRemove}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Animated.View style={{ transform: [{ scale: heartScale }] }}>
-              <Heart size={16} color={C.primary} fill={C.primary} strokeWidth={ICON_STROKE} />
-            </Animated.View>
-          </Pressable>
-        </View>
-        {/* Body */}
-        <View style={styles.cardBody}>
-          <Text style={[styles.cardTitle, { color: C.text }]} numberOfLines={2}>{recipe.title}</Text>
-          <View style={styles.cardMeta}>
-            <View style={styles.metaItem}>
-              <Clock size={11} color={C.textTertiary} strokeWidth={ICON_STROKE} />
-              <Text style={[styles.metaText, { color: C.textTertiary }]}>{recipe.prepTime}m</Text>
-            </View>
-            <View style={styles.metaItem}>
-              <Flame size={11} color={C.textTertiary} strokeWidth={ICON_STROKE} />
-              <Text style={[styles.metaText, { color: C.textTertiary }]}>{recipe.calories} cal</Text>
-            </View>
-          </View>
-          <View style={[styles.diffBadge, { backgroundColor: diffBg }]}>
-            <Text style={[styles.diffText, { color: diffColor }]}>{recipe.difficulty}</Text>
-          </View>
-        </View>
-      </View>
+    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut}>
+      <Animated.View style={[styles.tabWrap, active && styles.tabActive, { transform: [{ scale }] }]}>
+        <Text style={[styles.tabText, active && styles.tabTextActive]}>{label}</Text>
+      </Animated.View>
     </Pressable>
   );
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+// ─── Premium Saved Card ───────────────────────────────────────────────────────
+function PremiumSavedCard({ recipe, onPress, onRemove, C }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const removeScale = useRef(new Animated.Value(1)).current;
+
+  const pressIn = useCallback(() => Animated.spring(scale, { toValue: 0.97, useNativeDriver: true }).start(), []);
+  const pressOut = useCallback(() => Animated.spring(scale, { toValue: 1, useNativeDriver: true }).start(), []);
+
+  const handleRemove = useCallback(() => {
+    Animated.sequence([
+      Animated.spring(removeScale, { toValue: 0.8, useNativeDriver: true, speed: 20 }),
+      Animated.spring(removeScale, { toValue: 1.1, useNativeDriver: true, speed: 20 }),
+    ]).start(() => onRemove());
+  }, [onRemove]);
+
+  return (
+    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} style={styles.cardContainer}>
+      <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
+        <RecipeImage recipe={recipe} height={200} borderRadius={RADIUS.xl} style={StyleSheet.absoluteFill} />
+        
+        <LinearGradient
+          colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.85)']}
+          style={StyleSheet.absoluteFill}
+        />
+
+        {/* Remove Button */}
+        <Pressable 
+          onPress={handleRemove} 
+          style={({pressed}) => [styles.removeBtn, pressed && { opacity: 0.7 }]}
+          hitSlop={15}
+        >
+          <Animated.View style={{ transform: [{ scale: removeScale }] }}>
+            <View style={[styles.removeIconWrap, { backgroundColor: C.primary, borderColor: C.primary }]}>
+              <Bookmark size={18} color="#FFFFFF" fill="#FFFFFF" strokeWidth={ICON_STROKE} />
+            </View>
+          </Animated.View>
+        </Pressable>
+
+        <View style={styles.cardContent}>
+          <Text style={styles.cardTitle} numberOfLines={2}>{recipe.title}</Text>
+          
+          <View style={styles.cardMetaRow}>
+            <View style={styles.metaPill}>
+              <Clock size={12} color="#D1FAE5" />
+              <Text style={styles.metaText}>{recipe.prepTime} min</Text>
+            </View>
+            <View style={styles.metaPill}>
+              <Flame size={12} color="#FFE4E6" />
+              <Text style={[styles.metaText, { color: '#FFE4E6' }]}>{recipe.calories} cal</Text>
+            </View>
+            <View style={[styles.metaPill, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
+              <Text style={[styles.metaText, { color: '#FFFFFF', fontWeight: '700' }]}>{recipe.difficulty}</Text>
+            </View>
+          </View>
+        </View>
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+// ─── Main Screen ─────────────────────────────────────────────────────────────
 export default function FavoritesScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const C = useThemeColors();
-  const { savedRecipes, toggleSave, hydration, hydrationError, retryHydration, persistError } = useRecipes();
+  const { savedRecipes, toggleSave, hydration, retryHydration } = useRecipes();
+  
+  const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState('All');
 
   const [focusEpoch, setFocusEpoch] = useState(0);
   useFocusEffect(useCallback(() => { setFocusEpoch(e => e + 1); }, []));
 
-  const listKey    = `${hydration === 'ready' ? 'ready' : hydration}-${focusEpoch}`;
-  const savedIdsKey = savedRecipes.map(r => r.id).join('|');
-  const showLoading = hydration === 'loading' && savedRecipes.length === 0;
+  // Smart Collections Logic
+  const collections = useMemo(() => {
+    return [
+      'All',
+      'Quick (<20m)',
+      'Easy',
+      'High Protein',
+      'Vegetarian'
+    ];
+  }, []);
 
-  let body;
-  if (showLoading) {
-    body = (
-      <View style={styles.centerFill}>
-        <ActivityIndicator size="large" color={C.primary} />
-        <Text style={[styles.loadingText, { color: C.textSecondary }]}>Loading your saved recipes…</Text>
+  const filteredRecipes = useMemo(() => {
+    let result = savedRecipes;
+    
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(r => r.title.toLowerCase().includes(q) || r.description?.toLowerCase().includes(q));
+    }
+
+    if (activeTab === 'Quick (<20m)') result = result.filter(r => r.prepTime < 20);
+    else if (activeTab === 'Easy') result = result.filter(r => r.difficulty === 'Easy');
+    else if (activeTab === 'High Protein') result = result.filter(r => r.macros?.protein >= 20);
+    else if (activeTab === 'Vegetarian') result = result.filter(r => r.tags?.includes('vegetarian'));
+
+    return result;
+  }, [savedRecipes, search, activeTab]);
+
+  if (hydration === 'loading' && savedRecipes.length === 0) {
+    return (
+      <View style={[styles.loaderWrap, { backgroundColor: C.background }]}>
+        <ActivityIndicator size="large" color="#3E6B50" />
       </View>
-    );
-  } else if (hydration === 'error') {
-    body = (
-      <View style={styles.centerFill}>
-        <Text style={[styles.errorTitle, { color: C.text }]}>Could not load saved recipes</Text>
-        <Text style={[styles.errorSub, { color: C.textSecondary }]}>{hydrationError || 'Something went wrong.'}</Text>
-        <Pressable
-          style={({ pressed }) => [styles.retryBtn, { borderColor: C.primaryPale, backgroundColor: C.primaryFaint }, pressed && { opacity: 0.85 }]}
-          onPress={retryHydration}
-        >
-          <RefreshCw size={16} color={C.primary} strokeWidth={ICON_STROKE} />
-          <Text style={[styles.retryText, { color: C.primary }]}>Try again</Text>
-        </Pressable>
-      </View>
-    );
-  } else if (savedRecipes.length === 0) {
-    body = (
-      <View style={[styles.centerFill, { paddingTop: SPACING.section }]}>
-        <View style={[styles.emptyIconWrap, { backgroundColor: C.primaryFaint, borderColor: C.primaryPale }]}>
-          <Bookmark size={34} color={C.primary} strokeWidth={ICON_STROKE} />
-        </View>
-        <Text style={[styles.emptyTitle, { color: C.text }]}>No saved recipes yet</Text>
-        <Text style={[styles.emptySub, { color: C.textSecondary }]}>
-          Tap the heart on any recipe to save it here. Your list stays after you restart the app.
-        </Text>
-        <Pressable
-          style={({ pressed }) => [styles.browseBtn, { backgroundColor: C.primary }, pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }]}
-          onPress={() => navigation.navigate('RecipesTab')}
-        >
-          <Text style={styles.browseBtnText}>Browse recipes</Text>
-        </Pressable>
-      </View>
-    );
-  } else {
-    body = (
-      <FlatList
-        key={listKey}
-        data={savedRecipes}
-        extraData={savedIdsKey}
-        keyExtractor={r => r.id}
-        numColumns={2}
-        contentContainerStyle={styles.grid}
-        columnWrapperStyle={styles.row}
-        showsVerticalScrollIndicator={false}
-        removeClippedSubviews={false}
-        renderItem={({ item }) => (
-          <FavoriteCard
-            recipe={item}
-            C={C}
-            onPress={() => navigation.navigate(ROUTES.DETAIL, { recipe: item })}
-            onRemove={() => toggleSave(item)}
-          />
-        )}
-      />
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: C.background }]}>
-      {/* Hero header */}
-      <LinearGradient
-        colors={PREMIUM_HEADER_WIDE}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.header, { paddingTop: insets.top + SPACING.md }]}
-      >
-        <View style={styles.headerRow}>
-          <View>
-            <Text style={styles.headerTitle}>Saved</Text>
-            <Text style={styles.headerSub}>
-              {savedRecipes.length > 0
-                ? `${savedRecipes.length} recipe${savedRecipes.length !== 1 ? 's' : ''} in your collection`
-                : hydration === 'loading' ? 'Syncing your collection…' : ' '}
-            </Text>
-          </View>
-          <View style={styles.heartIcon}>
-            <Heart size={22} color="#FACC15" fill="rgba(250,204,21,0.3)" strokeWidth={ICON_STROKE} />
+    <View style={[styles.root, { backgroundColor: '#F8F9FA' }]}>
+      {/* Header Area */}
+      <View style={[styles.header, { paddingTop: insets.top + SPACING.lg }]}>
+        <View style={styles.headerTop}>
+          <Text style={styles.title}>My Collection</Text>
+          <View style={styles.countBadge}>
+            <Layers size={14} color="#3E6B50" />
+            <Text style={styles.countText}>{savedRecipes.length}</Text>
           </View>
         </View>
-      </LinearGradient>
 
-      {persistError ? (
-        <Text style={[styles.persistNote, { color: C.textTertiary }]}>
-          Could not sync last change. {persistError}
-        </Text>
-      ) : null}
+        {/* Custom Search Bar */}
+        <View style={styles.searchBar}>
+          <Search size={18} color="#9CA3AF" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search my collection..."
+            placeholderTextColor="#9CA3AF"
+            value={search}
+            onChangeText={setSearch}
+          />
+          {search.length > 0 && (
+            <Pressable onPress={() => setSearch('')}>
+              <XCircle size={18} color="#9CA3AF" />
+            </Pressable>
+          )}
+        </View>
 
-      {body}
+        {/* Horizontal Filter Tabs */}
+        {savedRecipes.length > 0 && (
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={collections}
+            keyExtractor={item => item}
+            contentContainerStyle={styles.tabsContainer}
+            renderItem={({ item }) => (
+              <FilterTab 
+                label={item} 
+                active={activeTab === item} 
+                onPress={() => setActiveTab(item)} 
+              />
+            )}
+          />
+        )}
+      </View>
+
+      {/* Main List */}
+      {savedRecipes.length === 0 ? (
+        <View style={styles.emptyWrap}>
+          <View style={styles.emptyIcon}>
+            <Bookmark size={40} color="#3E6B50" strokeWidth={1.5} />
+          </View>
+          <Text style={styles.emptyTitle}>Nothing saved yet</Text>
+          <Text style={styles.emptySub}>Start exploring and tap the bookmark icon to build your personal cookbook.</Text>
+          <Pressable 
+            style={styles.exploreBtn}
+            onPress={() => navigation.navigate('RecipesTab')}
+          >
+            <Text style={styles.exploreBtnText}>Explore Recipes</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredRecipes}
+          keyExtractor={r => r.id}
+          contentContainerStyle={[styles.listContainer, { paddingBottom: insets.bottom + 100 }]}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.noResults}>
+              <Text style={styles.noResultsTitle}>No matches found</Text>
+              <Text style={styles.noResultsSub}>Try adjusting your search or filters.</Text>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <PremiumSavedCard
+              recipe={item}
+              C={C}
+              onPress={() => navigation.navigate(ROUTES.DETAIL, { recipe: item })}
+              onRemove={() => toggleSave(item)}
+            />
+          )}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { paddingHorizontal: SPACING.xl, paddingBottom: SPACING.xxl },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  headerTitle: { fontSize: 24, fontWeight: '800', color: '#F9FAFB', marginBottom: SPACING.xs, letterSpacing: -0.5 },
-  headerSub: { fontSize: 13, color: 'rgba(249,250,251,0.55)' },
-  heartIcon: {
-    width: 46, height: 46, borderRadius: 23,
-    backgroundColor: 'rgba(250,204,21,0.13)',
-    borderWidth: 1, borderColor: 'rgba(250,204,21,0.3)',
-    alignItems: 'center', justifyContent: 'center',
+  root: { flex: 1 },
+  loaderWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  
+  header: { 
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1, 
+    borderBottomColor: 'rgba(0,0,0,0.05)',
+    paddingBottom: SPACING.md,
+    ...SHADOWS.sm
   },
-
-  centerFill: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: SPACING.xl },
-  loadingText: { fontSize: 15, marginTop: SPACING.md },
-  errorTitle: { fontSize: 17, fontWeight: '700', textAlign: 'center', marginBottom: SPACING.sm },
-  errorSub: { fontSize: 14, textAlign: 'center', lineHeight: 22 },
-  retryBtn: {
-    marginTop: SPACING.lg, flexDirection: 'row', alignItems: 'center', gap: SPACING.sm,
-    paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md,
-    borderRadius: RADIUS.full, borderWidth: 1.5,
+  headerTop: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    paddingHorizontal: SPACING.xl,
+    marginBottom: SPACING.lg
   },
-  retryText: { fontSize: 15, fontWeight: '600' },
+  title: { fontSize: 26, fontWeight: '800', color: '#111827', letterSpacing: -0.5 },
+  countBadge: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 6,
+    backgroundColor: '#EDF5F0',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: RADIUS.full
+  },
+  countText: { fontSize: 14, fontWeight: '700', color: '#3E6B50' },
 
-  emptyIconWrap: { width: 84, height: 84, borderRadius: 42, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', textAlign: 'center', marginTop: SPACING.lg },
-  emptySub: { fontSize: 14, textAlign: 'center', lineHeight: 24, marginTop: SPACING.sm, maxWidth: 280 },
-  browseBtn: { borderRadius: RADIUS.full, paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md, marginTop: SPACING.lg, ...SHADOWS.green },
-  browseBtnText: { fontSize: 15, fontWeight: '700', color: '#FFFFFF' },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: SPACING.xl,
+    backgroundColor: '#F3F4F6',
+    borderRadius: RADIUS.xl,
+    paddingHorizontal: SPACING.md,
+    height: 48,
+    marginBottom: SPACING.md,
+  },
+  searchInput: { flex: 1, marginLeft: 8, fontSize: 15, color: '#111827' },
 
-  grid: { padding: SPACING.lg, paddingBottom: 120 },
-  row: { gap: SPACING.md, justifyContent: 'space-between' },
+  tabsContainer: { paddingHorizontal: SPACING.xl, gap: 10 },
+  tabWrap: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: RADIUS.full,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  tabActive: { backgroundColor: '#3E6B50', borderColor: '#3E6B50' },
+  tabText: { fontSize: 13, fontWeight: '600', color: '#6B7280' },
+  tabTextActive: { color: '#FFFFFF' },
 
+  listContainer: { padding: SPACING.xl, gap: SPACING.lg },
+  
+  cardContainer: { width: '100%' },
   card: {
-    flex: 1, maxWidth: '48%',
-    backgroundColor: '#FFFFFF', borderRadius: RADIUS.xl,
-    overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(228,221,210,0.8)',
-    marginBottom: SPACING.md, ...SHADOWS.sm,
+    height: 200,
+    borderRadius: RADIUS.xl,
+    overflow: 'hidden',
+    backgroundColor: '#E5E7EB',
+    ...SHADOWS.md
   },
-  cardHero: { height: 130, position: 'relative' },
   removeBtn: {
-    position: 'absolute', top: SPACING.sm, right: SPACING.sm,
-    width: 34, height: 34, borderRadius: 17,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    alignItems: 'center', justifyContent: 'center', ...SHADOWS.xs,
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    zIndex: 10,
   },
-  cardBody: { padding: SPACING.md, gap: SPACING.xs },
-  cardTitle: { fontSize: 13, fontWeight: '600', lineHeight: 18, minHeight: 36 },
-  cardMeta: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  metaText: { fontSize: 11, fontWeight: '500' },
-  diffBadge: { alignSelf: 'flex-start', borderRadius: RADIUS.full, paddingHorizontal: SPACING.sm, paddingVertical: 2 },
-  diffText: { fontSize: 10, fontWeight: '700' },
-  persistNote: { fontSize: 11, textAlign: 'center', paddingHorizontal: SPACING.xl, marginTop: SPACING.sm },
+  removeIconWrap: {
+    width: 36, height: 36,
+    borderRadius: 18,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1,
+  },
+  cardContent: {
+    position: 'absolute',
+    bottom: 0, left: 0, right: 0,
+    padding: SPACING.lg,
+    paddingRight: SPACING.xxl
+  },
+  cardTitle: { fontSize: 20, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.5, marginBottom: 8 },
+  cardMetaRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
+  metaPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 8, paddingVertical: 4,
+    borderRadius: RADIUS.md
+  },
+  metaText: { fontSize: 12, fontWeight: '600', color: '#D1FAE5' },
+
+  emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: SPACING.xxl },
+  emptyIcon: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#EDF5F0', alignItems: 'center', justifyContent: 'center', marginBottom: SPACING.xl },
+  emptyTitle: { fontSize: 20, fontWeight: '800', color: '#111827', marginBottom: 8 },
+  emptySub: { fontSize: 14, color: '#6B7280', textAlign: 'center', lineHeight: 22, marginBottom: SPACING.xl },
+  exploreBtn: { backgroundColor: '#3E6B50', paddingHorizontal: 24, paddingVertical: 14, borderRadius: RADIUS.lg, ...SHADOWS.green },
+  exploreBtnText: { fontSize: 15, fontWeight: '700', color: '#FFFFFF' },
+
+  noResults: { paddingVertical: 40, alignItems: 'center' },
+  noResultsTitle: { fontSize: 16, fontWeight: '700', color: '#111827' },
+  noResultsSub: { fontSize: 14, color: '#6B7280' }
 });

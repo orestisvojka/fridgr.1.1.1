@@ -1,228 +1,120 @@
 // src/screens/SplashScreen.jsx
-// Matches mockup: warm cream bg, fridge icon, "Fridgr" wordmark, "THE CULINARY CURATOR"
 import { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Leaf } from 'lucide-react-native';
 
-// ─── Fridge Icon ──────────────────────────────────────────────────────────────
-function FridgeIcon() {
-  return (
-    <View style={s.iconWrap}>
-      {/* Body */}
-      <View style={s.fridgeBody}>
-        {/* Freezer top section */}
-        <View style={s.fridgeTop} />
-        {/* Divider */}
-        <View style={s.fridgeDivider} />
-        {/* Main compartment */}
-        <View style={s.fridgeBottom} />
-        {/* Handle top */}
-        <View style={[s.handle, s.handleTop]} />
-        {/* Handle bottom */}
-        <View style={[s.handle, s.handleBottom]} />
-      </View>
-      {/* Leaf badge — top right */}
-      <View style={s.leafBadge}>
-        <Leaf size={9} color="#FFFFFF" strokeWidth={2.5} />
-      </View>
-    </View>
-  );
-}
-
-// ─── Progress Bar ─────────────────────────────────────────────────────────────
-function ProgressBar({ progress }) {
-  return (
-    <View style={s.progressTrack}>
-      <Animated.View style={[s.progressFill, { width: progress.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }) }]} />
-    </View>
-  );
-}
-
-// ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function SplashScreen({ onDone }) {
-  const iconAnim   = useRef(new Animated.Value(0)).current;
-  const iconScale  = useRef(new Animated.Value(0.82)).current;
-  const textAnim   = useRef(new Animated.Value(0)).current;
-  const textY      = useRef(new Animated.Value(12)).current;
-  const subAnim    = useRef(new Animated.Value(0)).current;
-  const barAnim    = useRef(new Animated.Value(0)).current;
-  const labelAnim  = useRef(new Animated.Value(0)).current;
+  const logoY = useRef(new Animated.Value(20)).current;
+  const logoOp = useRef(new Animated.Value(0)).current;
+  const tagOp = useRef(new Animated.Value(0)).current;
+  const barW = useRef(new Animated.Value(0)).current;
   const screenFade = useRef(new Animated.Value(1)).current;
+  const pulseScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    // Pulse animation for the glowing dot
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseScale, { toValue: 1.4, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(pulseScale, { toValue: 1, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+      ])
+    ).start();
+
     Animated.sequence([
       Animated.delay(200),
-      // Icon appears
       Animated.parallel([
-        Animated.spring(iconScale, { toValue: 1, tension: 80, friction: 8, useNativeDriver: true }),
-        Animated.timing(iconAnim, { toValue: 1, duration: 420, useNativeDriver: true }),
+        Animated.spring(logoY, { toValue: 0, tension: 50, friction: 6, useNativeDriver: true }),
+        Animated.timing(logoOp, { toValue: 1, duration: 600, useNativeDriver: true }),
       ]),
-      Animated.delay(80),
-      // "Fridgr" wordmark
-      Animated.parallel([
-        Animated.timing(textAnim, { toValue: 1, duration: 340, useNativeDriver: true }),
-        Animated.timing(textY,    { toValue: 0, duration: 340, useNativeDriver: true }),
-      ]),
-      Animated.delay(60),
-      // Subtitle + bar
-      Animated.parallel([
-        Animated.timing(subAnim,   { toValue: 1, duration: 300, useNativeDriver: true }),
-        Animated.timing(barAnim,   { toValue: 1, duration: 900, useNativeDriver: false }),
-        Animated.timing(labelAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
-      ]),
-      Animated.delay(300),
-      // Fade out
-      Animated.timing(screenFade, { toValue: 0, duration: 380, useNativeDriver: true }),
+      Animated.timing(tagOp, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(barW, { toValue: 1, duration: 1500, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
+      Animated.delay(100),
+      Animated.timing(screenFade, { toValue: 0, duration: 400, useNativeDriver: true }),
     ]).start(() => onDone?.());
   }, []);
 
   return (
-    <Animated.View style={[StyleSheet.absoluteFill, s.container, { opacity: screenFade }]}>
+    <Animated.View style={[s.root, { opacity: screenFade }]}>
       <StatusBar style="dark" />
-
-      {/* Center content */}
       <View style={s.center}>
-        {/* Icon */}
-        <Animated.View style={{ opacity: iconAnim, transform: [{ scale: iconScale }], marginBottom: 24 }}>
-          <FridgeIcon />
+        <Animated.View style={[s.logoWrap, { opacity: logoOp, transform: [{ translateY: logoY }] }]}>
+          <Animated.View style={[s.dotWrap, { transform: [{ scale: pulseScale }] }]}>
+            <View style={s.dot} />
+          </Animated.View>
+          <Text style={s.wordmark}>FRIDGR</Text>
         </Animated.View>
 
-        {/* Wordmark */}
-        <Animated.Text style={[s.wordmark, { opacity: textAnim, transform: [{ translateY: textY }] }]}>
-          Fridgr
-        </Animated.Text>
-
-        {/* Tagline */}
-        <Animated.Text style={[s.tagline, { opacity: subAnim }]}>
+        <Animated.Text style={[s.tagline, { opacity: tagOp }]}>
           THE CULINARY CURATOR
         </Animated.Text>
       </View>
 
-      {/* Bottom: progress bar + label */}
-      <Animated.View style={[s.bottom, { opacity: labelAnim }]}>
-        <ProgressBar progress={barAnim} />
+      <Animated.View style={[s.bottom, { opacity: tagOp }]}>
+        <View style={s.barTrack}>
+          <Animated.View style={[s.barFill, { width: barW.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }) }]} />
+        </View>
         <Text style={s.initLabel}>INITIALIZING PANTRY</Text>
       </Animated.View>
     </Animated.View>
   );
 }
 
-const ICON_BG    = '#D4E8DA';
-const ICON_GREEN = '#3E6B50';
-const BG         = '#F9F7F2';
+const GREEN = '#3E6B50';
+const BG = '#F9F7F2';
 
 const s = StyleSheet.create({
-  container: {
-    backgroundColor: BG,
-    alignItems: 'center',
-    justifyContent: 'center',
+  root: { flex: 1, backgroundColor: BG, alignItems: 'center', justifyContent: 'center' },
+  center: { alignItems: 'center' },
+  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
+  dotWrap: { 
+    width: 20, 
+    height: 20, 
+    borderRadius: 10, 
+    backgroundColor: 'rgba(62, 107, 80, 0.15)', 
+    alignItems: 'center', 
+    justifyContent: 'center' 
   },
-  center: {
-    alignItems: 'center',
+  dot: { 
+    width: 10, 
+    height: 10, 
+    borderRadius: 5, 
+    backgroundColor: GREEN 
   },
-
-  // ─── Fridge Icon ───────────────────────────────────────────────────────────
-  iconWrap: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: ICON_BG,
-    alignItems: 'center',
-    justifyContent: 'center',
+  wordmark: { 
+    fontSize: 40, 
+    fontWeight: '800', 
+    letterSpacing: 4, 
+    color: '#0D3B26' 
   },
-  fridgeBody: {
-    width: 34,
-    height: 50,
-    borderRadius: 5,
-    borderWidth: 2,
-    borderColor: ICON_GREEN,
-    overflow: 'hidden',
-    position: 'relative',
+  tagline: { 
+    fontSize: 10, 
+    fontWeight: '700', 
+    letterSpacing: 4, 
+    color: '#8A8A84' 
   },
-  fridgeTop: {
-    height: 17,
-    backgroundColor: 'transparent',
+  bottom: { 
+    position: 'absolute', 
+    bottom: 60, 
+    left: 70, 
+    right: 70, 
+    alignItems: 'center', 
+    gap: 16 
   },
-  fridgeDivider: {
-    height: 2,
-    backgroundColor: ICON_GREEN,
+  barTrack: { 
+    width: '100%', 
+    height: 2, 
+    backgroundColor: '#E4DDD2', 
+    overflow: 'hidden', 
+    borderRadius: 1 
   },
-  fridgeBottom: {
-    flex: 1,
-    backgroundColor: 'transparent',
+  barFill: { 
+    height: '100%', 
+    backgroundColor: GREEN 
   },
-  handle: {
-    position: 'absolute',
-    right: -7,
-    width: 5,
-    borderRadius: 2,
-    backgroundColor: ICON_GREEN,
-  },
-  handleTop: {
-    top: 5,
-    height: 11,
-  },
-  handleBottom: {
-    bottom: 8,
-    height: 8,
-  },
-  leafBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: ICON_GREEN,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // ─── Wordmark ──────────────────────────────────────────────────────────────
-  wordmark: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: '#1E1E1C',
-    letterSpacing: -0.5,
-    marginBottom: 8,
-  },
-
-  // ─── Tagline ───────────────────────────────────────────────────────────────
-  tagline: {
-    fontSize: 10,
-    fontWeight: '600',
-    letterSpacing: 2.8,
-    color: '#8A8A84',
-    textTransform: 'uppercase',
-  },
-
-  // ─── Bottom Progress ───────────────────────────────────────────────────────
-  bottom: {
-    position: 'absolute',
-    bottom: 56,
-    left: 48,
-    right: 48,
-    alignItems: 'center',
-    gap: 10,
-  },
-  progressTrack: {
-    width: '100%',
-    height: 2,
-    borderRadius: 1,
-    backgroundColor: '#E4DDD2',
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 1,
-    backgroundColor: ICON_GREEN,
-  },
-  initLabel: {
-    fontSize: 9,
-    fontWeight: '600',
-    letterSpacing: 1.8,
-    color: '#8A8A84',
-    textTransform: 'uppercase',
-  },
+  initLabel: { 
+    fontSize: 9, 
+    fontWeight: '700', 
+    letterSpacing: 2, 
+    color: '#8A8A84' 
+  }
 });

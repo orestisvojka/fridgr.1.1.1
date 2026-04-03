@@ -195,7 +195,7 @@ export default function QuestionnaireScreen({ navigation }) {
         >
           <ArrowLeft
             size={22}
-            color={stepIndex === 0 ? 'rgba(248,250,252,0.22)' : '#FFFFFF'}
+            color={stepIndex === 0 ? 'rgba(13,59,38,0.2)' : '#0D3B26'}
             strokeWidth={ICON_STROKE}
           />
         </Pressable>
@@ -305,9 +305,6 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 44,
     height: 44,
-    borderRadius: 12,
-    backgroundColor: '#F5F5F5',
-    borderWidth: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },

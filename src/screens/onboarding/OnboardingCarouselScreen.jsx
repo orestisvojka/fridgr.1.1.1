@@ -1,19 +1,22 @@
 // src/screens/onboarding/OnboardingCarouselScreen.jsx
-import React, { useRef, useState } from 'react';
+// Premium welcome screen — glass morphism + staggered animations (iOS & Android safe)
+
+import React, { useEffect, useRef } from 'react';
 import {
-  View, Text, StyleSheet, FlatList, TouchableOpacity,
-  Dimensions, Animated,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  Easing,
+  Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FONT, SPACING, RADIUS } from '../../constants/theme';
+import { SPACING, RADIUS, SHADOWS, FONT } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
-import { ONBOARDING_SLIDES } from '../../data/mockData';
 import {
-  PREMIUM_CAROUSEL_GRADIENTS,
-  PREMIUM_VEIL,
-  PREMIUM,
   PREMIUM_CTA_VERTICAL,
   PREMIUM_CTA_VERTICAL_END,
   PREMIUM_CTA_VERTICAL_START,
@@ -21,224 +24,379 @@ import {
 
 const { width, height } = Dimensions.get('window');
 
-const GRADIENTS = PREMIUM_CAROUSEL_GRADIENTS;
-
-function Slide({ item, index }) {
+// ─── Glass card helper ─────────────────────────────────────────────────────────
+// React Native can't blur, so we simulate glass with a translucent
+// white/light-green fill + light border + subtle inner highlight.
+function GlassCard({ style, children }) {
   return (
-    <View style={[styles.slide, { width }]}>
-      {/* Text block only, emoji removed */}
-      <View style={styles.textBlock}>
-        <Text style={styles.slideTitle}>{item.title}</Text>
-        <Text style={styles.slideSubtitle}>{item.subtitle}</Text>
-      </View>
+    <View style={[glass.card, style]}>
+      {/* Inner top highlight line */}
+      <View style={glass.highlight} />
+      {children}
     </View>
   );
 }
 
-export default function OnboardingCarouselScreen({ navigation }) {
-  const insets  = useSafeAreaInsets();
-  const flatRef = useRef(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const scrollX = useRef(new Animated.Value(0)).current;
-
-  const handleNext = () => {
-    if (activeIndex < ONBOARDING_SLIDES.length - 1) {
-      flatRef.current?.scrollToIndex({ index: activeIndex + 1, animated: true });
-    } else {
-      navigation.navigate(ROUTES.QUESTIONNAIRE);
-    }
-  };
-
-  const handleSkip = () => navigation.navigate(ROUTES.QUESTIONNAIRE);
-
-  const onScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-    {
-      useNativeDriver: false,
-      listener: e => {
-        const idx = Math.round(e.nativeEvent.contentOffset.x / width);
-        setActiveIndex(idx);
-      },
-    }
+// ─── Feature pill ─────────────────────────────────────────────────────────────
+function FeaturePill({ label, anim }) {
+  return (
+    <Animated.View style={[pill.wrap, { opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }]}>
+      <View style={pill.dot} />
+      <Text style={pill.text}>{label}</Text>
+    </Animated.View>
   );
+}
 
-  const isLast = activeIndex === ONBOARDING_SLIDES.length - 1;
+// ─── Main ─────────────────────────────────────────────────────────────────────
+export default function OnboardingCarouselScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
+
+  // — Animations (all useNativeDriver: true except none needed) —
+  const bgOp       = useRef(new Animated.Value(0)).current;
+  const orb1Scale  = useRef(new Animated.Value(0.6)).current;
+  const orb2Scale  = useRef(new Animated.Value(0.5)).current;
+
+  const logoOp     = useRef(new Animated.Value(0)).current;
+  const logoY      = useRef(new Animated.Value(-20)).current;
+
+  const cardOp     = useRef(new Animated.Value(0)).current;
+  const cardScale  = useRef(new Animated.Value(0.94)).current;
+
+  const pill1Anim  = useRef(new Animated.Value(0)).current;
+  const pill2Anim  = useRef(new Animated.Value(0)).current;
+  const pill3Anim  = useRef(new Animated.Value(0)).current;
+
+  const ctaOp      = useRef(new Animated.Value(0)).current;
+  const ctaY       = useRef(new Animated.Value(16)).current;
+
+  // Continuous floating for orbs
+  const orb1Float  = useRef(new Animated.Value(0)).current;
+  const orb2Float  = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // ── Orb float loops ───────────────────────────────────────────────────────
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(orb1Float, { toValue: -14, duration: 2800, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(orb1Float, { toValue:   0, duration: 2800, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(orb2Float, { toValue: 12, duration: 3400, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(orb2Float, { toValue: 0,  duration: 3400, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ])
+    ).start();
+
+    // ── Entrance stagger ─────────────────────────────────────────────────────
+    Animated.sequence([
+      // 1. Fade bg + expand orbs
+      Animated.parallel([
+        Animated.timing(bgOp,      { toValue: 1, duration: 500, useNativeDriver: true }),
+        Animated.spring(orb1Scale, { toValue: 1, tension: 40, friction: 7, useNativeDriver: true }),
+        Animated.spring(orb2Scale, { toValue: 1, tension: 35, friction: 8, useNativeDriver: true }),
+      ]),
+
+      // 2. Logo drops in
+      Animated.parallel([
+        Animated.timing(logoOp, { toValue: 1, duration: 420, useNativeDriver: true }),
+        Animated.spring(logoY,  { toValue: 0, tension: 60, friction: 7, useNativeDriver: true }),
+      ]),
+
+      // 3. Glass card scales in
+      Animated.parallel([
+        Animated.timing(cardOp,    { toValue: 1, duration: 380, useNativeDriver: true }),
+        Animated.spring(cardScale, { toValue: 1, tension: 55, friction: 8, useNativeDriver: true }),
+      ]),
+
+      // 4. Pills stagger in
+      Animated.stagger(120, [
+        Animated.timing(pill1Anim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.timing(pill2Anim, { toValue: 1, duration: 300, useNativeDriver: true }),
+        Animated.timing(pill3Anim, { toValue: 1, duration: 300, useNativeDriver: true }),
+      ]),
+
+      // 5. CTA rises
+      Animated.parallel([
+        Animated.timing(ctaOp, { toValue: 1, duration: 340, useNativeDriver: true }),
+        Animated.spring(ctaY,  { toValue: 0, tension: 55, friction: 8, useNativeDriver: true }),
+      ]),
+    ]).start();
+  }, []);
+
+  const handleStart = () => navigation.navigate(ROUTES.QUESTIONNAIRE);
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.root, { opacity: bgOp }]}>
       <StatusBar style="light" />
 
+      {/* Deep forest gradient background */}
       <LinearGradient
-        colors={GRADIENTS[activeIndex] ?? GRADIENTS[0]}
-        locations={PREMIUM_VEIL.locations}
+        colors={['#0A1F14', '#143322', '#1E4D32', '#2C6645']}
+        locations={[0, 0.3, 0.65, 1]}
         style={StyleSheet.absoluteFill}
       />
 
-      {/* Decorative orbs */}
-      <View style={styles.orb} />
-      <View style={styles.orb2} />
+      {/* ── Floating orbs ──────────────────────────────────────────────────── */}
+      <Animated.View style={[
+        styles.orb1,
+        { transform: [{ scale: orb1Scale }, { translateY: orb1Float }] }
+      ]} />
+      <Animated.View style={[
+        styles.orb2,
+        { transform: [{ scale: orb2Scale }, { translateY: orb2Float }] }
+      ]} />
+      <View style={styles.orb3} />
 
-      {/* Skip button */}
-      {!isLast && (
-        <TouchableOpacity
-          style={[styles.skipBtn, { top: insets.top + SPACING.md }]}
-          onPress={handleSkip}
-        >
-          <Text style={styles.skipText}>Skip</Text>
-        </TouchableOpacity>
-      )}
+      {/* ── Content ────────────────────────────────────────────────────────── */}
+      <View style={[styles.content, {
+        paddingTop: insets.top + SPACING.xl,
+        paddingBottom: insets.bottom + SPACING.xxl,
+      }]}>
 
-      {/* Slides */}
-      <Animated.FlatList
-        ref={flatRef}
-        data={ONBOARDING_SLIDES}
-        keyExtractor={(_, i) => String(i)}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-        renderItem={({ item, index }) => <Slide item={item} index={index} />}
-        style={styles.flatList}
-        contentContainerStyle={{ alignItems: 'center' }}
-      />
+        {/* Logo */}
+        <Animated.View style={[styles.logoRow, { opacity: logoOp, transform: [{ translateY: logoY }] }]}>
+          <View style={styles.logoMark}>
+            <View style={styles.logoMarkDot} />
+          </View>
+          <Text style={styles.wordmark}>FRIDGR</Text>
+        </Animated.View>
 
-      {/* Bottom controls */}
-      <View style={[styles.bottom, { paddingBottom: insets.bottom + SPACING.xxl }]}>
-        {/* Dots */}
-        <View style={styles.dots}>
-          {ONBOARDING_SLIDES.map((_, i) => {
-            const dotWidth = scrollX.interpolate({
-              inputRange: [(i - 1) * width, i * width, (i + 1) * width],
-              outputRange: [8, 24, 8],
-              extrapolate: 'clamp',
-            });
-            return (
-              <Animated.View
-                key={i}
-                style={[styles.dot, { width: dotWidth, opacity: i === activeIndex ? 1 : 0.35 }]}
-              />
-            );
-          })}
-        </View>
-
-        {/* Next / Get Started button */}
-        <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.85}>
-          <LinearGradient
-            colors={PREMIUM_CTA_VERTICAL}
-            start={PREMIUM_CTA_VERTICAL_START}
-            end={PREMIUM_CTA_VERTICAL_END}
-            style={styles.nextBtnInner}
-          >
-            <Text style={styles.nextBtnText}>
-              {isLast ? 'Get Started' : 'Next'}
+        {/* Glass headline card */}
+        <Animated.View style={{ opacity: cardOp, transform: [{ scale: cardScale }], flex: 1, marginBottom: SPACING.lg }}>
+          <GlassCard style={styles.mainCard}>
+            <Text style={styles.headline}>Your kitchen,{'\n'}elevated.</Text>
+            <Text style={styles.subhead}>
+              Tell us about your taste and we'll handle the rest.
             </Text>
-            {!isLast && <Text style={styles.nextArrow}>→</Text>}
-          </LinearGradient>
-        </TouchableOpacity>
 
-        <Text style={styles.stepText}>
-          {activeIndex + 1} / {ONBOARDING_SLIDES.length}
-        </Text>
+            {/* Divider */}
+            <View style={styles.divider} />
+
+            {/* Feature pills */}
+            <View style={styles.pillsRow}>
+              <FeaturePill label="Smart Recipes"  anim={pill1Anim} />
+              <FeaturePill label="Zero Waste"     anim={pill2Anim} />
+              <FeaturePill label="Personalized"   anim={pill3Anim} />
+            </View>
+          </GlassCard>
+        </Animated.View>
+
+        {/* CTA */}
+        <Animated.View style={[styles.ctaWrap, { opacity: ctaOp, transform: [{ translateY: ctaY }] }]}>
+          <TouchableOpacity
+            style={styles.ctaBtn}
+            onPress={handleStart}
+            activeOpacity={0.84}
+          >
+            <LinearGradient
+              colors={['#4A8A62', '#3E6B50', '#2C4D38']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={styles.ctaGradient}
+            >
+              <Text style={styles.ctaText}>Get Started</Text>
+              <Text style={styles.ctaArrow}>→</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </Animated.View>
+
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
+// ─── Glass card styles ────────────────────────────────────────────────────────
+const glass = StyleSheet.create({
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.09)',
+    borderRadius: RADIUS.xxl,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.16)',
+    padding: SPACING.xxl,
+    overflow: 'hidden',
+    // iOS shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    // Android
+    elevation: 10,
     flex: 1,
-    backgroundColor: '#0A0A0F',
+    justifyContent: 'center',
   },
-  veil: {
+  highlight: {
     position: 'absolute',
-    left: 0,
-    right: 0,
     top: 0,
-    height: 280,
+    left: RADIUS.xxl,
+    right: RADIUS.xxl,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.30)',
   },
-  orb: {
+});
+
+// ─── Pill styles ──────────────────────────────────────────────────────────────
+const pill = StyleSheet.create({
+  wrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.11)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
+    borderRadius: RADIUS.full,
+    paddingVertical: 7,
+    paddingHorizontal: SPACING.md,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#6DDBA0',
+  },
+  text: {
+    ...FONT.labelSmall,
+    color: 'rgba(255,255,255,0.85)',
+    textTransform: 'none',
+    letterSpacing: 0.2,
+    fontSize: 12,
+  },
+});
+
+// ─── Screen styles ────────────────────────────────────────────────────────────
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#0A1F14',
+  },
+
+  // Orbs
+  orb1: {
     position: 'absolute',
-    top: -100,
-    right: -100,
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    top: -height * 0.12,
+    right: -width * 0.25,
+    width: width * 0.75,
+    height: width * 0.75,
+    borderRadius: width * 0.375,
+    backgroundColor: 'rgba(62,107,80,0.28)',
   },
   orb2: {
     position: 'absolute',
-    bottom: 60,
-    left: -80,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    bottom: height * 0.12,
+    left: -width * 0.3,
+    width: width * 0.65,
+    height: width * 0.65,
+    borderRadius: width * 0.325,
+    backgroundColor: 'rgba(44,70,56,0.32)',
   },
-  skipBtn: {
+  orb3: {
     position: 'absolute',
-    right: SPACING.xl,
-    zIndex: 10,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: RADIUS.full,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
-  },
-  skipText: { ...FONT.bodySmallMedium, color: 'rgba(6,64,43,0.75)' },
-  flatList: { flex: 1, marginTop: 60 },
-  slide: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: SPACING.xxl,
-    gap: SPACING.section,
-  },
-  emojiWrap: { alignItems: 'center', justifyContent: 'center' },
-  emoji: { fontSize: 90, textAlign: 'center' },
-  emojiGlow: {
-    position: 'absolute',
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-  },
-  textBlock: { alignItems: 'center', gap: SPACING.md },
-  slideTitle: {
-    ...FONT.h1,
-    color: '#06402B',
-    textAlign: 'center',
-  },
-  slideSubtitle: {
-    ...FONT.body,
-    color: 'rgba(6,64,43,0.65)',
-    textAlign: 'center',
-    lineHeight: 26,
-    maxWidth: 280,
+    bottom: -60,
+    right: -40,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    backgroundColor: 'rgba(109,219,160,0.07)',
   },
 
-  // Bottom
-  bottom: { alignItems: 'center', gap: SPACING.xl, paddingHorizontal: SPACING.xl },
-  dots: { flexDirection: 'row', gap: SPACING.sm, alignItems: 'center' },
-  dot: {
+  // Layout
+  content: {
+    flex: 1,
+    paddingHorizontal: SPACING.xl,
+  },
+
+  // Logo row
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: SPACING.xl,
+  },
+  logoMark: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 2,
+    borderColor: 'rgba(109,219,160,0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(109,219,160,0.12)',
+  },
+  logoMarkDot: {
+    width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#6DDBA0',
   },
-  nextBtn: {
-    width: '100%',
-    borderRadius: RADIUS.xl,
+  wordmark: {
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 4,
+    color: '#FFFFFF',
+  },
+
+  // Glass card interior
+  mainCard: {},
+  headline: {
+    fontSize: 38,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: -1.2,
+    lineHeight: 44,
+    marginBottom: SPACING.md,
+  },
+  subhead: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: 'rgba(255,255,255,0.60)',
+    lineHeight: 24,
+  },
+  divider: {
+    width: 36,
+    height: 1.5,
+    borderRadius: 1,
+    backgroundColor: 'rgba(109,219,160,0.4)',
+    marginVertical: SPACING.xl,
+  },
+  pillsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+  },
+
+  // CTA
+  ctaWrap: {
+    gap: SPACING.md,
+  },
+  ctaBtn: {
+    borderRadius: RADIUS.full,
     overflow: 'hidden',
+    // iOS shadow
+    shadowColor: '#3E6B50',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.45,
+    shadowRadius: 14,
+    // Android — elevation won't show shadow color but adds depth
+    elevation: 10,
   },
-  nextBtnInner: {
-    paddingVertical: SPACING.lg + 2,
+  ctaGradient: {
+    height: 58,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: SPACING.sm,
+    borderRadius: RADIUS.full,
   },
-  nextBtnText: { ...FONT.bodySemiBold, color: '#FFFFFF', fontSize: 16 },
-  nextArrow: { ...FONT.h4, color: 'rgba(255,255,255,0.8)' },
-  stepText: { ...FONT.caption, color: 'rgba(255,255,255,0.4)' },
+  ctaText: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
+  },
+  ctaArrow: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: 'rgba(255,255,255,0.75)',
+  },
 });

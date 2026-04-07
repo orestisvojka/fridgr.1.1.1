@@ -77,7 +77,13 @@ function InspirationCard({ recipe, onPress, isSaved }) {
 }
 
 const ic = StyleSheet.create({
-  card: { width: CARD_W, height: CARD_H, borderRadius: RADIUS.xl, overflow: 'hidden', marginRight: SPACING.md, ...SHADOWS.md },
+  card: {
+    width: CARD_W, height: CARD_H, borderRadius: RADIUS.xl, overflow: 'hidden', marginRight: SPACING.md,
+    // Glass effect on cards
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    ...SHADOWS.md,
+  },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12 },
   timeBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 9, paddingVertical: 4, borderRadius: RADIUS.full },
   timeText: { fontSize: 11, fontWeight: '700', color: '#fff' },
@@ -110,7 +116,16 @@ function CategoryItem({ item, onPress }) {
 
 const cat = StyleSheet.create({
   wrap: { alignItems: 'center', gap: 7, marginRight: 18, width: 72 },
-  circle: { width: 66, height: 66, borderRadius: 33, overflow: 'hidden', borderWidth: 2, borderColor: 'rgba(62,107,80,0.12)', ...SHADOWS.xs },
+  circle: {
+    width: 66, height: 66, borderRadius: 33, overflow: 'hidden',
+    borderWidth: 2, borderColor: 'rgba(62,107,80,0.18)',
+    // Glass ring effect
+    shadowColor: '#3E6B50',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 3,
+  },
   label: { fontSize: 12, fontWeight: '600', color: '#1E1E1C', textAlign: 'center' },
 });
 
@@ -161,12 +176,16 @@ export default function DashboardScreen({ navigation }) {
   );
 
   const CATEGORIES = [
-    { label: 'Pasta',   recipe: MOCK_RECIPES[0] },
-    { label: 'Pizza',   recipe: MOCK_RECIPES[1] },
-    { label: 'Biryani', recipe: MOCK_RECIPES[2] },
-    { label: 'Coffee',  recipe: MOCK_RECIPES[3] },
-    { label: 'Dessert', recipe: MOCK_RECIPES[4] },
-    { label: 'Salads',  recipe: MOCK_RECIPES[5] },
+    { label: 'Breakfast', recipe: MOCK_RECIPES[0] },
+    { label: 'Pasta',     recipe: MOCK_RECIPES[1] },
+    { label: 'Salads',    recipe: MOCK_RECIPES[5] },
+    { label: 'Asian',     recipe: MOCK_RECIPES[3] },
+    { label: 'Seafood',   recipe: MOCK_RECIPES[9] },
+    { label: 'Mexican',   recipe: MOCK_RECIPES[10] },
+    { label: 'Soups',     recipe: MOCK_RECIPES[16] },
+    { label: 'Dessert',   recipe: MOCK_RECIPES[4] },
+    { label: 'Healthy',   recipe: MOCK_RECIPES[14] },
+    { label: 'Wraps',     recipe: MOCK_RECIPES[18] },
   ];
 
   const greeting = useMemo(() => {
@@ -349,7 +368,9 @@ export default function DashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#FFFFFF' },
+  root: {
+    flex: 1, backgroundColor: '#FFFFFF',
+  },
 
   // Header
   header: {
@@ -366,7 +387,13 @@ const styles = StyleSheet.create({
 
   // Cook card
   cookCardWrap: { paddingHorizontal: SPACING.xl, marginTop: 4, marginBottom: 6 },
-  cookCard: { borderRadius: RADIUS.xl, overflow: 'hidden', ...SHADOWS.green },
+  cookCard: {
+    borderRadius: RADIUS.xl, overflow: 'hidden',
+    // Glass border on the cook card
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    ...SHADOWS.green,
+  },
   cookGradient: { flexDirection: 'row', alignItems: 'center', padding: SPACING.xl, overflow: 'hidden' },
   cookLeft: { flex: 1, gap: 4 },
   cookQuestion: { fontSize: 17, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.3 },

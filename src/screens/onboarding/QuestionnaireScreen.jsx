@@ -1,5 +1,5 @@
 // src/screens/onboarding/QuestionnaireScreen.jsx
-// Multi-select and steps with advance: 'confirm' use Continue; other singles advance on tap.
+// Dark charcoal with a whisper of green + frosted glass. Selection = tick only.
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
@@ -10,505 +10,441 @@ import {
   ScrollView,
   Animated,
   Dimensions,
-  Image,
-  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Check, ChevronRight } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useOnboarding } from '../../context/OnboardingContext';
-import { FONT, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
+import { FONT, SPACING, RADIUS } from '../../constants/theme';
 import { QUESTIONNAIRE_STEPS } from '../../data/questionnaireSteps';
 import { ICON_STROKE } from '../../constants/icons';
 import { getQuestionnaireIcon } from '../../constants/questionnaireIcons';
-import { BlurView } from 'expo-blur';
-import { ROUTES } from '../../constants/routes';
-import { DEFAULT_RECIPE_IMAGE } from '../../data/recipeImages';
 import {
-  PREMIUM,
   PREMIUM_CTA_VERTICAL,
-  PREMIUM_CTA_VERTICAL_END,
   PREMIUM_CTA_VERTICAL_START,
+  PREMIUM_CTA_VERTICAL_END,
 } from '../../constants/premiumScreenTheme';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const TOTAL = QUESTIONNAIRE_STEPS.length;
 
+// ─── Palette — dark charcoal, barely green ──────────────────────────────────
+const BG_TOP  = '#1A1F1C';   // near-black with green tint
+const BG_MID  = '#222A26';   // charcoal-green
+const BG_BOT  = '#2A3430';   // slightly lighter
+const G_TICK  = '#4A7C5E';   // tick fill — only real green accent
+const TEXT_PRI = 'rgba(255,255,255,0.92)';
+const TEXT_SEC = 'rgba(255,255,255,0.50)';
 
-
-function OptionRow({
-  option,
-  selected,
-  onPress,
-}) {
-  const OptionIcon = getQuestionnaireIcon(option.iconKey);
-
+// ─── Glass card ─────────────────────────────────────────────────────────────
+function GlassCard({ style, children }) {
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.optionShell,
-        selected && styles.optionShellSelected,
-        pressed && { opacity: 0.85 }
-      ]}
-      android_ripple={null}
-    >
-      {option.iconKey && (
-        <View style={styles.optionIcon}>
-          <OptionIcon
-            size={22}
-            color="#06402B"
-            strokeWidth={ICON_STROKE}
-          />
-        </View>
-      )}
-        <View style={styles.optionCopy}>
-        <Text style={[styles.optionLabel, selected && styles.optionLabelSelected]}>{option.label}</Text>
-        <Text style={[styles.optionDesc, selected && styles.optionDescSelected]}>{option.desc}</Text>
-      </View>
-      <View style={[styles.tick, selected && styles.tickOn]}>
-        {selected ? (
-          <Check size={16} color="#FFFFFF" strokeWidth={ICON_STROKE + 0.5} />
-        ) : null}
-      </View>
-    </Pressable>
+    <View style={[gl.card, style]}>
+      <View style={gl.shimmer} />
+      {children}
+    </View>
   );
 }
 
-export default function QuestionnaireScreen({ navigation }) {
-  const insets = useSafeAreaInsets();
-  const { answers, setAnswer, toggleMultiAnswer } = useOnboarding();
+const gl = StyleSheet.create({
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: RADIUS.xxl,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.13)',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.20,
+    shadowRadius: 14,
+    elevation: 5,
+  },
+  shimmer: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    right: 20,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+  },
+});
 
-  const [stepIndex, setStepIndex] = useState(0);
-  const advancing = useRef(false);
-  const contentOp = useRef(new Animated.Value(0)).current;
-  const contentTransY = useRef(new Animated.Value(15)).current;
-  const scrollViewRef = useRef(null);
+// ─── Option row — tick-only selection ────────────────────────────────────────
+function OptionRow({ option, selected, onPress }) {
+  const OptionIcon = getQuestionnaireIcon(option.iconKey);
+  const scaleAnim  = useRef(new Animated.Value(1)).current;
 
-  const step = QUESTIONNAIRE_STEPS[stepIndex];
-  const isMulti = step.type === 'multi';
-
-  const isAnswered = useCallback(() => {
-    const answer = answers[step.id];
-    if (isMulti) return Array.isArray(answer) && answer.length > 0;
-    return !!answer;
-  }, [answers, step.id, isMulti]);
-
-  const goNextOrFinish = useCallback(
-    (fromIndex) => {
-      if (fromIndex >= TOTAL - 1) {
-        navigation.navigate(ROUTES.TRIAL);
-        return;
-      }
-      setStepIndex(fromIndex + 1);
-    },
-    [navigation],
-  );
-
-  const handleSingleTap = useCallback(
-    (optionId) => {
-      setAnswer(step.id, optionId);
-    },
-    [step.id, setAnswer],
-  );
-
-  const handleMultiTap = useCallback(
-    (optionId) => {
-      toggleMultiAnswer(step.id, optionId);
-    },
-    [step.id, toggleMultiAnswer],
-  );
-
-  const handleContinue = useCallback(() => {
-    if (!isAnswered() || advancing.current) return;
-    advancing.current = true;
-    
-    Animated.parallel([
-      Animated.timing(contentOp, { toValue: 0, duration: 180, useNativeDriver: true }),
-      Animated.timing(contentTransY, { toValue: -15, duration: 180, useNativeDriver: true }),
-    ]).start(() => {
-      if (scrollViewRef.current) {
-        scrollViewRef.current.scrollTo({ y: 0, animated: false });
-      }
-      goNextOrFinish(stepIndex);
-      contentTransY.setValue(15);
-      advancing.current = false;
-    });
-  }, [isAnswered, stepIndex, goNextOrFinish, contentOp, contentTransY]);
-
-  const handleBack = useCallback(() => {
-    if (stepIndex <= 0 || advancing.current) return;
-    advancing.current = true;
-    
-    Animated.parallel([
-      Animated.timing(contentOp, { toValue: 0, duration: 180, useNativeDriver: true }),
-      Animated.timing(contentTransY, { toValue: 15, duration: 180, useNativeDriver: true }),
-    ]).start(() => {
-      if (scrollViewRef.current) {
-        scrollViewRef.current.scrollTo({ y: 0, animated: false });
-      }
-      setStepIndex((s) => s - 1);
-      contentTransY.setValue(-15);
-      advancing.current = false;
-    });
-  }, [stepIndex, contentOp, contentTransY]);
-
-  useEffect(() => {
-    contentOp.setValue(0);
-    Animated.parallel([
-      Animated.timing(contentOp, { toValue: 1, duration: 350, useNativeDriver: true }),
-      Animated.timing(contentTransY, { toValue: 0, duration: 350, useNativeDriver: true }),
+  const handlePress = () => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, { toValue: 0.975, duration: 70, useNativeDriver: true }),
+      Animated.spring(scaleAnim, { toValue: 1, tension: 130, friction: 6, useNativeDriver: true }),
     ]).start();
-  }, [stepIndex, contentOp, contentTransY]);
-
-  const isSelected = (optionId) => {
-    const answer = answers[step.id];
-    if (isMulti) return Array.isArray(answer) && answer.includes(optionId);
-    return answer === optionId;
+    onPress();
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#F9F7F2' }}>
-      {/* 100% Background Photo for the glass effect backdrop */}
-      <Image 
-        source={{ uri: DEFAULT_RECIPE_IMAGE }}
-        style={StyleSheet.absoluteFill}
-        resizeMode="cover"
-      />
-      
-      {/* Soft Frosted Glass Overlay mapping the entire screen to the Warm Cream aesthetic */}
-      <LinearGradient 
-        colors={['rgba(249,247,242,0.6)', 'rgba(249,247,242,0.95)']}
-        locations={[0, 1]}
-        style={StyleSheet.absoluteFill} 
-      />
-      <BlurView intensity={50} tint="light" style={StyleSheet.absoluteFill} pointerEvents="none" />
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <Pressable
+        onPress={handlePress}
+        android_ripple={null}
+        style={({ pressed }) => pressed && { opacity: 0.88 }}
+      >
+        <GlassCard style={opt.shell}>
+          {option.iconKey && (
+            <View style={opt.iconWrap}>
+              <OptionIcon size={20} color={TEXT_PRI} strokeWidth={ICON_STROKE} />
+            </View>
+          )}
+          <View style={opt.copy}>
+            <Text style={opt.label}>{option.label}</Text>
+            {option.desc ? <Text style={opt.desc}>{option.desc}</Text> : null}
+          </View>
+          <View style={[opt.tick, selected && opt.tickOn]}>
+            {selected && <Check size={13} color="#FFFFFF" strokeWidth={ICON_STROKE + 0.5} />}
+          </View>
+        </GlassCard>
+      </Pressable>
+    </Animated.View>
+  );
+}
 
-      <View style={[styles.header, { paddingTop: insets.top + SPACING.sm }]}>
+const opt = StyleSheet.create({
+  shell: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.md + 2,
+    paddingHorizontal: SPACING.lg,
+    gap: SPACING.md,
+  },
+  iconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.md,
+    backgroundColor: 'rgba(255,255,255,0.07)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  copy: { flex: 1, gap: 2 },
+  label: { ...FONT.bodySemiBold, fontSize: 15, color: TEXT_PRI },
+  desc: { ...FONT.bodySmall, fontSize: 12, color: TEXT_SEC, lineHeight: 17 },
+  tick: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.20)',
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tickOn: {
+    backgroundColor: G_TICK,
+    borderColor: G_TICK,
+  },
+});
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
+export default function QuestionnaireScreen({ navigation }) {
+  const insets = useSafeAreaInsets();
+  const { answers, setAnswer, toggleMultiAnswer, completeOnboarding } = useOnboarding();
+
+  const [stepIndex, setStepIndex] = useState(0);
+  const advancing    = useRef(false);
+  const contentOp    = useRef(new Animated.Value(0)).current;
+  const contentX     = useRef(new Animated.Value(28)).current;
+  const scrollRef    = useRef(null);
+  const orb1Y        = useRef(new Animated.Value(0)).current;
+  const orb2Y        = useRef(new Animated.Value(0)).current;
+  const progressAnim = useRef(new Animated.Value((1 / TOTAL) * 100)).current;
+
+  const step   = QUESTIONNAIRE_STEPS[stepIndex];
+  const isMulti = step.type === 'multi';
+
+  // Orb float
+  useEffect(() => {
+    const l1 = Animated.loop(Animated.sequence([
+      Animated.timing(orb1Y, { toValue: -14, duration: 3200, useNativeDriver: true }),
+      Animated.timing(orb1Y, { toValue:   0, duration: 3200, useNativeDriver: true }),
+    ]));
+    const l2 = Animated.loop(Animated.sequence([
+      Animated.timing(orb2Y, { toValue: 12, duration: 3800, useNativeDriver: true }),
+      Animated.timing(orb2Y, { toValue:  0, duration: 3800, useNativeDriver: true }),
+    ]));
+    l1.start(); l2.start();
+    return () => { l1.stop(); l2.stop(); };
+  }, []);
+
+  // Step transition
+  useEffect(() => {
+    contentOp.setValue(0);
+    Animated.parallel([
+      Animated.timing(contentOp, { toValue: 1, duration: 300, useNativeDriver: true }),
+      Animated.spring(contentX,  { toValue: 0, tension: 70, friction: 9, useNativeDriver: true }),
+    ]).start();
+    Animated.timing(progressAnim, {
+      toValue: ((stepIndex + 1) / TOTAL) * 100,
+      duration: 420,
+      useNativeDriver: false,
+    }).start();
+  }, [stepIndex]);
+
+  const isAnswered = useCallback(() => {
+    const a = answers[step.id];
+    if (isMulti) return Array.isArray(a) && a.length > 0;
+    return !!a;
+  }, [answers, step.id, isMulti]);
+
+  const goNextOrFinish = useCallback((fromIndex) => {
+    if (fromIndex >= TOTAL - 1) {
+      completeOnboarding();
+    } else {
+      setStepIndex(fromIndex + 1);
+    }
+  }, [completeOnboarding]);
+
+  const animateOut = (dir, cb) => {
+    advancing.current = true;
+    contentX.setValue(0);
+    Animated.parallel([
+      Animated.timing(contentOp, { toValue: 0, duration: 150, useNativeDriver: true }),
+      Animated.timing(contentX,  { toValue: dir === 'fwd' ? -28 : 28, duration: 150, useNativeDriver: true }),
+    ]).start(() => {
+      scrollRef.current?.scrollTo({ y: 0, animated: false });
+      contentX.setValue(dir === 'fwd' ? 32 : -32);
+      advancing.current = false;
+      cb();
+    });
+  };
+
+  const handleContinue = useCallback(() => {
+    if (!isAnswered() || advancing.current) return;
+    animateOut('fwd', () => goNextOrFinish(stepIndex));
+  }, [isAnswered, stepIndex, goNextOrFinish]);
+
+  const handleBack = useCallback(() => {
+    if (stepIndex <= 0 || advancing.current) return;
+    animateOut('back', () => setStepIndex(s => s - 1));
+  }, [stepIndex]);
+
+  const handleSelect = (id) => {
+    isMulti ? toggleMultiAnswer(step.id, id) : setAnswer(step.id, id);
+  };
+
+  const isSelected = (id) => {
+    const a = answers[step.id];
+    if (isMulti) return Array.isArray(a) && a.includes(id);
+    return a === id;
+  };
+
+  const answered = isAnswered();
+
+  return (
+    <View style={s.root}>
+      <LinearGradient
+        colors={[BG_TOP, BG_MID, BG_BOT]}
+        locations={[0, 0.5, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+
+      <Animated.View style={[s.orb1, { transform: [{ translateY: orb1Y }] }]} />
+      <Animated.View style={[s.orb2, { transform: [{ translateY: orb2Y }] }]} />
+
+      {/* Header */}
+      <View style={[s.header, { paddingTop: insets.top + SPACING.sm }]}>
         <Pressable
           onPress={handleBack}
           disabled={stepIndex === 0}
+          hitSlop={8}
           style={({ pressed }) => [
-            styles.backBtn,
-            pressed && stepIndex > 0 && { opacity: 0.85 },
+            stepIndex === 0 && { opacity: 0.22 },
+            pressed && stepIndex > 0 && { opacity: 0.7 },
           ]}
         >
-          <ArrowLeft
-            size={22}
-            color={stepIndex === 0 ? 'rgba(13,59,38,0.2)' : '#0D3B26'}
-            strokeWidth={ICON_STROKE}
-          />
+          <GlassCard style={s.backGlass}>
+            <ArrowLeft size={20} color={TEXT_PRI} strokeWidth={ICON_STROKE} />
+          </GlassCard>
         </Pressable>
-        <View style={styles.headerCenter}>
-          <View style={styles.stepPill}>
-            <Text style={styles.stepPillText}>
-              Step {stepIndex + 1} of {TOTAL}
-            </Text>
+
+        <GlassCard style={s.progressPill}>
+          <Text style={s.stepLabel}>
+            {stepIndex + 1}
+            <Text style={s.stepOf}> / {TOTAL}</Text>
+          </Text>
+          <View style={s.track}>
+            <Animated.View
+              style={[
+                s.trackFill,
+                {
+                  width: progressAnim.interpolate({
+                    inputRange: [0, 100],
+                    outputRange: ['0%', '100%'],
+                  }),
+                },
+              ]}
+            />
           </View>
-          <View style={styles.progressTrack}>
-            <View style={styles.progressRow}>
-              <View style={{ flex: stepIndex + 1 }}>
-                <View style={styles.progressFill} />
-              </View>
-              <View style={{ flex: Math.max(0, TOTAL - stepIndex - 1) }} />
-            </View>
-          </View>
-        </View>
+        </GlassCard>
+
         <View style={{ width: 44 }} />
       </View>
 
-      <Animated.View style={[styles.body, { opacity: contentOp, transform: [{ translateY: contentTransY }] }]}>
+      {/* Content */}
+      <Animated.View style={[s.body, { opacity: contentOp, transform: [{ translateX: contentX }] }]}>
         <ScrollView
-          ref={scrollViewRef}
-          contentContainerStyle={[
-            styles.scrollInner,
-            { paddingBottom: insets.bottom + 140 },
-          ]}
+          ref={scrollRef}
+          contentContainerStyle={[s.scroll, { paddingBottom: insets.bottom + 130 }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           bounces={false}
         >
-          <View style={styles.questionCard}>
-            <View style={styles.kickerRow}>
-              <View style={styles.kickerDot} />
-              <Text style={styles.kicker}>Personalize FRIDGR</Text>
-            </View>
-            <Text style={styles.question}>{step.question}</Text>
-            <Text style={styles.subtitle}>{step.subtitle}</Text>
-          </View>
+          <GlassCard style={s.qCard}>
+            <Text style={s.badge}>Personalize FRIDGR</Text>
+            <Text style={s.question}>{step.question}</Text>
+            {step.subtitle ? <Text style={s.subtitle}>{step.subtitle}</Text> : null}
+          </GlassCard>
 
-          <View style={styles.options}>
-            {step.options.map((option) => (
+          <View style={s.options}>
+            {step.options.map((o) => (
               <OptionRow
-                key={option.id}
-                option={option}
-                selected={isSelected(option.id)}
-                onPress={() => (isMulti ? handleMultiTap(option.id) : handleSingleTap(option.id))}
+                key={o.id}
+                option={o}
+                selected={isSelected(o.id)}
+                onPress={() => handleSelect(o.id)}
               />
             ))}
           </View>
 
-          <View style={styles.hintWrap}>
-            <Text style={styles.hint}>
-              {isMulti
-                ? 'Select all that apply, then tap Continue'
-                : 'Choose an option, then tap Continue'}
-            </Text>
-          </View>
+          <Text style={s.hint}>
+            {isMulti ? 'Select all that apply' : 'Choose one option'}
+          </Text>
         </ScrollView>
       </Animated.View>
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + SPACING.md }]}>
-          <Pressable
-            onPress={handleContinue}
-            disabled={!isAnswered()}
-            android_ripple={null}
-            style={({ pressed }) => [
-              styles.continueBtnOuter,
-              isAnswered() && styles.continueBtnOuterEnabled,
-              pressed && isAnswered() && { transform: [{ scale: 0.985 }] },
-            ]}
-          >
-            {isAnswered() ? (
-              <LinearGradient
-                colors={PREMIUM_CTA_VERTICAL}
-                start={PREMIUM_CTA_VERTICAL_START}
-                end={PREMIUM_CTA_VERTICAL_END}
-                style={styles.continueGrad}
-              >
-                <Text style={styles.continueText}>
-                  {stepIndex >= TOTAL - 1 ? 'Finish' : 'Continue'}
-                </Text>
-                <ChevronRight size={20} color="#FFFFFF" strokeWidth={ICON_STROKE} />
-              </LinearGradient>
-            ) : (
-              <View style={styles.continueSolidDisabled}>
-                <Text style={styles.continueTextDisabled}>
-                  {stepIndex >= TOTAL - 1 ? 'Finish' : 'Continue'}
-                </Text>
-                <ChevronRight size={20} color="#64748B" strokeWidth={ICON_STROKE} />
-              </View>
-            )}
-          </Pressable>
+      {/* Footer CTA */}
+      <View style={[s.footer, { paddingBottom: insets.bottom + SPACING.md }]}>
+        <View style={StyleSheet.absoluteFill}>
+          <LinearGradient
+            colors={['rgba(42,52,48,0)', BG_BOT]}
+            locations={[0, 0.35]}
+            style={StyleSheet.absoluteFill}
+          />
+        </View>
+
+        <Pressable
+          onPress={handleContinue}
+          disabled={!answered}
+          android_ripple={null}
+          style={({ pressed }) => [
+            s.ctaBtn,
+            answered && s.ctaBtnEnabled,
+            pressed && answered && { transform: [{ scale: 0.982 }], opacity: 0.88 },
+          ]}
+        >
+          {answered ? (
+            <LinearGradient
+              colors={PREMIUM_CTA_VERTICAL}
+              start={PREMIUM_CTA_VERTICAL_START}
+              end={PREMIUM_CTA_VERTICAL_END}
+              style={s.ctaGrad}
+            >
+              <Text style={s.ctaText}>
+                {stepIndex >= TOTAL - 1 ? 'Finish' : 'Continue'}
+              </Text>
+              <ChevronRight size={20} color="#FFFFFF" strokeWidth={ICON_STROKE} />
+            </LinearGradient>
+          ) : (
+            <View style={s.ctaDisabled}>
+              <Text style={s.ctaTextOff}>
+                {stepIndex >= TOTAL - 1 ? 'Finish' : 'Continue'}
+              </Text>
+              <ChevronRight size={20} color="rgba(255,255,255,0.25)" strokeWidth={ICON_STROKE} />
+            </View>
+          )}
+        </Pressable>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
+  root: { flex: 1, backgroundColor: BG_TOP },
+
+  orb1: {
+    position: 'absolute', top: -80, right: -80,
+    width: SCREEN_W * 0.65, height: SCREEN_W * 0.65,
+    borderRadius: SCREEN_W * 0.325,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+  },
+  orb2: {
+    position: 'absolute', bottom: 100, left: -100,
+    width: SCREEN_W * 0.55, height: SCREEN_W * 0.55,
+    borderRadius: SCREEN_W * 0.275,
+    backgroundColor: 'rgba(255,255,255,0.025)',
+  },
+
   header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: SPACING.md,
-    paddingBottom: SPACING.md,
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: SPACING.lg, paddingBottom: SPACING.md, gap: SPACING.sm,
   },
-  backBtn: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
+  backGlass: {
+    width: 40, height: 40, borderRadius: RADIUS.full,
+    alignItems: 'center', justifyContent: 'center',
   },
-  headerCenter: { flex: 1, alignItems: 'center', gap: 10, paddingHorizontal: SPACING.xs },
-  stepPill: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: 6,
-    borderRadius: RADIUS.full,
-    backgroundColor: 'transparent',
-    borderWidth: 0,
+  progressPill: {
+    flex: 1, flexDirection: 'row', alignItems: 'center',
+    gap: SPACING.sm, paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm, borderRadius: RADIUS.full,
   },
-  stepPillText: {
-    ...FONT.captionMedium,
-    color: '#FFFFFF',
-    letterSpacing: 0.8,
-    fontWeight: '600',
+  stepLabel: { ...FONT.label, color: TEXT_PRI, fontWeight: '800', minWidth: 30 },
+  stepOf: { fontWeight: '500', color: TEXT_SEC },
+  track: {
+    flex: 1, height: 4, borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.10)', overflow: 'hidden',
   },
-  progressTrack: {
-    width: '100%',
-    maxWidth: SCREEN_W - 140,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#EEEEEE',
-    overflow: 'hidden',
-  },
-  progressRow: {
-    flexDirection: 'row',
-    height: 4,
-    width: '100%',
-  },
-  progressFill: {
-    flex: 1,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: PREMIUM.accent,
-  },
+  trackFill: { height: '100%', borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.55)' },
+
   body: { flex: 1 },
-  scrollInner: {
-    paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.sm,
-  },
-  questionCard: {
-    borderRadius: RADIUS.lg,
-    padding: SPACING.lg,
-    marginBottom: SPACING.lg,
-    backgroundColor: 'transparent',
-    borderWidth: 0,
-  },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.sm,
-    marginBottom: SPACING.md,
-    display: 'none',
-  },
-  kickerDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: PREMIUM.accent,
-  },
-  kicker: {
-    ...FONT.labelSmall,
-    color: PREMIUM.accent,
-    letterSpacing: 1.8,
-    textTransform: 'uppercase',
-    fontWeight: '700',
+  scroll: { paddingHorizontal: SPACING.lg, paddingTop: SPACING.sm, gap: SPACING.md },
+
+  qCard: { padding: SPACING.xl, marginBottom: SPACING.sm },
+  badge: {
+    ...FONT.labelSmall, fontSize: 10, fontWeight: '700',
+    letterSpacing: 1.6, color: TEXT_SEC,
+    textTransform: 'uppercase', marginBottom: SPACING.sm,
   },
   question: {
-    fontSize: 27,
-    fontWeight: '700',
-    color: '#06402B',
-    letterSpacing: 0,
-    lineHeight: 33,
-    marginBottom: SPACING.sm,
+    fontSize: 26, fontWeight: '800', color: '#FFFFFF',
+    letterSpacing: -0.5, lineHeight: 32, marginBottom: SPACING.xs,
   },
-  subtitle: {
-    ...FONT.body,
-    fontSize: 15,
-    color: '#666666',
-    lineHeight: 22,
-    maxWidth: 340,
-  },
-  options: { gap: SPACING.md },
-  optionShell: {
-    borderRadius: RADIUS.xl, // smaller radius
-    overflow: 'hidden',
-    borderWidth: 1.5, // thinner border
-    borderColor: 'rgba(255, 255, 255, 0.85)', // frost edge
-    backgroundColor: 'rgba(255, 255, 255, 0.65)', // glass surface
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: SPACING.sm + 2, // much smaller vertical padding
-    paddingHorizontal: SPACING.md,
-    gap: SPACING.md,
-  },
-  optionShellSelected: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)', // brighter white focus
-    borderColor: '#3E6B50', // green focus border
-    shadowColor: '#3E6B50',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  optionIcon: {
-    width: 44, // smaller glass icon wrap
-    height: 44,
-    borderRadius: RADIUS.md, // smaller border radius
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.5)',
-  },
-  optionCopy: { flex: 1, gap: 1 },
-  optionLabel: {
-    ...FONT.bodySemiBold,
-    fontSize: 15, // slightly smaller font
-    color: '#0D3B26',
-  },
-  optionLabelSelected: {
-    color: '#0D3B26', // Keep dark text so it doesn't get lost on pure white
-    fontWeight: '800',
-  },
-  optionDesc: {
-    ...FONT.bodySmall,
-    color: 'rgba(13, 59, 38, 0.65)', // subtle sage green matching theme
-    lineHeight: 18,
-    fontSize: 12,
-  },
-  optionDescSelected: {
-    color: 'rgba(13, 59, 38, 0.9)',
-  },
-  tick: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.9)',
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tickOn: {
-    backgroundColor: '#3E6B50',
-    borderColor: '#3E6B50',
-  },
-  hintWrap: {
-    marginTop: SPACING.xxl,
-    alignSelf: 'center',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.sm,
-    borderRadius: RADIUS.lg,
-    backgroundColor: 'transparent',
-    borderWidth: 0,
-    maxWidth: SCREEN_W - SPACING.xl * 2,
-  },
+  subtitle: { ...FONT.body, fontSize: 14, color: TEXT_SEC, lineHeight: 21 },
+
+  options: { gap: SPACING.sm },
+
   hint: {
-    ...FONT.caption,
-    color: '#666666',
-    textAlign: 'center',
-    lineHeight: 18,
+    ...FONT.caption, color: 'rgba(255,255,255,0.25)',
+    textAlign: 'center', marginTop: SPACING.sm,
   },
+
   footer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: SPACING.xl,
-    paddingTop: SPACING.lg,
-    backgroundColor: 'rgba(249, 247, 242, 0.85)', // translucent Warm Cream footer
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.5)',
+    position: 'absolute', left: 0, right: 0, bottom: 0,
+    paddingHorizontal: SPACING.xl, paddingTop: SPACING.xxxl, overflow: 'hidden',
   },
-  continueBtnOuter: {
-    borderRadius: RADIUS.xl,
-    overflow: 'hidden',
+
+  ctaBtn: { borderRadius: RADIUS.full, overflow: 'hidden' },
+  ctaBtnEnabled: {
+    shadowColor: '#000', shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.30, shadowRadius: 14, elevation: 8,
   },
-  continueBtnOuterEnabled: {
-    ...SHADOWS.sm,
+  ctaGrad: {
+    height: 56, flexDirection: 'row', alignItems: 'center',
+    justifyContent: 'center', gap: SPACING.xs, borderRadius: RADIUS.full,
   },
-  continueGrad: {
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: SPACING.xs,
-    backgroundColor: '#06402B',
+  ctaDisabled: {
+    height: 56, flexDirection: 'row', alignItems: 'center',
+    justifyContent: 'center', gap: SPACING.xs,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: RADIUS.full,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
   },
-  continueSolidDisabled: {
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: SPACING.xs,
-    backgroundColor: '#EEEEEE',
-    borderWidth: 0,
-    borderRadius: RADIUS.xl,
-  },
-  continueText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '700' },
-  continueTextDisabled: {
-    ...FONT.h5,
-    color: '#94A3B8',
-    fontWeight: '600',
-  },
+  ctaText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '700' },
+  ctaTextOff: { ...FONT.h5, color: 'rgba(255,255,255,0.30)', fontWeight: '600' },
 });

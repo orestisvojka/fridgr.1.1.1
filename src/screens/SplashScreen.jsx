@@ -3,118 +3,218 @@ import { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
+const GREEN      = '#3E6B50';
+const GREEN_DARK = '#0D3B26';
+const BG         = '#F9F7F2';
+const DOT_COUNT  = 3;
+
 export default function SplashScreen({ onDone }) {
-  const logoY = useRef(new Animated.Value(20)).current;
-  const logoOp = useRef(new Animated.Value(0)).current;
-  const tagOp = useRef(new Animated.Value(0)).current;
-  const barW = useRef(new Animated.Value(0)).current;
+  // Core entrance
+  const logoY     = useRef(new Animated.Value(28)).current;
+  const logoOp    = useRef(new Animated.Value(0)).current;
+  const taglineOp = useRef(new Animated.Value(0)).current;
+  const taglineY  = useRef(new Animated.Value(10)).current;
+  const subtitleOp = useRef(new Animated.Value(0)).current;
+  const bottomOp  = useRef(new Animated.Value(0)).current;
   const screenFade = useRef(new Animated.Value(1)).current;
-  const pulseScale = useRef(new Animated.Value(1)).current;
+
+  // Glowing ring pulse
+  const ringScale  = useRef(new Animated.Value(1)).current;
+  const ringOp     = useRef(new Animated.Value(0.6)).current;
+
+  // Animated dots (3 dots pulsing in sequence)
+  const dotAnims  = useRef(Array.from({ length: DOT_COUNT }, () => new Animated.Value(0.2))).current;
 
   useEffect(() => {
-    // Pulse animation for the glowing dot
+    // Ring pulse loop
     Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulseScale, { toValue: 1.4, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        Animated.timing(pulseScale, { toValue: 1, duration: 800, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(ringScale, { toValue: 1.25, duration: 1000, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+          Animated.timing(ringScale, { toValue: 1,    duration: 1000, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        ]),
+        Animated.sequence([
+          Animated.timing(ringOp, { toValue: 0.15, duration: 1000, useNativeDriver: true }),
+          Animated.timing(ringOp, { toValue: 0.55, duration: 1000, useNativeDriver: true }),
+        ]),
       ])
     ).start();
 
+    // Dots wave loop
+    const makeWave = () =>
+      Animated.loop(
+        Animated.stagger(180,
+          dotAnims.map(d =>
+            Animated.sequence([
+              Animated.timing(d, { toValue: 1,   duration: 380, easing: Easing.out(Easing.ease), useNativeDriver: true }),
+              Animated.timing(d, { toValue: 0.2, duration: 380, easing: Easing.in(Easing.ease),  useNativeDriver: true }),
+            ])
+          )
+        )
+      );
+    makeWave().start();
+
+    // Entrance sequence
     Animated.sequence([
-      Animated.delay(200),
+      Animated.delay(150),
+      // Logo in
       Animated.parallel([
-        Animated.spring(logoY, { toValue: 0, tension: 50, friction: 6, useNativeDriver: true }),
-        Animated.timing(logoOp, { toValue: 1, duration: 600, useNativeDriver: true }),
+        Animated.spring(logoY,  { toValue: 0, tension: 55, friction: 7, useNativeDriver: true }),
+        Animated.timing(logoOp, { toValue: 1, duration: 550, useNativeDriver: true }),
       ]),
-      Animated.timing(tagOp, { toValue: 1, duration: 400, useNativeDriver: true }),
-      Animated.timing(barW, { toValue: 1, duration: 1500, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
-      Animated.delay(100),
-      Animated.timing(screenFade, { toValue: 0, duration: 400, useNativeDriver: true }),
+      // Tagline in
+      Animated.parallel([
+        Animated.timing(taglineOp, { toValue: 1, duration: 380, useNativeDriver: true }),
+        Animated.spring(taglineY,  { toValue: 0, tension: 60, friction: 8, useNativeDriver: true }),
+      ]),
+      // Subtitle + bottom dots in
+      Animated.parallel([
+        Animated.timing(subtitleOp, { toValue: 1, duration: 320, useNativeDriver: true }),
+        Animated.timing(bottomOp,   { toValue: 1, duration: 320, useNativeDriver: true }),
+      ]),
+      // Hold
+      Animated.delay(1400),
+      // Fade out
+      Animated.timing(screenFade, { toValue: 0, duration: 420, easing: Easing.in(Easing.ease), useNativeDriver: true }),
     ]).start(() => onDone?.());
   }, []);
 
   return (
     <Animated.View style={[s.root, { opacity: screenFade }]}>
       <StatusBar style="dark" />
+
+      {/* Subtle background circle */}
+      <Animated.View style={[s.bgOrb, { transform: [{ scale: ringScale }], opacity: ringOp }]} />
+
       <View style={s.center}>
+        {/* Logo mark */}
         <Animated.View style={[s.logoWrap, { opacity: logoOp, transform: [{ translateY: logoY }] }]}>
-          <Animated.View style={[s.dotWrap, { transform: [{ scale: pulseScale }] }]}>
-            <View style={s.dot} />
-          </Animated.View>
+          <View style={s.iconRing}>
+            <View style={s.iconDot} />
+          </View>
           <Text style={s.wordmark}>FRIDGR</Text>
         </Animated.View>
 
-        <Animated.Text style={[s.tagline, { opacity: tagOp }]}>
+        {/* Tagline */}
+        <Animated.Text style={[s.tagline, { opacity: taglineOp, transform: [{ translateY: taglineY }] }]}>
           THE CULINARY CURATOR
+        </Animated.Text>
+
+        {/* Divider */}
+        <Animated.View style={[s.divider, { opacity: subtitleOp }]} />
+
+        {/* Subtitle */}
+        <Animated.Text style={[s.subtitle, { opacity: subtitleOp }]}>
+          Cook smarter. Waste less. Eat better.
         </Animated.Text>
       </View>
 
-      <Animated.View style={[s.bottom, { opacity: tagOp }]}>
-        <View style={s.barTrack}>
-          <Animated.View style={[s.barFill, { width: barW.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }) }]} />
+      {/* Bottom loading dots */}
+      <Animated.View style={[s.bottom, { opacity: bottomOp }]}>
+        <View style={s.dotsRow}>
+          {dotAnims.map((anim, i) => (
+            <Animated.View
+              key={i}
+              style={[
+                s.loadDot,
+                { opacity: anim, transform: [{ scaleY: anim }] },
+              ]}
+            />
+          ))}
         </View>
-        <Text style={s.initLabel}>INITIALIZING PANTRY</Text>
+        <Text style={s.initLabel}>LOADING</Text>
       </Animated.View>
     </Animated.View>
   );
 }
 
-const GREEN = '#3E6B50';
-const BG = '#F9F7F2';
-
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: BG, alignItems: 'center', justifyContent: 'center' },
-  center: { alignItems: 'center' },
-  logoWrap: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
-  dotWrap: { 
-    width: 20, 
-    height: 20, 
-    borderRadius: 10, 
-    backgroundColor: 'rgba(62, 107, 80, 0.15)', 
-    alignItems: 'center', 
-    justifyContent: 'center' 
+  root: {
+    flex: 1,
+    backgroundColor: BG,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  dot: { 
-    width: 10, 
-    height: 10, 
-    borderRadius: 5, 
-    backgroundColor: GREEN 
+  bgOrb: {
+    position: 'absolute',
+    width: 320,
+    height: 320,
+    borderRadius: 160,
+    backgroundColor: 'rgba(62,107,80,0.07)',
   },
-  wordmark: { 
-    fontSize: 40, 
-    fontWeight: '800', 
-    letterSpacing: 4, 
-    color: '#0D3B26' 
+  center: {
+    alignItems: 'center',
+    gap: 12,
   },
-  tagline: { 
-    fontSize: 10, 
-    fontWeight: '700', 
-    letterSpacing: 4, 
-    color: '#8A8A84' 
+  logoWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 4,
   },
-  bottom: { 
-    position: 'absolute', 
-    bottom: 60, 
-    left: 70, 
-    right: 70, 
-    alignItems: 'center', 
-    gap: 16 
+  iconRing: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: GREEN,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(62,107,80,0.1)',
   },
-  barTrack: { 
-    width: '100%', 
-    height: 2, 
-    backgroundColor: '#E4DDD2', 
-    overflow: 'hidden', 
-    borderRadius: 1 
+  iconDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: GREEN,
   },
-  barFill: { 
-    height: '100%', 
-    backgroundColor: GREEN 
+  wordmark: {
+    fontSize: 44,
+    fontWeight: '900',
+    letterSpacing: 5,
+    color: GREEN_DARK,
   },
-  initLabel: { 
-    fontSize: 9, 
-    fontWeight: '700', 
-    letterSpacing: 2, 
-    color: '#8A8A84' 
-  }
+  tagline: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 5,
+    color: 'rgba(13,59,38,0.45)',
+    textTransform: 'uppercase',
+  },
+  divider: {
+    width: 32,
+    height: 1.5,
+    borderRadius: 1,
+    backgroundColor: 'rgba(62,107,80,0.25)',
+    marginVertical: 4,
+  },
+  subtitle: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: 'rgba(13,59,38,0.38)',
+    letterSpacing: 0.2,
+  },
+  bottom: {
+    position: 'absolute',
+    bottom: 56,
+    alignItems: 'center',
+    gap: 12,
+  },
+  dotsRow: {
+    flexDirection: 'row',
+    gap: 6,
+    alignItems: 'center',
+  },
+  loadDot: {
+    width: 4,
+    height: 16,
+    borderRadius: 2,
+    backgroundColor: GREEN,
+  },
+  initLabel: {
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 3,
+    color: 'rgba(13,59,38,0.35)',
+  },
 });

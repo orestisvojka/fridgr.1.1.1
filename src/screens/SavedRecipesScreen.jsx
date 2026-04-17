@@ -17,7 +17,7 @@ import PrimaryButton from '../components/PrimaryButton';
 import {
   colors,
   fontSize,
-  fontWeight,
+  fontFamily, fontWeight,
   radius,
   spacing,
   shadows,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: fontSize.xxl + 2,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.textInverse,
     letterSpacing: -0.6,
   },
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   listHeader: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: fontSize.md + 1,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.textPrimary,
     letterSpacing: -0.2,
   },
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   metaText: {
     fontSize: fontSize.xs,
     color: colors.textMuted,
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
   },
   diffBadge: {
     paddingVertical: 2,
@@ -221,14 +221,14 @@ const styles = StyleSheet.create({
   },
   diffText: {
     fontSize: fontSize.xs - 1,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     textTransform: 'uppercase',
     letterSpacing: 0.3,
   },
   cardCalories: {
     fontSize: fontSize.xs,
     color: colors.textMuted,
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
   },
   removeBtn: {
     paddingRight: spacing.md,
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: fontSize.xxl,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.textPrimary,
     letterSpacing: -0.4,
   },

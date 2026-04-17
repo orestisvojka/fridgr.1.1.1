@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import PrimaryButton from '../../components/PrimaryButton';
-import { colors, spacing, radius, fontSize, fontWeight } from '../../styles/theme';
+import { colors, spacing, radius, fontSize, fontFamily, fontWeight } from '../../styles/theme';
 
 export default function OfferScreen({ navigation }) {
   return (
@@ -80,12 +80,12 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#FFFFFF',
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     letterSpacing: 1,
   },
   title: {
     fontSize: 36,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: 40,
@@ -96,18 +96,18 @@ const styles = StyleSheet.create({
   },
   discountAmount: {
     fontSize: 64,
-    fontWeight: '900',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#FFFFFF',
   },
   discountLabel: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: 'rgba(255,255,255,0.8)',
     marginTop: -5,
   },
   subtitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 16, lineHeight: 24,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#FFFFFF',
     marginTop: 20,
   },
@@ -124,11 +124,11 @@ const styles = StyleSheet.create({
   },
   newPrice: {
     fontSize: 32,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#FFFFFF',
   },
   pricePeriod: {
-    fontSize: 16,
+    fontSize: 16, lineHeight: 24,
     color: 'rgba(255,255,255,0.6)',
   },
   footer: {
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   skipText: {
     color: 'rgba(255,255,255,0.5)',
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 14, lineHeight: 21,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
   },
 });

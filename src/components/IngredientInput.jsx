@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { colors, fontSize, fontWeight, radius, spacing, shadows } from '../styles/theme';
+import { colors, fontSize, fontFamily, fontWeight, radius, spacing, shadows } from '../styles/theme';
 import { normalizeIngredient } from '../utils/helpers';
 import { MAX_INGREDIENTS, MIN_INGREDIENT_LENGTH } from '../utils/constants';
 
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: fontSize.md,
     color: colors.textPrimary,
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular',
     textAlignVertical: 'center',
   },
   addBtn: {
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   },
   scanText: {
     fontSize: fontSize.sm,
-    fontWeight: fontWeight.semibold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.greenDark,
   },
   suggestionsWrap: {
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   },
   suggestLabel: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   },
   suggestionText: {
     fontSize: fontSize.sm,
-    fontWeight: fontWeight.semibold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textSecondary,
   },
   chipsWrap: {
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   },
   chipsLabel: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.greenDark,
   },
 });

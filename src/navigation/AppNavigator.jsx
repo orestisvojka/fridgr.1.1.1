@@ -13,7 +13,7 @@ import ResultsScreen from '../screens/ResultsScreen';
 import DetailScreen from '../screens/DetailScreen';
 import SavedRecipesScreen from '../screens/SavedRecipesScreen';
 
-import { colors, fontSize, fontWeight, radius, spacing } from '../styles/theme';
+import { colors, fontSize, fontFamily, fontWeight, radius, spacing } from '../styles/theme';
 
 const Tab = createBottomTabNavigator();
 const CookStack = createStackNavigator();
@@ -113,11 +113,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   tabLabelActive: {
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.green,
   },
   tabLabelInactive: {
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textMuted,
   },
 });

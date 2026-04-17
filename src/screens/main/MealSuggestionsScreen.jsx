@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RecipeCard from '../../components/RecipeCard';
-import { colors, shadows, radius, spacing, fontSize, fontWeight } from '../../styles/theme';
+import { colors, shadows, radius, spacing, fontSize, fontFamily, fontWeight } from '../../styles/theme';
 import { ROUTES } from '../../constants/routes';
 
 const SUGGESTIONS = [
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
     textAlign: 'center',
   },
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   floatingBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 16,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
+    fontSize: 16, lineHeight: 24,
   },
 });

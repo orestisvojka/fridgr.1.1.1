@@ -170,13 +170,13 @@ const s = StyleSheet.create({
   },
   wordmark: {
     fontSize: 44,
-    fontWeight: '900',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     letterSpacing: 5,
     color: GREEN_DARK,
   },
   tagline: {
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     letterSpacing: 5,
     color: 'rgba(13,59,38,0.45)',
     textTransform: 'uppercase',
@@ -189,8 +189,8 @@ const s = StyleSheet.create({
     marginVertical: 4,
   },
   subtitle: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: 13, lineHeight: 20,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: 'rgba(13,59,38,0.38)',
     letterSpacing: 0.2,
   },
@@ -213,7 +213,7 @@ const s = StyleSheet.create({
   },
   initLabel: {
     fontSize: 9,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     letterSpacing: 3,
     color: 'rgba(13,59,38,0.35)',
   },

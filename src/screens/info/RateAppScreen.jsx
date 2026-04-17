@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
     paddingVertical: SPACING.md + 2,
   },
-  primaryBtnText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '700' },
+  primaryBtnText: { ...FONT.h5, color: '#FFFFFF', fontFamily: 'Poppins_400Regular', fontWeight: '400' },
   secondaryBtn: {
     flexDirection: 'row',
     alignItems: 'center',

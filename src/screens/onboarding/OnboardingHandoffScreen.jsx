@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: PREMIUM.text,
     letterSpacing: -0.8,
     textAlign: 'center',
@@ -123,5 +123,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctaText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '700' },
+  ctaText: { ...FONT.h5, color: '#FFFFFF', fontFamily: 'Poppins_400Regular', fontWeight: '400' },
 });

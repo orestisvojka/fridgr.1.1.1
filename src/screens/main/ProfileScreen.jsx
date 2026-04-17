@@ -33,8 +33,8 @@ const strip = StyleSheet.create({
   wrap: { flexDirection: 'row', backgroundColor: '#FFFFFF', borderRadius: RADIUS.xl, paddingVertical: 14, ...SHADOWS.sm, borderWidth: 1, borderColor: 'rgba(228,221,210,0.7)' },
   row: { flex: 1, flexDirection: 'row', alignItems: 'center' },
   item: { flex: 1, alignItems: 'center', gap: 3 },
-  value: { fontSize: 20, fontWeight: '800', color: '#1E1E1C', letterSpacing: -0.5 },
-  label: { fontSize: 10, fontWeight: '500', color: '#8A8A84', letterSpacing: 0.2 },
+  value: { fontSize: 20, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#1E1E1C', letterSpacing: -0.5 },
+  label: { fontSize: 10, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#8A8A84', letterSpacing: 0.2 },
   divider: { width: StyleSheet.hairlineWidth, height: 28, backgroundColor: 'rgba(62,107,80,0.15)' },
 });
 
@@ -66,8 +66,8 @@ function MenuItem({ icon: Icon, label, value, onPress, iconBg, iconColor, isDest
 const menu = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, paddingHorizontal: SPACING.lg, paddingVertical: 14 },
   iconWrap: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  label: { fontSize: 15, fontWeight: '500', color: '#1E1E1C', flex: 1 },
-  value: { fontSize: 13, color: '#8A8A84', marginRight: 4 },
+  label: { fontSize: 15, lineHeight: 23, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#1E1E1C', flex: 1 },
+  value: { fontSize: 13, lineHeight: 20, color: '#8A8A84', marginRight: 4 },
   divider: { height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(62,107,80,0.08)', marginLeft: SPACING.lg + 34 + SPACING.md },
 });
 
@@ -76,7 +76,7 @@ function SectionTitle({ label }) {
   return <Text style={secTitle.text}>{label}</Text>;
 }
 const secTitle = StyleSheet.create({
-  text: { fontSize: 11, fontWeight: '700', letterSpacing: 0.8, color: 'rgba(62,107,80,0.50)', textTransform: 'uppercase', marginLeft: 4, marginBottom: SPACING.sm },
+  text: { fontSize: 11, fontFamily: 'Poppins_400Regular', fontWeight: '400', letterSpacing: 0.8, color: 'rgba(62,107,80,0.50)', textTransform: 'uppercase', marginLeft: 4, marginBottom: SPACING.sm },
 });
 
 // ─── Menu card ────────────────────────────────────────────────────────────────
@@ -196,17 +196,17 @@ const styles = StyleSheet.create({
   hero: { alignItems: 'center', paddingBottom: SPACING.xl + 12, gap: 4 },
   avatarRing: { width: 64, height: 64, borderRadius: 32, borderWidth: 2.5, borderColor: 'rgba(255,255,255,0.35)', marginBottom: 4, ...SHADOWS.md },
   avatar: { width: 59, height: 59, borderRadius: 29.5, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 22, fontWeight: '800', color: '#FFFFFF' },
-  heroName: { fontSize: 18, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.3 },
-  heroEmail: { fontSize: 13, color: 'rgba(255,255,255,0.55)' },
+  avatarText: { fontSize: 22, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF' },
+  heroName: { fontSize: 18, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF', letterSpacing: -0.3 },
+  heroEmail: { fontSize: 13, lineHeight: 20, color: 'rgba(255,255,255,0.55)' },
   joinBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     paddingHorizontal: 12, paddingVertical: 5, marginTop: 6,
     backgroundColor: 'rgba(255,255,255,0.88)', borderRadius: RADIUS.full,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.9)',
   },
-  joinText: { fontSize: 11, fontWeight: '500', color: 'rgba(30,30,28,0.65)' },
+  joinText: { fontSize: 11, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: 'rgba(30,30,28,0.65)' },
   statsRow: { paddingHorizontal: SPACING.lg, marginTop: -SPACING.lg, marginBottom: SPACING.sm },
   section: { paddingHorizontal: SPACING.xl, paddingTop: SPACING.lg, gap: SPACING.sm },
-  version: { fontSize: 11, fontWeight: '500', color: 'rgba(62,107,80,0.35)', textAlign: 'center', marginTop: SPACING.xl },
+  version: { fontSize: 11, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: 'rgba(62,107,80,0.35)', textAlign: 'center', marginTop: SPACING.xl },
 });

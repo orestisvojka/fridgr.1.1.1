@@ -94,7 +94,7 @@ function createStyles(C) {
       paddingHorizontal: SPACING.sm, paddingVertical: 4,
     },
     metaText: { ...FONT.caption, color: C.textTertiary },
-    diffText: { fontSize: 11, fontWeight: '600' },
+    diffText: { fontSize: 11, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
     missingPill: {
       flexDirection: 'row', alignItems: 'center', gap: 4,
       backgroundColor: C.accentFaint, borderRadius: RADIUS.full,

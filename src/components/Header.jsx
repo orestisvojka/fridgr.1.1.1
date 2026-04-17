@@ -10,7 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, fontSize, fontWeight, spacing } from '../styles/theme';
+import { colors, fontSize, fontFamily, fontWeight, spacing } from '../styles/theme';
 
 export default function Header({
   title,
@@ -114,21 +114,21 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize.lg,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     letterSpacing: -0.3,
   },
   largTitle: {
     fontSize: fontSize.xxl,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular',
     marginTop: 2,
   },
   rightLabel: {
     fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
   },
 });

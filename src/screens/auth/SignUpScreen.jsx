@@ -342,7 +342,7 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 16, fontWeight: '700', color: TEXT_PRI, letterSpacing: -0.2,
+    fontSize: 16, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_PRI, letterSpacing: -0.2,
   },
 
   scroll: { paddingHorizontal: SPACING.xxl },
@@ -383,14 +383,14 @@ const s = StyleSheet.create({
     // subtle left bar
   },
   inputError: {},
-  input: { flex: 1, fontSize: 14, fontWeight: '500', color: '#FFFFFF', paddingVertical: 0 },
+  input: { flex: 1, fontSize: 14, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF', paddingVertical: 0 },
   fieldErr: { fontSize: 11, color: '#FF8888', marginTop: 4, marginLeft: 28 },
 
   // Strength
   strength: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: 4, marginLeft: 28 },
   strengthBar: { flex: 1, flexDirection: 'row', gap: 3 },
   strengthSeg: { flex: 1, height: 3, borderRadius: 2 },
-  strengthLabel: { fontSize: 10, fontWeight: '600' },
+  strengthLabel: { fontSize: 10, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
 
   // Agree
   agreeRow: { flexDirection: 'row', alignItems: 'flex-start', gap: SPACING.md, marginBottom: SPACING.xl },
@@ -400,7 +400,7 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginTop: 1,
   },
   agreeText: { flex: 1, lineHeight: 18, fontSize: 12, color: TEXT_SEC },
-  agreeLink: { fontWeight: '700', color: TEXT_PRI },
+  agreeLink: { fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_PRI },
 
   // CTA
   cta: {
@@ -409,7 +409,7 @@ const s = StyleSheet.create({
     shadowOpacity: 0.30, shadowRadius: 14, elevation: 8,
   },
   ctaGrad: { height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: RADIUS.full },
-  ctaText: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.2 },
+  ctaText: { fontSize: 15, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF', letterSpacing: 0.2 },
 
   // Divider
   divider: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginBottom: SPACING.lg },
@@ -422,10 +422,10 @@ const s = StyleSheet.create({
     height: 48, alignItems: 'center', justifyContent: 'center',
     borderRadius: RADIUS.xl,
   },
-  socialText: { fontSize: 13, fontWeight: '600', color: TEXT_PRI },
+  socialText: { fontSize: 13, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_PRI },
 
   // Footer
   footer: { alignItems: 'center' },
   footerText: { fontSize: 13, color: TEXT_SEC },
-  footerLink: { fontWeight: '700', color: TEXT_PRI },
+  footerLink: { fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_PRI },
 });

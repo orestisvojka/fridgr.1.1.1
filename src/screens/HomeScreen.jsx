@@ -22,6 +22,7 @@ import { findMatchingRecipes } from '../services/recipeService';
 import {
   colors,
   fontSize,
+  fontFamily,
   fontWeight,
   radius,
   spacing,
@@ -91,6 +92,9 @@ export default function HomeScreen({ navigation }) {
               <Ionicons name="nutrition" size={20} color="#06402B" />
             </View>
             <Text style={styles.logoText}>{APP_NAME}</Text>
+          </View>
+          <View style={styles.poppinsBadge}>
+            <Text style={styles.poppinsBadgeText}>Poppins UI</Text>
           </View>
           <View style={styles.topActions}>
             {savedRecipes.length > 0 && (
@@ -269,7 +273,7 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontSize: fontSize.xl,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: '#06402B',
     letterSpacing: -0.5,
   },
@@ -277,6 +281,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  poppinsBadge: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  poppinsBadgeText: {
+    fontSize: 10,
+    fontFamily: 'Poppins_400Regular',
+    fontWeight: '400',
+    color: '#FFFFFF',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   iconBtn: {
     width: 38,
@@ -294,7 +314,7 @@ const styles = StyleSheet.create({
   },
   savedBadgeText: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: '#06402B',
   },
   greetRow: {
@@ -313,7 +333,7 @@ const styles = StyleSheet.create({
   },
   prefBadgeText: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.green,
   },
   heroCopy: {
@@ -321,7 +341,7 @@ const styles = StyleSheet.create({
   },
   tagline: {
     fontSize: fontSize.xxxl + 4,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: '#06402B',
     letterSpacing: -1.2,
     lineHeight: fontSize.xxxl + 12,
@@ -347,7 +367,7 @@ const styles = StyleSheet.create({
   },
   featurePillText: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
   },
   scroll: {
     flex: 1,
@@ -381,7 +401,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: fontSize.xl - 1,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textPrimary,
     letterSpacing: -0.3,
   },
@@ -403,7 +423,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: fontSize.sm,
     color: colors.error,
-    fontWeight: fontWeight.semibold,
+    fontFamily: 'Poppins_400Regular',
   },
   statsRow: {
     flexDirection: 'row',
@@ -419,13 +439,13 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: fontSize.xl,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textPrimary,
     letterSpacing: -0.5,
   },
   statLabel: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textMuted,
   },
   howSection: {
@@ -433,7 +453,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: fontSize.lg,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textPrimary,
     letterSpacing: -0.3,
     paddingLeft: spacing.xs,
@@ -460,7 +480,7 @@ const styles = StyleSheet.create({
   },
   howStepNum: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
@@ -468,7 +488,7 @@ const styles = StyleSheet.create({
   howText: {
     fontSize: fontSize.sm + 1,
     color: colors.textPrimary,
-    fontWeight: fontWeight.semibold,
+    fontFamily: 'Poppins_400Regular',
     lineHeight: 18,
   },
   footer: {
@@ -484,14 +504,14 @@ const styles = StyleSheet.create({
   },
   footerLogoText: {
     fontSize: fontSize.lg,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textPrimary,
     letterSpacing: -0.3,
   },
   footerTagline: {
     fontSize: fontSize.sm,
     color: colors.textMuted,
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular',
     textAlign: 'center',
   },
   footerDivider: {
@@ -512,12 +532,12 @@ const styles = StyleSheet.create({
   footerLinkText: {
     fontSize: fontSize.xs,
     color: colors.textMuted,
-    fontWeight: fontWeight.semibold,
+    fontFamily: 'Poppins_400Regular',
   },
   footerVersion: {
     fontSize: fontSize.xs - 1,
     color: colors.border,
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular',
     letterSpacing: 0.3,
   },
 });

@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import {
   colors,
   fontSize,
+  fontFamily,
   fontWeight,
   radius,
   spacing,
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize.xl - 1,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textPrimary,
     letterSpacing: -0.3,
   },
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
   },
   ratingText: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textSecondary,
   },
   cuisine: {
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
   },
   pillText: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
   },
   missingBanner: {
     flexDirection: 'row',
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: fontSize.xs + 1,
     color: colors.warningText,
-    fontWeight: fontWeight.semibold,
+    fontFamily: 'Poppins_400Regular',
     lineHeight: 17,
   },
   actions: {

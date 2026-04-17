@@ -84,7 +84,7 @@ const tl = StyleSheet.create({
   iconWrap: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   line: { flex: 1, width: 2, marginTop: 4, marginBottom: -4 },
   textWrap: { flex: 1, paddingTop: 8, paddingBottom: SPACING.lg },
-  title: { fontSize: 13, fontWeight: '700', marginBottom: 2 },
+  title: { fontSize: 13, fontFamily: 'Poppins_400Regular', fontWeight: '400', marginBottom: 2 },
   sub: { fontSize: 12, lineHeight: 18 },
 });
 
@@ -126,7 +126,7 @@ const pc = StyleSheet.create({
     ...SHADOWS.xs,
   },
   left: { flex: 1, gap: 4 },
-  title: { fontSize: 16, fontWeight: '700' },
+  title: { fontSize: 16, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
   sub: { fontSize: 13 },
   radioOuter: {
     width: 22, height: 22, borderRadius: 11,
@@ -139,7 +139,7 @@ const pc = StyleSheet.create({
     backgroundColor: '#D97706', borderRadius: RADIUS.full,
     paddingHorizontal: 8, paddingVertical: 2,
   },
-  badgeText: { fontSize: 9, fontWeight: '700', color: '#FFFFFF' },
+  badgeText: { fontSize: 9, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF' },
 });
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   headerLogoDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: '#3E6B50' },
-  headerLogo: { fontSize: 14, fontWeight: '800', letterSpacing: 0.5 },
+  headerLogo: { fontSize: 14, fontFamily: 'Poppins_400Regular', fontWeight: '400', letterSpacing: 0.5 },
   closeBtn: {
     width: 32, height: 32, borderRadius: 16,
     alignItems: 'center', justifyContent: 'center',
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
 
   scroll: { paddingHorizontal: SPACING.xl, paddingTop: SPACING.xl },
 
-  title: { fontSize: 22, fontWeight: '800', letterSpacing: -0.4, marginBottom: SPACING.xl },
+  title: { fontSize: 22, fontFamily: 'Poppins_400Regular', fontWeight: '400', letterSpacing: -0.4, marginBottom: SPACING.xl },
 
   timeline: { gap: 0, marginBottom: SPACING.lg },
 
@@ -264,6 +264,6 @@ const styles = StyleSheet.create({
   },
   ctaBtn: { borderRadius: RADIUS.full, overflow: 'hidden', ...SHADOWS.green },
   ctaGradient: { height: 48, alignItems: 'center', justifyContent: 'center' },
-  ctaText: { fontSize: 14, fontWeight: '800', color: '#FFFFFF' },
+  ctaText: { fontSize: 14, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF' },
   ctaLegal: { fontSize: 11, textAlign: 'center' },
 });

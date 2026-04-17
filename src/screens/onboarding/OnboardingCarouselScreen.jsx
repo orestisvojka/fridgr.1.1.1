@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
   },
   wordmark: {
     fontSize: 18,
-    fontWeight: '900',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     letterSpacing: 4,
     color: '#FFFFFF',
   },
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
   mainCard: {},
   headline: {
     fontSize: 38,
-    fontWeight: '900',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#FFFFFF',
     letterSpacing: -1.2,
     lineHeight: 44,
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   },
   subhead: {
     fontSize: 16,
-    fontWeight: '400',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: 'rgba(255,255,255,0.60)',
     lineHeight: 24,
   },
@@ -390,13 +390,13 @@ const styles = StyleSheet.create({
   },
   ctaText: {
     fontSize: 17,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#FFFFFF',
     letterSpacing: 0.3,
   },
   ctaArrow: {
     fontSize: 17,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: 'rgba(255,255,255,0.75)',
   },
 });

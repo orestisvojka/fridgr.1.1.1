@@ -44,13 +44,13 @@ export function createPremiumAuthStyles(C) {
       borderWidth: 1,
       borderColor: LIGHT.border,
     },
-    logoBadgeText: { ...FONT.label, color: '#0D3B26', fontWeight: '800', letterSpacing: 1.5, fontSize: 11 },
+    logoBadgeText: { ...FONT.label, color: '#0D3B26', fontFamily: 'Poppins_400Regular', fontWeight: '400', letterSpacing: 1.5, fontSize: 11 },
     scroll: {
       paddingHorizontal: SPACING.lg,
       paddingTop: SPACING.md,
       paddingBottom: 40,
     },
-    title: { ...FONT.h1, color: LIGHT.text, marginBottom: 4, fontSize: 30, fontWeight: '800' },
+    title: { ...FONT.h1, color: LIGHT.text, marginBottom: 4, fontSize: 30, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
     subtitle: { ...FONT.body, color: LIGHT.textMuted, marginBottom: SPACING.lg, fontSize: 15 },
     errorBanner: {
       flexDirection: 'row',
@@ -88,9 +88,9 @@ export function createPremiumAuthStyles(C) {
       alignSelf: 'center',
     },
     field: { gap: 6 },
-    label: { ...FONT.label, color: LIGHT.text, fontWeight: '700', fontSize: 13, letterSpacing: 0.3 },
+    label: { ...FONT.label, color: LIGHT.text, fontFamily: 'Poppins_400Regular', fontWeight: '400', fontSize: 13, letterSpacing: 0.3 },
     labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    forgotText: { ...FONT.bodySmallMedium, color: LIGHT.accent, fontWeight: '700', fontSize: 12 },
+    forgotText: { ...FONT.bodySmallMedium, color: LIGHT.accent, fontFamily: 'Poppins_400Regular', fontWeight: '400', fontSize: 12 },
     inputWrap: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -117,7 +117,7 @@ export function createPremiumAuthStyles(C) {
     input: {
       flex: 1,
       fontSize: 15,
-      fontWeight: '500',
+      fontFamily: 'Poppins_400Regular', fontWeight: '400',
       color: LIGHT.text,
       textAlignVertical: 'center',
       paddingVertical: 0,
@@ -136,7 +136,7 @@ export function createPremiumAuthStyles(C) {
     },
     primaryBtnDisabled: { opacity: 0.5 },
     primaryBtnGradient: { height: 56, alignItems: 'center', justifyContent: 'center' },
-    primaryBtnText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '800', fontSize: 17, letterSpacing: 0.3 },
+    primaryBtnText: { ...FONT.h5, color: '#FFFFFF', fontFamily: 'Poppins_400Regular', fontWeight: '400', fontSize: 17, letterSpacing: 0.3 },
     // ── DIVIDER & SOCIAL ────────────────────────────────────
     divider: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginBottom: SPACING.md },
     dividerLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(13,59,38,0.2)' },
@@ -152,11 +152,11 @@ export function createPremiumAuthStyles(C) {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    socialBtnLabel: { ...FONT.h4, color: LIGHT.text, fontWeight: '700' },
+    socialBtnLabel: { ...FONT.h4, color: LIGHT.text, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
     // ── FOOTER ──────────────────────────────────────────────
     footer: { alignItems: 'center', marginTop: SPACING.md },
     footerText: { ...FONT.body, color: LIGHT.textMuted, fontSize: 14 },
-    footerLink: { color: LIGHT.accent, fontWeight: '800' },
+    footerLink: { color: LIGHT.accent, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
     // ── PASSWORD STRENGTH ───────────────────────────────────
     strength: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: 4 },
     strengthBar: { flex: 1, flexDirection: 'row', gap: 3 },
@@ -177,7 +177,7 @@ export function createPremiumAuthStyles(C) {
     },
     checkboxActive: { backgroundColor: LIGHT.accent, borderColor: LIGHT.accent },
     agreeText: { ...FONT.bodySmall, color: LIGHT.textMuted, flex: 1, lineHeight: 20, fontSize: 12.5 },
-    agreeLink: { color: LIGHT.accent, fontWeight: '700' },
+    agreeLink: { color: LIGHT.accent, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
   });
 }
 
@@ -204,7 +204,7 @@ export function createPremiumForgotStyles(C) {
     },
     title: { ...FONT.h1, color: LIGHT.text, marginBottom: SPACING.sm },
     subtitle: { ...FONT.body, color: LIGHT.textMuted, lineHeight: 24, marginBottom: SPACING.xxl },
-    emailHighlight: { color: LIGHT.accent, fontWeight: '600' },
+    emailHighlight: { color: LIGHT.accent, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
     errorBanner: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -216,7 +216,7 @@ export function createPremiumForgotStyles(C) {
     },
     errorText: { ...FONT.bodySmall, color: C.error, flex: 1 },
     field: { gap: SPACING.sm, marginBottom: SPACING.xxl },
-    label: { ...FONT.label, color: LIGHT.text, fontWeight: '600' },
+    label: { ...FONT.label, color: LIGHT.text, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
     inputWrap: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -231,7 +231,7 @@ export function createPremiumForgotStyles(C) {
     input: {
       flex: 1,
       fontSize: 15,
-      fontWeight: '400',
+      fontFamily: 'Poppins_400Regular', fontWeight: '400',
       color: LIGHT.text,
       textAlignVertical: 'center',
       paddingVertical: 0,

@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { ArrowRight, ShoppingCart } from 'lucide-react-native';
-import { colors, radius, fontSize, fontWeight, spacing, shadows } from '../styles/theme';
+import { colors, radius, fontSize, fontFamily, fontWeight, spacing, shadows } from '../styles/theme';
 import { ICON_STROKE } from '../constants/icons';
 
 const ICON_MAP = {
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   label: {
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
     letterSpacing: 0.1,
   },
   iconLeft: {

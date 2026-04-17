@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors, fontSize, fontWeight, radius, spacing } from '../styles/theme';
+import { colors, fontSize, fontFamily, fontWeight, radius, spacing } from '../styles/theme';
 
 const MACRO_CONFIG = {
   calories: { label: 'Cal', color: '#8B5CF6', bg: '#F5F3FF' },
@@ -60,11 +60,11 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: fontSize.md - 1,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
   },
   label: {
     fontSize: fontSize.xs - 1,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     textTransform: 'uppercase',
     letterSpacing: 0.7,
     marginTop: 2,

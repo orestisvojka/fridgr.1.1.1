@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import PrimaryButton from '../../components/PrimaryButton';
-import { shadows } from '../../styles/theme';
+import { shadows , fontFamily } from '../../styles/theme';
 import { useOnboarding } from '../../context/OnboardingContext';
 
 export default function CameraPermissionScreen({ navigation }) {
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
     textAlign: 'center',
     marginBottom: 16,

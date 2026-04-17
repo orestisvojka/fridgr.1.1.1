@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import {
   colors,
   fontSize,
-  fontWeight,
+  fontFamily, fontWeight,
   radius,
   spacing,
   shadows,
@@ -61,7 +61,7 @@ export default function ShoppingListModal({ visible, recipe, onClose }) {
             <View>
               <Text style={styles.sheetTitle}>Shopping List</Text>
               <Text style={styles.sheetSubtitle}>
-                For <Text style={{ color: palette.color, fontWeight: fontWeight.bold }}>{recipe?.title}</Text>
+                For <Text style={{ color: palette.color, fontFamily: 'Poppins_400Regular', fontWeight: '400' }}>{recipe?.title}</Text>
               </Text>
             </View>
             <TouchableOpacity onPress={handleClose} style={styles.closeBtn} activeOpacity={0.8}>
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   },
   sheetTitle: {
     fontSize: fontSize.xxl - 2,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.textPrimary,
     letterSpacing: -0.4,
   },
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.textMuted,
     minWidth: 70,
     textAlign: 'right',
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   itemText: {
     flex: 1,
     fontSize: fontSize.md,
-    fontWeight: fontWeight.semibold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.textPrimary,
     textTransform: 'capitalize',
   },
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     fontSize: fontSize.xs - 1,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   doneText: {
     flex: 1,
     fontSize: fontSize.sm + 1,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.greenDark,
   },
   footer: {
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: fontSize.xl,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.textPrimary,
   },
   emptyDesc: {

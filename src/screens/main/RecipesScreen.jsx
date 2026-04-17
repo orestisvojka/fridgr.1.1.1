@@ -59,7 +59,7 @@ function FilterChip({ label, active, onPress }) {
 const chip = StyleSheet.create({
   base: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: RADIUS.full, alignItems: 'center', justifyContent: 'center' },
   inactive: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: RADIUS.full, backgroundColor: 'rgba(255,255,255,0.9)', borderWidth: 1, borderColor: 'rgba(62,107,80,0.15)' },
-  text: { fontSize: 13, fontWeight: '600', letterSpacing: 0.1 },
+  text: { fontSize: 13, lineHeight: 20, fontFamily: 'Poppins_400Regular', fontWeight: '400', letterSpacing: 0.1 },
 });
 
 // ─── Recipe Row Card ──────────────────────────────────────────────────────────
@@ -103,7 +103,7 @@ function RecipeCard({ recipe, onPress, isSaved, C }) {
                 <Text style={[card.metaText, { color: C.textTertiary }]}>{recipe.calories} cal</Text>
               </View>
               <View style={[card.diffBadge, { backgroundColor: diffBg }]}>
-                <Text style={{ fontSize: 9, fontWeight: '700', color: diffColor }}>{recipe.difficulty}</Text>
+                <Text style={{ fontSize: 9, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: diffColor }}>{recipe.difficulty}</Text>
               </View>
             </View>
           </View>
@@ -137,11 +137,11 @@ const card = StyleSheet.create({
   thumb: { width: 70, height: 70, borderRadius: RADIUS.lg, overflow: 'hidden', flexShrink: 0, backgroundColor: '#F4F1EA' },
   body: { flex: 1, gap: 4, paddingVertical: 12 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  title: { fontSize: 14, fontWeight: '700', flex: 1 },
+  title: { fontSize: 14, lineHeight: 21, fontFamily: 'Poppins_400Regular', fontWeight: '400', flex: 1 },
   desc: { fontSize: 11, color: '#8A8A84' },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
   metaPill: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  metaText: { fontSize: 11, fontWeight: '500' },
+  metaText: { fontSize: 11, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
   diffBadge: { borderRadius: RADIUS.full, paddingHorizontal: 7, paddingVertical: 2 },
   heartBtn: {
     padding: 12,
@@ -270,8 +270,8 @@ export default function RecipesScreen({ navigation }) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#F4F1EA' },
   header: { paddingHorizontal: SPACING.xl, paddingBottom: SPACING.xl, gap: SPACING.xs },
-  headerTitle: { fontSize: 24, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.5, marginBottom: 2 },
-  headerSub: { fontSize: 13, color: 'rgba(255,255,255,0.55)', marginBottom: SPACING.md },
+  headerTitle: { fontSize: 24, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF', letterSpacing: -0.5, marginBottom: 2 },
+  headerSub: { fontSize: 13, lineHeight: 20, color: 'rgba(255,255,255,0.55)', marginBottom: SPACING.md },
   searchWrap: {
     flexDirection: 'row', alignItems: 'center', gap: SPACING.sm,
     paddingHorizontal: SPACING.md, height: 46,
@@ -279,11 +279,11 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xl,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.95)',
   },
-  searchInput: { flex: 1, fontSize: 14, fontWeight: '500', color: '#1E1E1C', paddingVertical: 0 },
+  searchInput: { flex: 1, fontSize: 14, lineHeight: 21, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#1E1E1C', paddingVertical: 0 },
   filtersBar: { backgroundColor: 'rgba(255,255,255,0.7)', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'rgba(62,107,80,0.12)' },
   filtersRow: { paddingHorizontal: SPACING.xl, paddingVertical: SPACING.md, gap: SPACING.sm, flexDirection: 'row' },
   list: { padding: SPACING.xl, gap: SPACING.md, paddingBottom: 160 },
   empty: { alignItems: 'center', paddingTop: 80, gap: SPACING.sm },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#1E1E1C' },
-  emptySub: { fontSize: 14, color: '#8A8A84' },
+  emptyTitle: { fontSize: 18, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#1E1E1C' },
+  emptySub: { fontSize: 14, lineHeight: 21, color: '#8A8A84' },
 });

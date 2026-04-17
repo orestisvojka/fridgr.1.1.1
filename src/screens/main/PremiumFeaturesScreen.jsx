@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PrimaryButton from '../../components/PrimaryButton';
-import { colors, shadows, radius, spacing, fontSize, fontWeight } from '../../styles/theme';
+import { colors, shadows, radius, spacing, fontSize, fontFamily, fontWeight } from '../../styles/theme';
 
 const FEATURES = [
   { id: '1', title: 'Unlimited scans', desc: 'Scan as many times as you like, no limits.', icon: 'camera' },
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
   },
   scrollContent: {
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
   featureTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
     marginBottom: 4,
   },
@@ -125,14 +125,14 @@ const styles = StyleSheet.create({
   },
   planLabel: {
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#15803D',
     letterSpacing: 1,
     marginBottom: 8,
   },
   planPrice: {
     fontSize: 32,
-    fontWeight: '900',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#FFFFFF',
     marginBottom: 4,
   },
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   planSavings: {
     fontSize: 12,
     color: 'rgba(255,255,255,0.4)',
-    fontWeight: '600',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
   },
   footer: {
     padding: 24,
@@ -156,6 +156,6 @@ const styles = StyleSheet.create({
   restoreText: {
     fontSize: 13,
     color: '#A8A29E',
-    fontWeight: '600',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
   },
 });

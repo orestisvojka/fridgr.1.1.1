@@ -20,6 +20,7 @@ import PrimaryButton from '../components/PrimaryButton';
 import {
   colors,
   fontSize,
+  fontFamily,
   fontWeight,
   radius,
   spacing,
@@ -79,7 +80,7 @@ export default function ResultsScreen({ route, navigation }) {
       <View style={styles.matchBanner}>
         <Ionicons name="flash" size={16} color={colors.green} />
         <Text style={styles.matchText}>
-          <Text style={{ fontWeight: fontWeight.extrabold, color: colors.textPrimary }}>
+          <Text style={{ fontFamily: 'Poppins_400Regular', fontWeight: '400', color: colors.textPrimary }}>
             {recipes.length} recipe{recipes.length !== 1 ? 's' : ''}
           </Text>
           {' '}matched your fridge
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
   matchText: {
     fontSize: fontSize.sm + 1,
     color: colors.textSecondary,
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular',
   },
   pillRow: {
     flexDirection: 'row',
@@ -197,14 +198,14 @@ const styles = StyleSheet.create({
   },
   ingPillText: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.semibold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textSecondary,
     textTransform: 'capitalize',
   },
   sortNote: {
     fontSize: fontSize.xs,
     color: colors.textMuted,
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular',
     paddingLeft: spacing.xs,
   },
   emptyWrap: {
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: fontSize.xxl,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textPrimary,
     letterSpacing: -0.4,
   },

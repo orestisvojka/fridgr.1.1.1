@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PrimaryButton from '../../components/PrimaryButton';
-import { colors, shadows, radius, spacing, fontSize, fontWeight } from '../../styles/theme';
+import { colors, shadows, radius, spacing, fontSize, fontFamily, fontWeight } from '../../styles/theme';
 import { ROUTES } from '../../constants/routes';
 
 export default function ProteinResultScreen({ navigation }) {
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
   },
   content: {
@@ -85,13 +85,13 @@ const styles = StyleSheet.create({
   },
   bigNumber: {
     fontSize: 100,
-    fontWeight: '900',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#15803D',
     letterSpacing: -4,
   },
   unit: {
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
     marginTop: -10,
   },
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#78716C',
   },
   insightBox: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   },
   insightText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#15803D',
     textAlign: 'center',
     lineHeight: 22,

@@ -288,9 +288,9 @@ const s = StyleSheet.create({
   heroSection: { marginBottom: SPACING.xxl, gap: SPACING.sm },
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: SPACING.md },
   logoDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: G_TICK },
-  logoText: { fontSize: 12, fontWeight: '800', letterSpacing: 1.6, color: TEXT_SEC },
+  logoText: { fontSize: 12, fontFamily: 'Poppins_400Regular', fontWeight: '400', letterSpacing: 1.6, color: TEXT_SEC },
   heroTitle: {
-    fontSize: 36, fontWeight: '900', color: '#FFFFFF',
+    fontSize: 36, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF',
     letterSpacing: -1.2, lineHeight: 42,
   },
   heroSub: { fontSize: 15, color: TEXT_SEC, lineHeight: 22 },
@@ -306,15 +306,15 @@ const s = StyleSheet.create({
 
   // Fields — each is its own glass row, no card wrapper
   fieldWrap: { gap: 6, marginBottom: SPACING.lg },
-  label: { fontWeight: '600', fontSize: 12, color: TEXT_SEC, letterSpacing: 0.3, marginLeft: 4 },
+  label: { fontFamily: 'Poppins_400Regular', fontWeight: '400', fontSize: 12, color: TEXT_SEC, letterSpacing: 0.3, marginLeft: 4 },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  forgotLink: { fontWeight: '600', fontSize: 12, color: TEXT_PRI },
+  forgotLink: { fontFamily: 'Poppins_400Regular', fontWeight: '400', fontSize: 12, color: TEXT_PRI },
   inputRow: {
     flexDirection: 'row', alignItems: 'center', gap: SPACING.sm,
     paddingHorizontal: SPACING.lg, height: 52,
     borderRadius: RADIUS.xl,
   },
-  input: { flex: 1, fontSize: 14, fontWeight: '500', color: '#FFFFFF', paddingVertical: 0 },
+  input: { flex: 1, fontSize: 14, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF', paddingVertical: 0 },
   fieldErr: { fontSize: 11, color: '#FF8888', marginLeft: 4, marginTop: 2 },
 
   // CTA
@@ -324,7 +324,7 @@ const s = StyleSheet.create({
     shadowOpacity: 0.30, shadowRadius: 14, elevation: 8,
   },
   ctaGrad: { height: 54, alignItems: 'center', justifyContent: 'center', borderRadius: RADIUS.full },
-  ctaText: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.2 },
+  ctaText: { fontSize: 15, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF', letterSpacing: 0.2 },
 
   // Divider
   divider: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md, marginBottom: SPACING.lg },
@@ -338,10 +338,10 @@ const s = StyleSheet.create({
     height: 48, alignItems: 'center', justifyContent: 'center',
     borderRadius: RADIUS.xl,
   },
-  socialLabel: { fontSize: 13, fontWeight: '700', color: TEXT_PRI },
+  socialLabel: { fontSize: 13, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_PRI },
 
   // Footer
   footer: { alignItems: 'center' },
   footerText: { fontSize: 13, color: TEXT_SEC },
-  footerLink: { fontWeight: '700', color: TEXT_PRI },
+  footerLink: { fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_PRI },
 });

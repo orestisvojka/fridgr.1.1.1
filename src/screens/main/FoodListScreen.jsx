@@ -42,7 +42,7 @@ function createStyles(C) {
       ...SHADOWS.sm,
     },
     searchIcon: { marginRight: SPACING.md },
-    searchInput: { flex: 1, fontSize: 15, fontWeight: '400', textAlignVertical: 'center', paddingVertical: 0, color: C.text },
+    searchInput: { flex: 1, fontSize: 15, fontFamily: 'Poppins_400Regular', fontWeight: '400', textAlignVertical: 'center', paddingVertical: 0, color: C.text },
     filterButton: {
       width: 40,
       height: 40,
@@ -89,7 +89,7 @@ function createStyles(C) {
       borderWidth: 1,
       borderColor: C.border,
     },
-    mealPlaceholder: { fontSize: 32, color: C.primary },
+    mealPlaceholder: { fontSize: 32, lineHeight: 42, letterSpacing: -0.5, color: C.primary },
     mealMeta: {
       flexDirection: 'row',
       alignItems: 'center',

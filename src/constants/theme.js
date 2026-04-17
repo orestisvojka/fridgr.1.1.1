@@ -126,22 +126,22 @@ export const TOUCH = {
 
 // ─── Typography ───────────────────────────────────────────────────────────────
 export const FONT = {
-  display: { fontSize: 40, fontWeight: '800', letterSpacing: -1.5, lineHeight: 46 },
-  hero:    { fontSize: 32, fontWeight: '800', letterSpacing: -1,   lineHeight: 38 },
-  h1:      { fontSize: 28, fontWeight: '700', letterSpacing: -0.5, lineHeight: 34 },
-  h2:      { fontSize: 24, fontWeight: '700', letterSpacing: -0.3, lineHeight: 30 },
-  h3:      { fontSize: 20, fontWeight: '700', letterSpacing: -0.2, lineHeight: 26 },
-  h4:      { fontSize: 18, fontWeight: '600', letterSpacing: -0.1, lineHeight: 24 },
-  h5:      { fontSize: 16, fontWeight: '600', lineHeight: 22 },
-  body:            { fontSize: 15, fontWeight: '400', lineHeight: 23 },
-  bodyMedium:      { fontSize: 15, fontWeight: '500', lineHeight: 23 },
-  bodySemiBold:    { fontSize: 15, fontWeight: '600', lineHeight: 23 },
-  bodySmall:       { fontSize: 13, fontWeight: '400', lineHeight: 20 },
-  bodySmallMedium: { fontSize: 13, fontWeight: '500', lineHeight: 20 },
-  label:      { fontSize: 12, fontWeight: '600', letterSpacing: 0.3 },
-  labelSmall: { fontSize: 10, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase' },
-  caption:       { fontSize: 11, fontWeight: '400', lineHeight: 16 },
-  captionMedium: { fontSize: 11, fontWeight: '500', lineHeight: 16 },
+  display: { fontSize: 40, fontFamily: 'Poppins_400Regular', letterSpacing: -1.0, lineHeight: 48 },
+  hero:    { fontSize: 32, fontFamily: 'Poppins_400Regular', letterSpacing: -0.8,  lineHeight: 40 },
+  h1:      { fontSize: 28, fontFamily: 'Poppins_400Regular',      letterSpacing: -0.5, lineHeight: 36 },
+  h2:      { fontSize: 24, fontFamily: 'Poppins_400Regular',      letterSpacing: -0.3, lineHeight: 32 },
+  h3:      { fontSize: 20, fontFamily: 'Poppins_400Regular',      letterSpacing: -0.2, lineHeight: 28 },
+  h4:      { fontSize: 18, fontFamily: 'Poppins_400Regular',  letterSpacing: -0.1, lineHeight: 26 },
+  h5:      { fontSize: 16, fontFamily: 'Poppins_400Regular',  lineHeight: 24 },
+  body:            { fontSize: 15, fontFamily: 'Poppins_400Regular',  lineHeight: 24 },
+  bodyMedium:      { fontSize: 15, fontFamily: 'Poppins_400Regular',   lineHeight: 24 },
+  bodySemiBold:    { fontSize: 15, fontFamily: 'Poppins_400Regular', lineHeight: 24 },
+  bodySmall:       { fontSize: 13, fontFamily: 'Poppins_400Regular',  lineHeight: 21 },
+  bodySmallMedium: { fontSize: 13, fontFamily: 'Poppins_400Regular',   lineHeight: 21 },
+  label:      { fontSize: 12, fontFamily: 'Poppins_400Regular', letterSpacing: 0.3 },
+  labelSmall: { fontSize: 10, fontFamily: 'Poppins_400Regular',      letterSpacing: 1.0, textTransform: 'uppercase' },
+  caption:       { fontSize: 11, fontFamily: 'Poppins_400Regular', lineHeight: 18 },
+  captionMedium: { fontSize: 11, fontFamily: 'Poppins_400Regular',  lineHeight: 18 },
 };
 
 // ─── Shadows ──────────────────────────────────────────────────────────────────

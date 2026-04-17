@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import PrimaryButton from '../../components/PrimaryButton';
-import { colors, shadows, radius, spacing, fontSize, fontWeight } from '../../styles/theme';
+import { colors, shadows, radius, spacing, fontSize, fontFamily, fontWeight } from '../../styles/theme';
 import { ROUTES } from '../../constants/routes';
 
 const FOUND_ITEMS = [
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
   },
   scrollContent: {
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
   },
   footer: {

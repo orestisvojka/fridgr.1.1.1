@@ -395,8 +395,8 @@ const s = StyleSheet.create({
     gap: SPACING.sm, paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm, borderRadius: RADIUS.full,
   },
-  stepLabel: { ...FONT.label, color: TEXT_PRI, fontWeight: '800', minWidth: 30 },
-  stepOf: { fontWeight: '500', color: TEXT_SEC },
+  stepLabel: { ...FONT.label, color: TEXT_PRI, fontFamily: 'Poppins_400Regular', fontWeight: '400', minWidth: 30 },
+  stepOf: { fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_SEC },
   track: {
     flex: 1, height: 4, borderRadius: 2,
     backgroundColor: 'rgba(255,255,255,0.10)', overflow: 'hidden',
@@ -408,12 +408,12 @@ const s = StyleSheet.create({
 
   qCard: { padding: SPACING.xl, marginBottom: SPACING.sm },
   badge: {
-    ...FONT.labelSmall, fontSize: 10, fontWeight: '700',
+    ...FONT.labelSmall, fontSize: 10, fontFamily: 'Poppins_400Regular', fontWeight: '400',
     letterSpacing: 1.6, color: TEXT_SEC,
     textTransform: 'uppercase', marginBottom: SPACING.sm,
   },
   question: {
-    fontSize: 26, fontWeight: '800', color: '#FFFFFF',
+    fontSize: 26, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF',
     letterSpacing: -0.5, lineHeight: 32, marginBottom: SPACING.xs,
   },
   subtitle: { ...FONT.body, fontSize: 14, color: TEXT_SEC, lineHeight: 21 },
@@ -445,6 +445,6 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: RADIUS.full,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
   },
-  ctaText: { ...FONT.h5, color: '#FFFFFF', fontWeight: '700' },
-  ctaTextOff: { ...FONT.h5, color: 'rgba(255,255,255,0.30)', fontWeight: '600' },
+  ctaText: { ...FONT.h5, color: '#FFFFFF', fontFamily: 'Poppins_400Regular', fontWeight: '400' },
+  ctaTextOff: { ...FONT.h5, color: 'rgba(255,255,255,0.30)', fontFamily: 'Poppins_400Regular', fontWeight: '400' },
 });

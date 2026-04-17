@@ -9,7 +9,7 @@ import { Bell, Bookmark, Clock, Sparkles, ArrowRight, ChefHat } from 'lucide-rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 import { useRecipes } from '../../context/RecipesContext';
-
+import { useThemeColors } from '../../context/ThemeContext';
 import { SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { ROUTES } from '../../constants/routes';
 import { MOCK_RECIPES, TRENDING_IDS } from '../../data/mockData';
@@ -20,7 +20,6 @@ const { width } = Dimensions.get('window');
 const CARD_W = width * 0.58;
 const CARD_H = 255;
 
-// ─── Spring helpers ───────────────────────────────────────────────────────────
 function useSpring(target = 0.96) {
   const scale = useRef(new Animated.Value(1)).current;
   const pressIn = useCallback(() =>
@@ -32,38 +31,29 @@ function useSpring(target = 0.96) {
   return { scale, pressIn, pressOut };
 }
 
-// ─── InspirationCard ──────────────────────────────────────────────────────────
 function InspirationCard({ recipe, onPress, isSaved }) {
   const { scale, pressIn, pressOut } = useSpring(0.965);
   return (
-    <Pressable 
-      onPress={onPress} 
-      onPressIn={pressIn} 
-      onPressOut={pressOut}
-      android_ripple={RIPPLE_LIGHT}
-    >
+    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut}>
       <Animated.View style={[ic.card, { transform: [{ scale }] }]}>
         <RecipeImage recipe={recipe} height={CARD_H} borderRadius={RADIUS.xl} style={StyleSheet.absoluteFill} />
         <LinearGradient
           colors={['transparent', 'rgba(0,0,0,0.78)']}
-          start={{ x: 0, y: 0.35 }}
-          end={{ x: 0, y: 1 }}
+          start={{ x: 0, y: 0.35 }} end={{ x: 0, y: 1 }}
           style={StyleSheet.absoluteFill}
           pointerEvents="none"
         />
-        {/* Top badges */}
         <View style={ic.topRow}>
           <View style={ic.timeBadge}>
             <Clock size={10} color="#fff" strokeWidth={2} />
             <Text style={ic.timeText}>{recipe.prepTime}m</Text>
           </View>
           {isSaved && (
-            <View style={ic.heartBadge}>
-              <Bookmark size={12} color="#FFFFFF" fill="#FFFFFF" strokeWidth={0} />
+            <View style={ic.savedBadge}>
+              <Bookmark size={11} color="#FFFFFF" fill="#FFFFFF" strokeWidth={0} />
             </View>
           )}
         </View>
-        {/* Bottom */}
         <View style={ic.bottom}>
           <Text style={ic.title} numberOfLines={2}>{recipe.title}</Text>
           <View style={ic.authorRow}>
@@ -78,29 +68,31 @@ function InspirationCard({ recipe, onPress, isSaved }) {
 
 const ic = StyleSheet.create({
   card: {
-    width: CARD_W, height: CARD_H, borderRadius: RADIUS.xl, overflow: 'hidden', marginRight: SPACING.md,
-    // Glass effect on cards
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.15)',
+    width: CARD_W, height: CARD_H, borderRadius: RADIUS.xl,
+    overflow: 'hidden', marginRight: SPACING.md,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
     ...SHADOWS.md,
   },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 12 },
-  timeBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 9, paddingVertical: 4, borderRadius: RADIUS.full },
-  timeText: { fontSize: 11, fontWeight: '700', color: '#fff' },
-  heartBadge: { width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(62,107,80,0.92)', alignItems: 'center', justifyContent: 'center' },
+  timeBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 9, paddingVertical: 4,
+    borderRadius: RADIUS.full,
+  },
+  timeText:   { fontSize: 11, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#fff' },
+  savedBadge: {
+    width: 26, height: 26, borderRadius: 13,
+    backgroundColor: 'rgba(62,107,80,0.92)',
+    alignItems: 'center', justifyContent: 'center',
+  },
   bottom: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 14, gap: 6 },
-  title: { fontSize: 15, fontWeight: '700', color: '#FFFFFF', lineHeight: 20 },
+  title:  { fontSize: 15, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF', lineHeight: 20 },
   authorRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   authorDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#4ADE80' },
-  authorName: { fontSize: 12, color: 'rgba(255,255,255,0.75)', flex: 1 },
+  authorName: { fontSize: 12, color: 'rgba(255,255,255,0.72)', flex: 1 },
 });
 
-// ─── Touch Config ─────────────────────────────────────────────────────────────
-const RIPPLE_LIGHT = { color: 'rgba(255,255,255,0.2)', borderless: false };
-const RIPPLE_DARK  = { color: 'rgba(0,0,0,0.06)', borderless: false };
-
-// ─── CategoryItem ─────────────────────────────────────────────────────────────
-function CategoryItem({ item, onPress }) {
+function CategoryItem({ item, onPress, C }) {
   const { scale, pressIn, pressOut } = useSpring(0.9);
   return (
     <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut}>
@@ -108,56 +100,48 @@ function CategoryItem({ item, onPress }) {
         <View style={cat.circle}>
           <RecipeImage recipe={item.recipe} height={66} borderRadius={33} style={{ width: 66 }} />
         </View>
-        <Text style={cat.label} numberOfLines={1}>{item.label}</Text>
+        <Text style={[cat.label, { color: C.text }]} numberOfLines={1}>{item.label}</Text>
       </Animated.View>
     </Pressable>
   );
 }
 
 const cat = StyleSheet.create({
-  wrap: { alignItems: 'center', gap: 7, marginRight: 18, width: 72 },
+  wrap:   { alignItems: 'center', gap: 7, marginRight: 18, width: 72 },
   circle: {
     width: 66, height: 66, borderRadius: 33, overflow: 'hidden',
     borderWidth: 2, borderColor: 'rgba(62,107,80,0.18)',
-    // Glass ring effect
-    shadowColor: '#3E6B50',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowColor: '#3E6B50', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12, shadowRadius: 8, elevation: 3,
   },
-  label: { fontSize: 12, fontWeight: '600', color: '#1E1E1C', textAlign: 'center' },
+  label: { fontSize: 12, fontFamily: 'Poppins_400Regular', fontWeight: '400', textAlign: 'center' },
 });
 
-// ─── Section Header ───────────────────────────────────────────────────────────
-function SectionHeader({ title, onSeeAll }) {
+function SectionHeader({ title, onSeeAll, C }) {
   const { scale, pressIn, pressOut } = useSpring(0.92);
   return (
     <View style={sh.row}>
-      <Text style={sh.title}>{title}</Text>
-      <Pressable 
-        onPress={onSeeAll} 
-        onPressIn={pressIn} 
-        onPressOut={pressOut}
-        android_ripple={{ color: 'rgba(62,107,80,0.08)', borderless: true, radius: 40 }}
-      >
-        <Animated.Text style={[sh.seeAll, { transform: [{ scale: scale }] }]}>See all</Animated.Text>
+      <Text style={[sh.title, { color: C.text }]}>{title}</Text>
+      <Pressable onPress={onSeeAll} onPressIn={pressIn} onPressOut={pressOut}>
+        <Animated.Text style={[sh.seeAll, { transform: [{ scale }], color: C.primary }]}>
+          See all
+        </Animated.Text>
       </Pressable>
     </View>
   );
 }
 
 const sh = StyleSheet.create({
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: SPACING.xl, marginBottom: 14 },
-  title: { fontSize: 17, fontWeight: '800', color: '#1E1E1C', letterSpacing: -0.3 },
-  seeAll: { fontSize: 13, fontWeight: '700', color: '#3E6B50' },
+  row:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: SPACING.xl, marginBottom: 14 },
+  title:  { fontSize: 17, fontFamily: 'Poppins_400Regular', fontWeight: '400', letterSpacing: -0.3 },
+  seeAll: { fontSize: 13, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
 });
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
 export default function DashboardScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { savedRecipes, isSaved } = useRecipes();
+  const C = useThemeColors();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -166,9 +150,10 @@ export default function DashboardScreen({ navigation }) {
 
   const { scale: bellScale, pressIn: bellIn, pressOut: bellOut } = useSpring(0.88);
 
-  const trending = useMemo(() =>
-    TRENDING_IDS.map(id => MOCK_RECIPES.find(r => r.id === id)).filter(Boolean),
-  []);
+  const trending = useMemo(
+    () => TRENDING_IDS.map(id => MOCK_RECIPES.find(r => r.id === id)).filter(Boolean),
+    [],
+  );
 
   const dailyInspiration = useMemo(
     () => [...MOCK_RECIPES].sort(() => 0.5 - Math.random()).slice(0, 6),
@@ -198,7 +183,7 @@ export default function DashboardScreen({ navigation }) {
   const firstName = (user?.name ?? '').split(' ')[0] || 'Chef';
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { backgroundColor: C.background }]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 110 }}
@@ -208,23 +193,22 @@ export default function DashboardScreen({ navigation }) {
           <View style={[styles.header, { paddingTop: insets.top + 18 }]}>
             <View style={styles.headerLeft}>
               <Pressable onPress={() => navigation.navigate('ProfileTab')}>
-                <View style={styles.avatarWrap}>
+                <View style={[styles.avatarWrap, { backgroundColor: C.primary }]}>
                   <Text style={styles.avatarText}>{firstName[0].toUpperCase()}</Text>
                 </View>
               </Pressable>
               <View style={styles.greetingCol}>
-                <Text style={styles.greetingText}>{greeting},</Text>
-                <Text style={styles.nameText}>{firstName} 👋</Text>
+                <Text style={[styles.greetingText, { color: C.textSecondary }]}>{greeting},</Text>
+                <Text style={[styles.nameText, { color: C.text }]}>{firstName} 👋</Text>
               </View>
             </View>
-            <Pressable 
-              onPressIn={bellIn} 
-              onPressOut={bellOut} 
+            <Pressable
+              onPressIn={bellIn}
+              onPressOut={bellOut}
               onPress={() => Alert.alert('Notifications', 'No new notifications.')}
-              android_ripple={{ color: 'rgba(0,0,0,0.08)', borderless: true, radius: 24 }}
             >
-              <Animated.View style={[styles.bellBtn, { transform: [{ scale: bellScale }] }]}>
-                <Bell size={18} color="#1E1E1C" strokeWidth={ICON_STROKE} />
+              <Animated.View style={[styles.bellBtn, { backgroundColor: C.surface2, transform: [{ scale: bellScale }] }]}>
+                <Bell size={18} color={C.text} strokeWidth={ICON_STROKE} />
               </Animated.View>
             </Pressable>
           </View>
@@ -234,7 +218,6 @@ export default function DashboardScreen({ navigation }) {
             <Pressable
               style={({ pressed }) => [styles.cookCard, pressed && Platform.OS === 'ios' && { opacity: 0.92 }]}
               onPress={() => navigation.navigate('ScanTab')}
-              android_ripple={{ color: 'rgba(255,255,255,0.15)', borderless: false }}
             >
               <LinearGradient
                 colors={['#2C4D38', '#3E6B50', '#4A7C5E']}
@@ -244,7 +227,8 @@ export default function DashboardScreen({ navigation }) {
                 <LinearGradient
                   colors={['rgba(255,255,255,0.10)', 'transparent']}
                   start={{ x: 0, y: 0 }} end={{ x: 0, y: 0.6 }}
-                  style={StyleSheet.absoluteFill} pointerEvents="none"
+                  style={StyleSheet.absoluteFill}
+                  pointerEvents="none"
                 />
                 <View style={styles.cookLeft}>
                   <Text style={styles.cookQuestion}>What can I cook today?</Text>
@@ -262,10 +246,10 @@ export default function DashboardScreen({ navigation }) {
           </View>
         </Animated.View>
 
-        {/* ── Saved for later (Only if has data) ── */}
+        {/* ── Saved for later ── */}
         {savedRecipes.length > 0 && (
           <View style={styles.section}>
-            <SectionHeader title="My Collection" onSeeAll={() => navigation.navigate('SavedTab')} />
+            <SectionHeader title="My Collection" onSeeAll={() => navigation.navigate('SavedTab')} C={C} />
             <FlatList
               data={savedRecipes.slice(0, 5)}
               keyExtractor={r => `saved_${r.id}`}
@@ -274,8 +258,7 @@ export default function DashboardScreen({ navigation }) {
               contentContainerStyle={styles.hList}
               renderItem={({ item }) => (
                 <InspirationCard
-                  recipe={item}
-                  isSaved={true}
+                  recipe={item} isSaved
                   onPress={() => navigation.navigate(ROUTES.DETAIL, { recipe: item })}
                 />
               )}
@@ -285,13 +268,11 @@ export default function DashboardScreen({ navigation }) {
 
         {/* ── Daily Inspiration ── */}
         <View style={styles.section}>
-          <SectionHeader title="Daily Inspiration" onSeeAll={() => navigation.navigate('RecipesTab')} />
+          <SectionHeader title="Daily Inspiration" onSeeAll={() => navigation.navigate('RecipesTab')} C={C} />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hList}>
             {dailyInspiration.map(recipe => (
               <InspirationCard
-                key={recipe.id}
-                recipe={recipe}
-                isSaved={isSaved(recipe.id)}
+                key={recipe.id} recipe={recipe} isSaved={isSaved(recipe.id)}
                 onPress={() => navigation.navigate(ROUTES.DETAIL, { recipe })}
               />
             ))}
@@ -300,12 +281,11 @@ export default function DashboardScreen({ navigation }) {
 
         {/* ── Categories ── */}
         <View style={styles.section}>
-          <SectionHeader title="Categories" onSeeAll={() => navigation.navigate('RecipesTab')} />
+          <SectionHeader title="Categories" onSeeAll={() => navigation.navigate('RecipesTab')} C={C} />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hList}>
             {CATEGORIES.map(item => (
               <CategoryItem
-                key={item.label}
-                item={item}
+                key={item.label} item={item} C={C}
                 onPress={() => navigation.navigate('RecipesTab', { category: item.label })}
               />
             ))}
@@ -314,7 +294,7 @@ export default function DashboardScreen({ navigation }) {
 
         {/* ── Trending ── */}
         <View style={styles.section}>
-          <SectionHeader title="Trending recipes" onSeeAll={() => navigation.navigate('RecipesTab')} />
+          <SectionHeader title="Trending recipes" onSeeAll={() => navigation.navigate('RecipesTab')} C={C} />
           <FlatList
             data={trending}
             keyExtractor={r => r.id}
@@ -323,8 +303,7 @@ export default function DashboardScreen({ navigation }) {
             contentContainerStyle={styles.hList}
             renderItem={({ item }) => (
               <InspirationCard
-                recipe={item}
-                isSaved={isSaved(item.id)}
+                recipe={item} isSaved={isSaved(item.id)}
                 onPress={() => navigation.navigate(ROUTES.DETAIL, { recipe: item })}
               />
             )}
@@ -335,9 +314,11 @@ export default function DashboardScreen({ navigation }) {
         {savedRecipes.length < 3 && (
           <View style={styles.premiumWrap}>
             <Pressable
-              style={({ pressed }) => [styles.premiumCard, pressed && Platform.OS === 'ios' && { opacity: 0.92, transform: [{ scale: 0.985 }] }]}
+              style={({ pressed }) => [
+                styles.premiumCard,
+                pressed && Platform.OS === 'ios' && { opacity: 0.92, transform: [{ scale: 0.985 }] },
+              ]}
               onPress={() => navigation.navigate(ROUTES.SUBSCRIPTION)}
-              android_ripple={{ color: 'rgba(255,255,255,0.1)' }}
             >
               <LinearGradient
                 colors={['#0D3B26', '#1A5C3A', '#0D3B26']}
@@ -347,7 +328,8 @@ export default function DashboardScreen({ navigation }) {
                 <LinearGradient
                   colors={['rgba(255,255,255,0.10)', 'transparent']}
                   start={{ x: 0, y: 0 }} end={{ x: 0, y: 0.5 }}
-                  style={StyleSheet.absoluteFill} pointerEvents="none"
+                  style={StyleSheet.absoluteFill}
+                  pointerEvents="none"
                 />
                 <View style={styles.premiumChip}>
                   <Sparkles size={11} color="#FBD96A" strokeWidth={2} />
@@ -368,55 +350,43 @@ export default function DashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1, backgroundColor: '#FFFFFF',
-  },
+  root: { flex: 1 },
 
-  // Header
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: SPACING.xl, paddingBottom: SPACING.md,
   },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  avatarWrap: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#3E6B50', alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 17, fontWeight: '800', color: '#fff' },
-  greetingCol: { gap: 1 },
-  greetingText: { fontSize: 12, color: '#8A8A84', fontWeight: '500' },
-  nameText: { fontSize: 16, fontWeight: '800', color: '#1E1E1C' },
-  bellBtn: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#F4F1EA', alignItems: 'center', justifyContent: 'center' },
+  headerLeft:    { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  avatarWrap:    { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
+  avatarText:    { fontSize: 17, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#fff' },
+  greetingCol:   { gap: 1 },
+  greetingText:  { fontSize: 12, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
+  nameText:      { fontSize: 16, fontFamily: 'Poppins_400Regular', fontWeight: '400' },
+  bellBtn:       { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
 
-  // Cook card
-  cookCardWrap: { paddingHorizontal: SPACING.xl, marginTop: 4, marginBottom: 6 },
-  cookCard: {
-    borderRadius: RADIUS.xl, overflow: 'hidden',
-    // Glass border on the cook card
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
-    ...SHADOWS.green,
-  },
-  cookGradient: { flexDirection: 'row', alignItems: 'center', padding: SPACING.xl, overflow: 'hidden' },
-  cookLeft: { flex: 1, gap: 4 },
-  cookQuestion: { fontSize: 17, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.3 },
-  cookSub: { fontSize: 12, color: 'rgba(255,255,255,0.65)' },
-  cookCta: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 10 },
-  cookCtaText: { fontSize: 13, fontWeight: '700', color: '#D1FAE5' },
-  cookIconWrap: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center' },
+  cookCardWrap:  { paddingHorizontal: SPACING.xl, marginTop: 4, marginBottom: 6 },
+  cookCard:      { borderRadius: RADIUS.xl, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', ...SHADOWS.green },
+  cookGradient:  { flexDirection: 'row', alignItems: 'center', padding: SPACING.xl, overflow: 'hidden' },
+  cookLeft:      { flex: 1, gap: 4 },
+  cookQuestion:  { fontSize: 17, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF', letterSpacing: -0.3 },
+  cookSub:       { fontSize: 12, color: 'rgba(255,255,255,0.65)' },
+  cookCta:       { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 10 },
+  cookCtaText:   { fontSize: 13, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#D1FAE5' },
+  cookIconWrap:  { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center' },
 
-  // Sections
   section: { paddingTop: 26 },
-  hList: { paddingHorizontal: SPACING.xl, paddingBottom: 4 },
+  hList:   { paddingHorizontal: SPACING.xl, paddingBottom: 4 },
 
-  // Premium
-  premiumWrap: { paddingHorizontal: SPACING.xl, paddingTop: SPACING.xl },
-  premiumCard: { borderRadius: RADIUS.xl, overflow: 'hidden', ...SHADOWS.lg },
+  premiumWrap:     { paddingHorizontal: SPACING.xl, paddingTop: SPACING.xl },
+  premiumCard:     { borderRadius: RADIUS.xl, overflow: 'hidden', ...SHADOWS.lg },
   premiumGradient: { padding: SPACING.xl, gap: SPACING.md, overflow: 'hidden' },
   premiumChip: {
     flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start',
     backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: RADIUS.full,
     paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.20)',
   },
-  premiumChipText: { fontSize: 10, fontWeight: '800', letterSpacing: 1.1, color: '#D1FAE5' },
-  premiumTitle: { fontSize: 20, fontWeight: '800', color: '#FFFFFF', lineHeight: 26 },
-  premiumCta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
-  premiumCtaText: { fontSize: 14, fontWeight: '700', color: '#D1FAE5' },
+  premiumChipText: { fontSize: 10, fontFamily: 'Poppins_400Regular', fontWeight: '400', letterSpacing: 1.1, color: '#D1FAE5' },
+  premiumTitle:    { fontSize: 20, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF', lineHeight: 26 },
+  premiumCta:      { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+  premiumCtaText:  { fontSize: 14, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#D1FAE5' },
 });

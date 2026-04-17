@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   tabLabelActive: {
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
   },
   activeDot: {
     width: 4, height: 4, borderRadius: 2,

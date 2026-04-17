@@ -44,8 +44,8 @@ function createStyles(C) {
     },
     searchInput: {
       flex: 1,
-      fontSize: 15,
-      fontWeight: '400',
+      fontSize: 15, lineHeight: 23,
+      fontFamily: 'Poppins_400Regular', fontWeight: '400',
       textAlignVertical: 'center',
       paddingVertical: 0,
       color: C.text,

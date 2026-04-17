@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import PrimaryButton from '../../components/PrimaryButton';
-import { colors, spacing, radius, fontSize, fontWeight, shadows } from '../../styles/theme';
+import { colors, spacing, radius, fontSize, fontFamily, fontWeight, shadows } from '../../styles/theme';
 
 export default function HabitScreen({ navigation }) {
   return (
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
     textAlign: 'center',
     marginBottom: 60,
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#15803D',
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   item: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#44403C',
     lineHeight: 22,
   },

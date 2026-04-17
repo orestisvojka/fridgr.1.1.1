@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
     marginBottom: 40,
   },
@@ -96,8 +96,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   task: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 14, lineHeight: 21,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#78716C',
   },
 });

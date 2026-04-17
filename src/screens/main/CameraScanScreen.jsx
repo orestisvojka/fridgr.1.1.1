@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   },
   instruction: {
     fontSize: 18,
-    fontWeight: '600',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#FFFFFF',
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.75)',

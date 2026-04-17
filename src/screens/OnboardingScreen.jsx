@@ -15,7 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useOnboarding } from '../context/OnboardingContext';
-import { colors, fontSize, fontWeight, radius, spacing, shadows, icons } from '../styles/theme';
+import { colors, fontSize, fontFamily, fontWeight, radius, spacing, shadows, icons } from '../styles/theme';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
   skipText: {
     fontSize: fontSize.md,
     color: colors.textMuted,
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
   },
   content: {
     flex: 1,
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   },
   stepLabel: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.green,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize.xxxl,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.textPrimary,
     letterSpacing: -0.8,
   },
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   },
   optionLabel: {
     fontSize: fontSize.md + 1,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: colors.textPrimary,
   },
   optionLabelSelected: {
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   },
   ctaText: {
      fontSize: fontSize.lg,
-     fontWeight: fontWeight.extrabold,
+     fontFamily: 'Poppins_400Regular', fontWeight: '400',
      color: '#fff',
      letterSpacing: -0.2,
    },
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
   },
   ctaText: {
     fontSize: fontSize.lg,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#fff',
     letterSpacing: -0.2,
   },

@@ -248,7 +248,7 @@ const s = StyleSheet.create({
   },
   logoText: {
     fontSize: 13,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: TEXT_ON,
     letterSpacing: 1.4,
   },
@@ -258,7 +258,7 @@ const s = StyleSheet.create({
   heroCard: { padding: SPACING.xl },
   heroTitle: {
     fontSize: 28,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#FFFFFF',
     letterSpacing: -0.6,
     lineHeight: 34,
@@ -290,7 +290,7 @@ const s = StyleSheet.create({
   featureText: { flex: 1, gap: 1 },
   featureLabel: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: TEXT_ON,
   },
   featureSub: {
@@ -317,10 +317,10 @@ const s = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  primaryText: { fontSize: 15, fontWeight: '800', color: '#FFFFFF' },
+  primaryText: { fontSize: 15, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF' },
 
   secondaryText: { fontSize: 13, color: TEXT_MUT },
-  secondaryLink: { fontWeight: '800', color: TEXT_ON },
+  secondaryLink: { fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_ON },
 
   legal: {
     fontSize: 10,

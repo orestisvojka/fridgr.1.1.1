@@ -94,12 +94,28 @@ export const fontSize = {
   hero: 48,
 };
 
+export const fontFamily = {
+  thin: 'Poppins_400Regular',
+  extraLight: 'Poppins_400Regular',
+  light: 'Poppins_400Regular',
+  regular: 'Poppins_400Regular',
+  medium: 'Poppins_400Regular',
+  semibold: 'Poppins_400Regular',
+  bold: 'Poppins_400Regular',
+  extrabold: 'Poppins_400Regular',
+  black: 'Poppins_400Regular',
+};
+
 export const fontWeight = {
+  thin: '100',
+  extraLight: '200',
+  light: '300',
   regular: '400',
   medium: '500',
   semibold: '600',
   bold: '700',
   extrabold: '800',
+  black: '900',
 };
 
 export const shadows = {

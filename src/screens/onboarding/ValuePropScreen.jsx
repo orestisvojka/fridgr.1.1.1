@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import PrimaryButton from '../../components/PrimaryButton';
-import { colors, spacing, radius, fontSize, fontWeight } from '../../styles/theme';
+import { colors, spacing, radius, fontSize, fontFamily, fontWeight } from '../../styles/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 34,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
     textAlign: 'center',
     marginBottom: 40,
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   },
   bullet: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#44403C',
   },
   footer: {

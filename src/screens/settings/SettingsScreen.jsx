@@ -99,7 +99,7 @@ const r = StyleSheet.create({
     width: 40, height: 40, borderRadius: RADIUS.md,
     alignItems: 'center', justifyContent: 'center',
   },
-  label: { ...FONT.bodyMedium, color: TEXT_PRI, flex: 1, fontSize: 15 },
+  label: { ...FONT.bodyMedium, color: TEXT_PRI, flex: 1, fontSize: 15, lineHeight: 23 },
 });
 
 const DIVIDER = (
@@ -245,14 +245,14 @@ const s = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 16, fontWeight: '700', color: TEXT_PRI, letterSpacing: -0.2,
+    fontSize: 16, lineHeight: 24, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_PRI, letterSpacing: -0.2,
   },
 
   scroll: { paddingHorizontal: SPACING.xl, paddingTop: SPACING.sm, gap: SPACING.xl },
 
   section: { gap: SPACING.sm },
   sectionTitle: {
-    fontSize: 11, fontWeight: '700', color: TEXT_SEC,
+    fontSize: 11, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_SEC,
     textTransform: 'uppercase', letterSpacing: 1, marginLeft: 4,
   },
 
@@ -262,7 +262,7 @@ const s = StyleSheet.create({
     marginBottom: 4,
   },
   footerText: {
-    fontSize: 12, fontWeight: '800', color: TEXT_SEC, letterSpacing: 0.8,
+    fontSize: 12, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: TEXT_SEC, letterSpacing: 0.8,
   },
   footerSub: {
     fontSize: 11, color: 'rgba(255,255,255,0.25)',

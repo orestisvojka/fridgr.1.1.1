@@ -19,6 +19,7 @@ import PrimaryButton from '../components/PrimaryButton';
 import {
   colors,
   fontSize,
+  fontFamily,
   fontWeight,
   radius,
   spacing,
@@ -39,7 +40,7 @@ function SectionTitle({ icon, label, color }) {
 
 const sStyles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.md },
-  label: { fontSize: fontSize.lg - 1, fontWeight: fontWeight.extrabold, color: colors.textPrimary, letterSpacing: -0.2 },
+  label: { fontSize: fontSize.lg - 1, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: colors.textPrimary, letterSpacing: -0.2 },
 });
 
 export default function DetailScreen({ route, navigation }) {
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontSize: fontSize.xxl + 2,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: colors.textPrimary,
     letterSpacing: -0.6,
     textAlign: 'center',
@@ -265,7 +266,7 @@ const styles = StyleSheet.create({
   },
   pillText: {
     fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
   },
   body: {
     padding: spacing.xl,
@@ -300,7 +301,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     color: colors.textPrimary,
     textTransform: 'capitalize',
-    fontWeight: fontWeight.medium,
+    fontFamily: 'Poppins_400Regular',
   },
   ingredientMissing: {
     color: colors.textSecondary,
@@ -313,7 +314,7 @@ const styles = StyleSheet.create({
   },
   missingTagText: {
     fontSize: fontSize.xs - 1,
-    fontWeight: fontWeight.bold,
+    fontFamily: 'Poppins_400Regular',
     color: '#D97706',
     textTransform: 'uppercase',
     letterSpacing: 0.4,
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
   },
   missingTitle: {
     fontSize: fontSize.lg - 1,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: '#92400E',
   },
   missingSubtitle: {
@@ -361,7 +362,7 @@ const styles = StyleSheet.create({
   },
   stepNumberText: {
     fontSize: fontSize.sm,
-    fontWeight: fontWeight.extrabold,
+    fontFamily: 'Poppins_400Regular',
     color: '#fff',
   },
   stepText: {

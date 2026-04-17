@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, shadows, radius, spacing, fontSize, fontWeight } from '../../styles/theme';
+import { colors, shadows, radius, spacing, fontSize, fontFamily, fontWeight } from '../../styles/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
     lineHeight: 30,
   },
@@ -93,19 +93,19 @@ const styles = StyleSheet.create({
   },
   avgLabel: {
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#A8A29E',
     letterSpacing: 1,
     marginBottom: 4,
   },
   avgValue: {
     fontSize: 32,
-    fontWeight: '900',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
   },
   perDay: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#78716C',
   },
   bars: {
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   dayLabel: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#A8A29E',
   },
   statsGrid: {
@@ -149,13 +149,13 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#78716C',
     marginBottom: 8,
   },
   statValue: {
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
     marginBottom: 2,
   },
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   },
   tipTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#D97706',
     marginBottom: 8,
   },
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#92400E',
     textAlign: 'center',
-    fontWeight: '600',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     lineHeight: 20,
   },
 });

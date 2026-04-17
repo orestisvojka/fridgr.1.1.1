@@ -84,7 +84,7 @@ function PremiumSavedCard({ recipe, onPress, onRemove, C }) {
               <Text style={[styles.metaText, { color: '#FFE4E6' }]}>{recipe.calories} cal</Text>
             </View>
             <View style={[styles.metaPill, { backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-              <Text style={[styles.metaText, { color: '#FFFFFF', fontWeight: '700' }]}>{recipe.difficulty}</Text>
+              <Text style={[styles.metaText, { color: '#FFFFFF', fontFamily: 'Poppins_400Regular', fontWeight: '400' }]}>{recipe.difficulty}</Text>
             </View>
           </View>
         </View>
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.xl,
     marginBottom: SPACING.lg
   },
-  title: { fontSize: 26, fontWeight: '800', color: '#111827', letterSpacing: -0.5 },
+  title: { fontSize: 26, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#111827', letterSpacing: -0.5 },
   countBadge: { 
     flexDirection: 'row', 
     alignItems: 'center', 
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: RADIUS.full
   },
-  countText: { fontSize: 14, fontWeight: '700', color: '#3E6B50' },
+  countText: { fontSize: 14, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#3E6B50' },
 
   searchBar: {
     flexDirection: 'row',
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     borderColor: '#E5E7EB',
   },
   tabActive: { backgroundColor: '#3E6B50', borderColor: '#3E6B50' },
-  tabText: { fontSize: 13, fontWeight: '600', color: '#6B7280' },
+  tabText: { fontSize: 13, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#6B7280' },
   tabTextActive: { color: '#FFFFFF' },
 
   listContainer: { padding: SPACING.xl, gap: SPACING.lg },
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     paddingRight: SPACING.xxl
   },
-  cardTitle: { fontSize: 20, fontWeight: '800', color: '#FFFFFF', letterSpacing: -0.5, marginBottom: 8 },
+  cardTitle: { fontSize: 20, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF', letterSpacing: -0.5, marginBottom: 8 },
   cardMetaRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
   metaPill: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
@@ -320,16 +320,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8, paddingVertical: 4,
     borderRadius: RADIUS.md
   },
-  metaText: { fontSize: 12, fontWeight: '600', color: '#D1FAE5' },
+  metaText: { fontSize: 12, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#D1FAE5' },
 
   emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: SPACING.xxl },
   emptyIcon: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#EDF5F0', alignItems: 'center', justifyContent: 'center', marginBottom: SPACING.xl },
-  emptyTitle: { fontSize: 20, fontWeight: '800', color: '#111827', marginBottom: 8 },
+  emptyTitle: { fontSize: 20, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#111827', marginBottom: 8 },
   emptySub: { fontSize: 14, color: '#6B7280', textAlign: 'center', lineHeight: 22, marginBottom: SPACING.xl },
   exploreBtn: { backgroundColor: '#3E6B50', paddingHorizontal: 24, paddingVertical: 14, borderRadius: RADIUS.lg, ...SHADOWS.green },
-  exploreBtnText: { fontSize: 15, fontWeight: '700', color: '#FFFFFF' },
+  exploreBtnText: { fontSize: 15, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#FFFFFF' },
 
   noResults: { paddingVertical: 40, alignItems: 'center' },
-  noResultsTitle: { fontSize: 16, fontWeight: '700', color: '#111827' },
+  noResultsTitle: { fontSize: 16, fontFamily: 'Poppins_400Regular', fontWeight: '400', color: '#111827' },
   noResultsSub: { fontSize: 14, color: '#6B7280' }
 });

@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, shadows, radius, spacing, fontSize, fontWeight } from '../../styles/theme';
+import { colors, shadows, radius, spacing, fontSize, fontFamily, fontWeight } from '../../styles/theme';
 
 const EXPIRING_ITEMS = [
   { id: '1', name: 'Milk', left: '1 day left', color: '#FEF2F2', icon: 'beaker' },
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
   },
   scrollContent: {
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: '#92400E',
-    fontWeight: '600',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     lineHeight: 20,
   },
   list: {
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   itemName: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#1C1917',
   },
   leftText: {
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   recipeBtnText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: 'Poppins_400Regular', fontWeight: '400',
     color: '#15803D',
   },
 });
